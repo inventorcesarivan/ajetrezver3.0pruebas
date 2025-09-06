@@ -321,6 +321,31 @@ body[data-theme="madera"] .board-wrap{
   background-image: none !important;
   background-blend-mode: normal !important;
 }
+
+  /* === Ajetrez: Indicadores de restricción de desplazamiento === */
+  #shiftCtrl #btnShift[aria-disabled="true"]{
+    background:#b91c1c; color:#fff; cursor:not-allowed; opacity:0.98;
+  }
+  #shiftCtrl #btnShift[aria-disabled="true"]:hover{ background:#a31616; }
+  #shiftCtrl #btnShift[aria-disabled="true"]:active{ transform:none; }
+
+  /* Banner de alerta (temporal) */
+  #banner.danger{ background:#b91c1c; color:#fff; }
+
+
+  #shiftCtrl #btnShift.warn{ box-shadow: 0 0 0 2px rgba(185,28,28,.35) inset; }
+  @keyframes flashWarn { 0%{ transform:scale(1.00);} 50%{ transform:scale(0.98);} 100%{ transform:scale(1.00);} }
+  #shiftCtrl #btnShift.flash-warn{ animation: flashWarn .6s ease; }
+
+
+  /* Icono de advertencia en botón bloqueado */
+  #shiftCtrl #btnShift.warn::before,
+  #shiftCtrl #btnShift[aria-disabled="true"]::before{
+    content: "⚠ ";
+    font-weight: 900;
+    margin-right: 4px;
+  }
+
 </style>
 
 
@@ -361,22 +386,31 @@ body[data-theme="madera"] .board-wrap{
 
 
 <style id="overlayPatch">
-  /* Overlay solo visual: no bloquea controles, solo evita mover por lógica GAME_STARTED */
+  /* Overlay centrado sobre el tablero 8×8 (sin bloquear controles) */
   #boardWrap{ position: relative !important; }
   #startOverlay{
     position: absolute !important;  /* delimitar al tablero */
     inset: 0 !important;
     background: transparent !important;
     backdrop-filter: none !important;
-    pointer-events: none !important; /* NO intercepta clics */
-    display: flex !important;
+    pointer-events: none !important; /* NO intercepta clics fuera del botón */
+    /* el JS controla cuándo se muestra: no forzamos display aquí */
     align-items: center !important;
     justify-content: center !important;
+    z-index: 12 !important; /* por encima del tablero */
   }
-  #startOverlay .start-card{ background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+  #startOverlay .start-card{
+    background: transparent !important; 
+    box-shadow: none !important; 
+    padding: 0 !important;
+    pointer-events: none !important;  /* el card no capta clics */
+  }
   #startOverlay .start-card > div:first-child{ display: none !important; } /* oculta título */
-  #startOverlay .start-card .hint{ display: none !important; }
-  #startOverlay #btnStartGame{ display: none !important; } /* ocultamos el botón original del overlay */
+  #startOverlay .start-card .hint{ display: none !important; }             /* oculta hint  */
+  #startOverlay #btnStartGame{
+    display: inline-block !important;  /* aseguramos que sea visible */
+    pointer-events: auto !important;   /* clic sólo en el botón */
+  }
 </style>
 
 
@@ -420,6 +454,7 @@ body[data-theme="madera"] .board-wrap{
     transform: translateX(-50%) translateY(-2px);
   }
 </style>
+
 </head>
 <body>
   <div class="frame" id="fsRoot" data-fullscreen-root>
@@ -495,7 +530,7 @@ body[data-theme="madera"] .board-wrap{
           </div>
 
           <div id="tabsView">
-            <div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-info">Info de tus partidas</button><button class="tab-btn" data-tab="tab-mas">Más (próximamente)</button></div>
+            <div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-info">Info de tus partidas</button><button class="tab-btn" data-tab="tab-mas">Más (próximamente)</button></div>
             <div class="mp-content">
               <div class="tab" id="tab-personalizacion" style="display:none">
                 <h3>Personalización del juego</h3>
@@ -549,15 +584,63 @@ body[data-theme="madera"] .board-wrap{
                 <p class="hint-sm">Al elegir un modo, la partida se reinicia automáticamente.</p>
               </div>
 
-              <div class="tab" id="tab-guia" style="display:none">
-                <h3>Guía rápida</h3>
-                <ul>
-                  <li>Ajetrez respeta las reglas del ajedrez clásico para el movimiento de piezas.</li>
-                  <li>El tablero se compone de secciones horizontales que pueden <em>desplazarse</em> luego de una captura.</li>
-                  <li>Tras capturar, elegís entre <strong>Mantener</strong> o <strong>Desplazar</strong> la sección de esa fila.</li>
-                  <li>El desplazamiento alterna entre 0 y +8 columnas (izquierda/derecha) y se aplica a la fila completa.</li>
-                </ul>
+              
+<div class="tab" id="tab-guia" style="display:none">
+  <h3>Guía rápida</h3>
+  <ol>
+    <li><strong>Objetivo:</strong> dar jaque mate al rey rival.</li>
+    <li><strong>Mover piezas:</strong> igual que en ajedrez clásico (incluye enroque y captura al paso).</li>
+    <li><strong>Tras capturar:</strong> decidís en la <em>misma fila</em> entre <strong>Mantener</strong> o <strong>Desplazar</strong> la sección completa (offset 0 ↔ 8).</li>
+    <li><strong>Restricciones:</strong> no hay desplazamientos si estás en jaque o si el 8×8 quedaría sin piezas de algún bando.</li>
+    <li><strong>Zonas:</strong> se juega sólo en el 8×8 central; los laterales funcionan como reserva al desplazar.</li>
+    <li><strong>Partida:</strong> pulsá <em>Comenzar</em>, elegí modo; cambiar de modo reinicia la partida.</li>
+    <li><strong>Final:</strong> jaque mate o tablas (ahogado, 3 repeticiones, 50 jugadas, material insuficiente, acuerdo).</li>
+  </ol>
+</div>
+
+
+              
+              <div class="tab" id="tab-reglas" style="display:none">
+                <h3>Reglamento general de Ajetrez</h3>
+                <ol>
+                  <li><strong>Objeto y alcance.</strong> Ajetrez es una variante basada en ajedrez clásico. El objetivo es dar <em>jaque mate</em> al rey adversario.</li>
+                  <li><strong>Definiciones.</strong>
+                    <ol>
+                      <li><em>Recuadro central 8×8</em>: zona jugable donde se mueven y capturan piezas.</li>
+                      <li><em>Sección (de fila)</em>: conjunto de 16 casillas asociadas a una fila, con offset alternante 0 ↔ 8 (izquierda/derecha).</li>
+                      <li><em>Piezas disponibles</em>: piezas ubicadas dentro del recuadro central 8×8.</li>
+                    </ol>
+                  </li>
+                  <li><strong>Reglas clásicas vigentes.</strong> Todos los movimientos y reglas del ajedrez estándar aplican: movimiento de piezas, jaque, jaque mate, <em>enroque</em>, y <em>captura al paso</em>.</li>
+                  <li><strong>Configuración inicial.</strong> Las piezas inician como en ajedrez clásico dentro del recuadro central 8×8.</li>
+                  <li><strong>Secuencia de juego.</strong> En cada turno: <em>mover</em> una pieza propia legalmente; si hubo captura en la jugada, ejecutar la <em>Decisión de Sección</em> correspondiente (punto 6); finalizada esa decisión, el turno pasa al rival.</li>
+                  <li><strong>Decisión de Sección (tras captura).</strong>
+                    <ol>
+                      <li>Se limita <u>únicamente</u> a la fila donde ocurrió la captura.</li>
+                      <li>El jugador que capturó elige entre: <strong>Mantener</strong> o <strong>Desplazar</strong> la sección de esa fila.</li>
+                      <li>El <strong>desplazamiento</strong> alterna el offset de la fila entre 0 y 8 columnas y se aplica a la sección completa (16 casillas).</li>
+                      <li>Mientras exista una decisión pendiente, no se aceptan interacciones en otras filas.</li>
+                    </ol>
+                  </li>
+                  <li><strong>Límites al desplazamiento.</strong>
+                    <ol>
+                      <li><strong>Sin desplazamientos en jaque/mate:</strong> si el jugador activo está en <em>jaque</em> o la posición es <em>jaque mate</em>, no puede desplazar ninguna sección, en ninguna fila. Debe primero salir del jaque (o la partida termina si es mate).</li>
+                      <li><strong>Preservación del 8×8:</strong> está prohibido desplazar una sección si esa acción deja el recuadro central 8×8 sin piezas disponibles de alguno de los dos bandos.</li>
+                      <li>Una vez confirmada la decisión (mantener/desplazar), ésta se consume y el turno pasa al rival.</li>
+                    </ol>
+                  </li>
+                  <li><strong>Zona jugable.</strong> Toda jugada (movimiento y captura) ocurre dentro del recuadro central 8×8. Las zonas laterales no son jugables y actúan como reserva al desplazar secciones.</li>
+                  <li><strong>Inicio y modos de juego.</strong> Al abrir/cambiar de modo, el juego permanece bloqueado hasta pulsar <em>Comenzar partida</em>. Modos: 1v1 local, vs Bot, Bot vs Bot (demo) y Online (en preparación). Cambiar de modo reinicia la partida.</li>
+                  <li><strong>Finalización y tablas.</strong>
+                    <ol>
+                      <li><strong>Victoria:</strong> por jaque mate o abandono.</li>
+                      <li><strong>Tablas:</strong> ahogado; triple repetición (reclamable); regla de 50 jugadas sin peón ni captura (reclamable); material insuficiente; acuerdo mutuo.</li>
+                    </ol>
+                  </li>
+                </ol>
+                <p class="hint-sm">Versión del reglamento: 2025-09-06.</p>
               </div>
+
 
               <div class="tab" id="tab-info" style="display:none">
                 <h3>Info de tus partidas</h3>
@@ -613,8 +696,7 @@ body[data-theme="madera"] .board-wrap{
         </div>
         <button id="btnMegaMenu" class="btn" type="button" aria-expanded="false" aria-controls="megaPanel">Menú</button>
         <div id="rightControls" class="right-ctrls">
-                    <button id="btnStartGameBR" class="btn small" type="button" style="background:#e11;">Comenzar partida</button>
-          <button id="btnRestartBR" class="btn small" type="button">Reiniciar</button>
+<button id="btnRestartBR" class="btn small" type="button">Reiniciar</button>
           <button id="btnFSBR" class="btn small" type="button">Pantalla completa</button>
         </div>
       </div>
@@ -868,15 +950,27 @@ const btnBack = document.getElementById('btnBack');
     });
   }
   if(btnShift){
-    btnShift.addEventListener('click', function(){
+    
+btnShift.addEventListener('click', function(){
       if(lockedByBot()) return;
       if(!pendingShift) return;
       const row = pendingShift.row;
       const current = (Array.isArray(offsets) ? offsets[row] : 0) || 0;
       const target = current === 0 ? 8 : 0;
+      try{
+        if(window.AJ_RULES && window.AJ_RULES.legalShiftWithReason){
+          const chk = window.AJ_RULES.legalShiftWithReason(row, target, board, offsets);
+          if(!chk.ok){
+            if(window.showRuleAlert) window.showRuleAlert(chk.reason || 'No se puede desplazar por regla.');
+            try{ btnShift.classList.add('flash-warn'); setTimeout(()=>btnShift.classList.remove('flash-warn'), 600); }catch(_){}
+            return;
+          }
+        }
+      }catch(_){}
       pendingChoice = { row, action: 'shift', target };
       if(typeof showConfirm==='function') showConfirm('Desplazar sección');
     });
+
   }
   if(btnConfirm){
     btnConfirm.addEventListener('click', function(){
@@ -974,7 +1068,7 @@ function showChoose(row){
   if(window.AJ_RULES && window.AJ_RULES.legalShiftWithReason){
     const current = offsets[row]; const target = (current===0?8:0);
     const chk = window.AJ_RULES.legalShiftWithReason(row, target, board, offsets);
-    btnShift.setAttribute('aria-disabled', String(!chk.ok));
+    btnShift.setAttribute('aria-disabled', String(!chk.ok)); btnShift.classList.toggle('warn', !chk.ok);
     btnShift.title = chk.ok ? '' : (chk.reason || 'No se puede desplazar por regla.');
   }
 }
@@ -1186,7 +1280,17 @@ function playMove(from, to, special, capturesKing){
 }
 
 function doShiftTo(row, target){
-  try{ window.__SND__ && __SND__.play('shift'); }catch(_){}
+  
+  // Verificar reglas antes de desplazar (refuerzo de seguridad)
+  try{
+    if(window.AJ_RULES && !window.AJ_RULES.legalShift(row, target, board, offsets)){
+      if(window.showRuleAlert) window.showRuleAlert(window.AJ_RULES.lastError || 'No se puede desplazar por regla.');
+      pendingChoice = null;
+      showChoose(row);
+      return;
+    }
+  }catch(_){}
+try{ window.__SND__ && __SND__.play('shift'); }catch(_){}
 
   if(!pendingShift || row!==pendingShift.row) return;
   const newOff = offsets.slice();
@@ -1487,30 +1591,73 @@ async function botDecideShift(row){
 </script>
 
 <script>
+
 window.showRuleAlert = (msg)=>{
   try{
     const overlay = document.getElementById('overlay');
     const banner  = document.getElementById('banner');
     if(banner){ banner.textContent = msg || 'Acción bloqueada por regla.'; banner.classList.add('danger'); }
-    if(overlay){ overlay.style.display='block'; setTimeout(()=>{ overlay.style.display='none'; }, 2000); }
+    if(overlay){
+      overlay.style.display='flex';
+      setTimeout(()=>{
+        overlay.style.display='none';
+        try{ banner && banner.classList.remove('danger'); }catch(_){}
+      }, 3000);
+    }
   }catch(e){ console && console.warn(e); }
 };
+
 </script>
 
 <script>
 window.AJ_RULES = window.AJ_RULES || {};
+
+
 window.AJ_RULES.legalShiftWithReason = function(row, target, boardRef, offsRef){
-  let reason = ''; let ok = true;
+  let ok = true; let reason = '';
   try{
-    const who = (typeof pendingShift!=='undefined' && pendingShift && pendingShift.who) ? pendingShift.who : (typeof turn!=='undefined'? turn:'w');
+    // 0) Fin de partida
+    if(typeof gameOver!=='undefined' && gameOver){
+      return { ok:false, reason:'La partida ya terminó.' };
+    }
+
+    // 1) ¿Quién decide? (jugador que capturó / turno actual)
+    const chooser = (typeof pendingShift!=='undefined' && pendingShift && pendingShift.who)
+      ? pendingShift.who
+      : (typeof turn!=='undefined' ? turn : 'w');
+
+    // 2) No hay desplazamientos si el que decide está en jaque
     const current = buildVisible(boardRef, offsRef);
-    const rowHas = { w:false, b:false };
-    for(let c=0;c<8;c++){ const q = current[row][c]; if(q && q.type==='K') rowHas[q.color]=true; }
-    if(rowHas[who] && inCheck(current, who)){ ok=false; reason='No se puede desplazar: tu rey está en jaque.'; }
-  }catch(e){ ok=true; reason=''; }
-  window.AJ_RULES.lastError = ok ? '' : reason;
+    if(inCheck(current, chooser)){
+      return { ok:false, reason:'No se puede desplazar: tu rey está en jaque.' };
+    }
+
+    // 3) Simular desplazamiento y validar disponibilidad + reyes dentro del 8×8
+    const newOffs = Array.isArray(offsRef) ? offsRef.slice() : [];
+    newOffs[row] = target;
+    const vis2 = buildVisible(boardRef, newOffs);
+
+    let hasW=false, hasB=false, hasWK=false, hasBK=false;
+    for(let r=0;r<8;r++){
+      for(let c=0;c<8;c++){
+        const p = vis2[r][c];
+        if(!p) continue;
+        if(p.color==='w'){ hasW=true; if(p.type==='K') hasWK=true; }
+        else if(p.color==='b'){ hasB=true; if(p.type==='K') hasBK=true; }
+      }
+    }
+    if(!hasW || !hasB){
+      return { ok:false, reason:'Prohibido: el 8×8 no puede quedar sin piezas de un bando.' };
+    }
+    if(!hasWK || !hasBK){
+      return { ok:false, reason:'Prohibido: No se puede desplazar una sección, cuando eso implica, dejar sin rey en el área jugable a cualquiera de los jugadores' };
+    }
+
+  }catch(_){ ok = true; reason = ''; }
   return { ok, reason };
 };
+
+
 window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   const res = window.AJ_RULES.legalShiftWithReason(row, target, boardRef, offsRef);
   return !!res.ok;
@@ -1589,7 +1736,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
     }
   }
 
-  btnOpen.addEventListener('click', openPanel);
+  btnOpen.addEventListener('click', ()=>{ const isOpen = panel.style.display==='flex'; if(isOpen){ closePanel(); } else { openPanel(); } });
   btnClose.addEventListener('click', closePanel);
   backdrop.addEventListener('click', closePanel);
 
@@ -2147,6 +2294,64 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   applyTheme(saved || 'dia');
 })();
 </script>
+<script id="pulseStopper">
+(function(){
+  try{
+    var btn = document.getElementById('btnStartGame');
+    if(btn){
+      btn.addEventListener('click', function(){
+        btn.classList.add('no-pulse');
+      try{ btn.style.removeProperty('animation'); }catch(_){};}, { once: true });
+    }
+  }catch(_){}
+})();
+</script>
+<style id="pulsePatch">
+/* Heartbeat animation (final precedence) */
+#startOverlay #btnStartGame{
+  animation: heartbeat 1.6s ease-in-out infinite !important;
+  transform-origin: center;
+  will-change: transform, box-shadow;
+}
+#startOverlay #btnStartGame.no-pulse{ animation: none !important; }
+
+@keyframes heartbeat{
+  0%   { transform: scale(1);   box-shadow: 0 0 0 0 rgba(225,17,17,0.45); }
+  25%  { transform: scale(1.05); box-shadow: 0 0 0 4px rgba(225,17,17,0.25); }
+  40%  { transform: scale(1.1);  box-shadow: 0 0 0 8px rgba(225,17,17,0.15); }
+  60%  { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(225,17,17,0.25); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(225,17,17,0.0); }
+}
+
+</style>
+<style id="sizePatch">
+/* +10% size for start button */
+#startOverlay #btnStartGame{
+  font-size: 110% !important;
+  padding: 11px 20px !important; /* from ~10px 18px */
+}
+</style>
+<style id="mobileFit">
+/* --- Mobile responsive fit: mantiene posiciones respetando contenedores --- */
+@media (max-width: 900px){
+  :root{
+    /* Escala el tablero para que las 24 columnas entren en pantalla sin overflow,
+       respetando el tamaño original como tope superior. */
+    --square: clamp(12px, calc((100vw - 24px) / 24), 56px);
+  }
+  html, body{ max-width:100vw; overflow-x:hidden; }
+  #boardWrap{ max-width:100vw; margin: 0 auto; }
+  /* Botón de inicio: tamaño y legibilidad responsiva */
+  #startOverlay #btnStartGame{
+    font-size: clamp(14px, 3.6vw, 18px) !important;
+    padding: clamp(9px, 1.8vw, 12px) clamp(14px, 3.6vw, 22px) !important;
+  }
+  /* Controles derechos: su separación ya depende de --square; aquí aseguramos que no se colapse */
+  .right-ctrls{ gap: max(8px, calc(var(--square) * 0.4)); }
+  /* Evita que sombras externas generen scroll lateral */
+  #board{ overflow: hidden; }
+}
+</style>
 </body>
 </html>
 
