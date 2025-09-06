@@ -556,6 +556,47 @@ body, html{overflow:visible!important;}
     margin-top: 10px !important;
   }
 </style>
+
+<!-- AJETREZ: estilo uniforme para botón de Sonido -->
+<style>
+  #audioGroup{
+    border: 2px solid #fff !important;
+    border-radius: 999px !important;
+    padding: 4px 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #000; /* igual que los botones negros */
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    cursor: pointer;
+  }
+  #audioGroup .label{ margin-right:4px; }
+  #audioGroup select{
+    background: #fff !important;
+    color: #000 !important;
+    border-radius: 6px !important;
+    border: none !important;
+    padding: 2px 6px !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+  }
+</style>
+
+<!-- AJETREZ: contorno blanco también para botón superior izquierdo "Modo de juego" -->
+<style>
+  /* Asegurar que los tabs del panel tengan borde blanco como los demás botones */
+  #menu-panel .tabs .btn,
+  #menu-panel .tabs .btn.active,
+  #menu-panel .tab,
+  #menu-panel .tab.active {
+    border: 2px solid #fff !important;
+    border-radius: 999px !important;
+  }
+</style>
 </head>
 <body>
   <div class="frame" id="fsRoot" data-fullscreen-root>
@@ -4212,6 +4253,48 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
     const panel = findModosScope();
     const obs = new MutationObserver(()=> relocate());
     obs.observe(panel, {childList:true, subtree:true});
+  }catch(_){}
+})();
+</script>
+
+<!-- AJETREZ: Mover control de Sonido junto a Reiniciar (margen ~3mm) -->
+<style>
+  /* Espaciado de ~3mm entre Sonido y Reiniciar */
+  #rightControls #audioGroup{ margin-right: 3mm; }
+  /* Asegurar alineación horizontal compacta */
+  #rightControls{ display: inline-flex; align-items: center; gap: 0.4rem; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_MOVE_SOUND_RIGHT__) return;
+  window.__AJ_MOVE_SOUND_RIGHT__ = true;
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+  function move(){
+    const audio = qs('#audioGroup');
+    const right = qs('#rightControls');
+    const restart = qs('#btnRestartBR');
+    if(audio && right && restart && audio.parentNode !== right){
+      right.insertBefore(audio, restart); // Sonido queda a la izquierda de Reiniciar
+      // Ajustar estilos del grupo de audio para verse como botón alineado
+      audio.style.position = 'static';
+      audio.style.left = 'auto';
+      audio.style.top = 'auto';
+      audio.style.whiteSpace = 'nowrap';
+      audio.style.display = 'inline-flex';
+      audio.style.alignItems = 'center';
+      audio.style.justifyContent = 'center';
+    }
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', move, {once:true});
+  }else{
+    move();
+  }
+  // Reaplicar si el bottom bar re-renderiza
+  try{
+    const bar = qs('#bottomBar') || document.body;
+    const obs = new MutationObserver(move);
+    obs.observe(bar, {childList:true, subtree:true});
   }catch(_){}
 })();
 </script>
