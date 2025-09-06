@@ -2531,51 +2531,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
 
 
 
-<script id="soundSelectScript">
-(function(){
-  try{
-    const KEY = 'ajetrez.muted';
-    const sel = document.getElementById('selSound');
-    window.__MUTED__ = (localStorage.getItem(KEY) === '1');
 
-    function setAllMuted(m){
-      try{
-        if (window.AUDIO){
-          Object.keys(window.AUDIO).forEach(k => {
-            const a = window.AUDIO[k];
-            if(a){ a.muted = !!m; }
-          });
-        }
-      }catch(_){}
-    }
-    function applyUI(){
-      if(!sel) return;
-      sel.value = window.__MUTED__ ? 'off' : 'on';
-      sel.title = window.__MUTED__ ? 'Sonido: Off' : 'Sonido: On';
-    }
-    function setMuted(m){
-      window.__MUTED__ = !!m;
-      localStorage.setItem(KEY, window.__MUTED__ ? '1' : '0');
-      setAllMuted(window.__MUTED__);
-      applyUI();
-    }
-    if (sel){
-      sel.addEventListener('change', function(){
-        setMuted(sel.value === 'off');
-      });
-    }
-    const origPlaySnd = window.playSnd;
-    if (typeof origPlaySnd === 'function'){
-      window.playSnd = function(key){
-        if(window.__MUTED__) return;
-        try{ return origPlaySnd.call(this, key); }catch(_){}
-      };
-    }
-    setAllMuted(window.__MUTED__);
-    applyUI();
-  }catch(e){ /* noop */ }
-})();
-</script>
 <style id="bottomBarGridFix">
 /* Reorganiza la barra inferior para que no se descompagine al añadir el control de Sonido */
 #bottomBar{
@@ -2626,6 +2582,79 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   font-weight: 700 !important;
 }
 </style>
+<script id="soundSelectFix">
+(function(){
+  try{
+    const KEY = 'ajetrez.muted';
+    // Ensure global flag exists and UI reflects it
+    window.__MUTED__ = (localStorage.getItem(KEY) === '1');
+    const sel = document.getElementById('selSound');
+    function applyUI(){
+      if(sel){ sel.value = window.__MUTED__ ? 'off' : 'on'; }
+    }
+    function setAllMuted(m){
+      try{
+        if (window.AUDIO){
+          for (const k in window.AUDIO){
+            const a = window.AUDIO[k];
+            if (a){
+              a.muted = !!m;
+              a.volume = m ? 0 : (a.volume || 0.85);
+            }
+          }
+        }
+      }catch(_){}
+    }
+    function setMuted(m){
+      window.__MUTED__ = !!m;
+      localStorage.setItem(KEY, window.__MUTED__ ? '1' : '0');
+      setAllMuted(window.__MUTED__);
+      applyUI();
+    }
+    // UI binding (change + input for seguro)
+    if(sel){
+      const handler = () => setMuted(sel.value === 'off');
+      sel.addEventListener('change', handler);
+      sel.addEventListener('input', handler);
+    }
+    // Wrap playSnd
+    if (typeof window.playSnd === 'function'){
+      const origPlaySnd = window.playSnd;
+      window.playSnd = function(key){
+        if (window.__MUTED__) return;
+        return origPlaySnd.apply(this, arguments);
+      };
+    }
+    // Wrap make() so que nuevos audios respeten mute
+    if (typeof window.make === 'function'){
+      const origMake = window.make;
+      window.make = function(){
+        const a = origMake.apply(this, arguments);
+        try{
+          a.muted = !!window.__MUTED__;
+          if (window.__MUTED__) a.volume = 0;
+        }catch(_){}
+        return a;
+      };
+    }
+    // As a final safety net: patch HTMLMediaElement.play to no-op when muted
+    const H = (window.HTMLMediaElement || {}).prototype;
+    if (H && !H.__ajetrez_patched_play){
+      const origPlay = H.play;
+      if (typeof origPlay === 'function'){
+        H.play = function(){
+          if (window.__MUTED__) { try{ this.pause(); }catch(_){ } return Promise.resolve(); }
+          return origPlay.apply(this, arguments);
+        };
+        H.__ajetrez_patched_play = true;
+      }
+    }
+    // initialize state
+    setAllMuted(window.__MUTED__);
+    applyUI();
+  }catch(e){ /* noop */ }
+})();
+</script>
 </body>
 </html>
 
