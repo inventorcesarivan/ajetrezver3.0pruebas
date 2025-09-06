@@ -455,6 +455,107 @@ body[data-theme="madera"] .board-wrap{
   }
 </style>
 
+
+<style id="rpFloatStyles">
+#rpBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:999998;display:none;}
+#replayPanel.rp-float{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:min(760px,94vw);max-height:78vh;overflow:auto;background:#fff;
+  z-index:999999;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.35);padding:14px;}
+/* compact list spacing */
+#replayPanel .row{gap:10px;}
+#rpList li{margin:2px 0;}
+</style>
+
+
+<style id="rpEnforcerStyles">
+/* Enforce top-most modal */
+#rpBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.40)!important;z-index:2147483000!important;display:none;}
+#replayPanel.rp-float{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;
+  width:min(820px,96vw)!important;max-height:80vh!important;overflow:auto!important;background:#fff!important;
+  z-index:2147483001!important;border-radius:14px!important;box-shadow:0 18px 60px rgba(0,0,0,.45)!important;
+  padding:16px!important; display:none;}
+#replayPanel.rp-force-show{display:block!important; visibility:visible!important; opacity:1!important;}
+/* Prevent parent overflow clipping */
+body, html{overflow:visible!important;}
+</style>
+
+
+<style id="rpTopStyles">
+/* Panel flotante independiente arriba del panel del juego (sobre todo), con separación ~3mm */
+#replayPanel.rp-top {
+  position: fixed !important;
+  top: 3mm !important;           /* separación solicitada */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(920px, 96vw) !important;
+  max-height: calc(100vh - 6mm) !important;  /* deja 3mm arriba y 3mm abajo */
+  overflow: auto !important;
+  background: #fff !important;
+  z-index: 2147483600 !important; /* por encima de cualquier panel */
+  border-radius: 14px !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.45) !important;
+  padding: 16px !important;
+  display: none;
+}
+/* Eliminamos el backdrop para no tapar el panel/menú */
+#rpBackdrop { display: none !important; }
+</style>
+
+
+<style id="infoSplitStyles">
+#infoSplit { display:flex; gap:14px; align-items:flex-start; }
+#infoLeft  { flex: 1 1 50%; min-width: 420px; }
+#infoRight { flex: 1 1 50%; max-width: 520px; min-width: 320px; }
+#infoRight .card { border:1px solid #eee; border-radius:12px; padding:10px; background:#fff; }
+#infoRight .muted { font-size: 13px; color:#666; }
+#infoRight.sticky { position: sticky; top: 12px; }
+@media (max-width: 1024px){
+  #infoSplit { flex-direction: column; }
+  #infoRight { max-width: none; width: 100%; position: static; }
+}
+</style>
+
+
+<style id="ghostBoardStyles">
+#ghostWrap{ display:flex; flex-direction:column; gap:8px; align-items:center; margin-bottom:8px; }
+#ghostTitle{ font-weight:700; font-size:14px; }
+#ghostCanvas{ width: 260px; height:260px; max-width:100%; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+#ghostLegend{ font-size:12px; color:#666; }
+.controls-row{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.controls-row .btn.small{ order: 2; }      /* play/pause/prev/next */
+#rpReset{ order: 1; }                      /* reset goes first (arriba) */
+</style>
+
+
+<!-- AJETREZ: centrar bloque de dificultad en Modos de juego -->
+<style>
+  /* Centra el bloque completo debajo de la fila de botones */
+  .aj-bot-diff-modes{
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    /* apariencia */
+    display: inline-block;
+    margin-top: 14px;
+    min-width: 320px;
+  }
+  /* Opcional: alinear elementos internos en columna y acotar ancho del select */
+  .aj-bot-diff-modes label{ display:block; margin-bottom:6px; }
+  .aj-bot-diff-modes select{ min-width: 240px; }
+  .aj-bot-diff-modes .hint-sm{ max-width: 560px; }
+</style>
+
+<!-- AJETREZ: Reubicar bloque de dificultad debajo del texto de reinicio (solo Modos de juego) -->
+<style>
+  /* Anula el centrado previo para que el bloque fluya justo bajo el texto */
+  #menu-panel .aj-bot-diff-modes{
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    display: block !important;
+    margin-top: 10px !important;
+  }
+</style>
 </head>
 <body>
   <div class="frame" id="fsRoot" data-fullscreen-root>
@@ -636,7 +737,7 @@ body[data-theme="madera"] .board-wrap{
                 <p class="hint-sm">Versión del reglamento: 2025-09-06.</p>
 </div>
               <div class="tab" id="tab-info" style="display:none">
-                <h3>Info de tus partidas</h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3mm;"><h3 style="margin:0;">Info de tus partidas</h3><button class="btn small danger" id="btnClearLogs" style="margin-left:12px;">Borrar historial</button></div>
                 <div class="hint-sm">Se guarda <strong>localmente</strong> en este navegador.
 </div>
                 <div class="row">
@@ -661,7 +762,12 @@ body[data-theme="madera"] .board-wrap{
 </div>
 </div>
 </div>
-                <div style="margin-top:10px;max-height:240px;overflow:auto;border:1px solid #eee;border-radius:10px;">
+                
+
+
+<div id="infoSplit">
+  <div id="infoLeft">
+    <div style="margin-top:10px;max-height:120px;overflow:auto;border:1px solid #eee;border-radius:10px;">
                   <table class="simple" id="logsTable">
                     <thead>
                       <tr><th>Fecha</th><th>Modo</th><th>Resultado</th><th>Ganador</th><th>Movs</th></tr>
@@ -669,8 +775,26 @@ body[data-theme="madera"] .board-wrap{
                     <tbody></tbody>
                   </table>
 </div>
-                <div class="row" style="margin-top:8px;">
-                  <button class="btn secondary" id="btnClearLogs" type="button" title="Borra todo el historial guardado localmente.">Borrar historial</button>
+                
+  
+    <div class="card" style="margin-top:10px;">
+      <h4 style="margin:6px 0 10px 0;">Reproductor de partidas</h4>
+      <div class="muted" id="rpEmptyHint">Elegí una partida (clic en la Fecha) para ver el historial paso a paso.</div>
+      <!-- Replay panel will be injected here -->
+      <div id="replayDock"></div>
+    </div>
+</div>
+  <div id="infoRight" class="sticky">
+    <div class="card">
+      <div id="ghostWrap">
+        <div id="ghostTitle">Tablero (vista previa)</div>
+        <canvas id="ghostCanvas" width="520" height="520"></canvas>
+        <div id="ghostLegend">Señala la jugada actual; el tablero real puede estar cubierto por el menú.</div>
+      </div></div>
+  </div>
+</div>
+<div class="row" style="margin-top:8px;">
+                  
 </div>
 </div>
               <div class="tab" id="tab-mas" style="display:none">
@@ -1857,7 +1981,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
         try{ const d=new Date(s); return d.toLocaleString(); }catch(_){ return s; }
       };
       const winner = log.winner==='w' ? 'Blancas' : (log.winner==='b' ? 'Negras' : (log.winner==='draw' ? '-' : (log.winner||'-')));
-      tr.innerHTML = `<td>${fmt(log.startedAt)}</td><td>${log.mode||'-'}</td><td>${log.result}</td><td>${winner}</td><td>${log.moves||0}</td>`;
+      tr.innerHTML = `<td><a href="#" class="log-open" data-id="${log.id}">${fmt(log.startedAt)}</a></td><td>${log.mode||'-'}</td><td>${log.result}</td><td>${winner}</td><td>${log.moves||0}</td>`;
       t.appendChild(tr);
     });
     document.getElementById('statTotal').textContent = logs.length;
@@ -2653,6 +2777,1442 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
     setAllMuted(window.__MUTED__);
     applyUI();
   }catch(e){ /* noop */ }
+})();
+</script>
+
+<script>
+(function(){
+  // ======= Util seguro =======
+  function deepClone(o){ try { return JSON.parse(JSON.stringify(o)); } catch(_){ return null; } }
+  function safeGet(el){ return document.getElementById(el); }
+
+  // ======= Logger v2 =======
+  const LS_KEY = 'aj_logs_v2';
+  const LS_KEY_V1 = 'aj_logs_v1';
+  function getLogs(){
+    try{
+      const v2 = JSON.parse(localStorage.getItem(LS_KEY)||'[]')||[];
+      if(v2.length) return v2;
+      const v1 = JSON.parse(localStorage.getItem(LS_KEY_V1)||'[]')||[];
+      if(!v1.length) return [];
+      const migrated = v1.map(x=>({...x, history:[], meta:{migrated:true}}));
+      localStorage.setItem(LS_KEY, JSON.stringify(migrated));
+      return migrated;
+    }catch(_){ return []; }
+  }
+  function saveLogs(a){ try{ localStorage.setItem(LS_KEY, JSON.stringify(a)); }catch(_){} }
+
+  let CURRENT_GAME_ID = null;
+  function snapshotState(){
+    return {
+      board: (typeof window.board!=='undefined') ? deepClone(window.board) : null,
+      offsets: (typeof window.offsets!=='undefined' && window.offsets) ? window.offsets.slice() : null,
+      turn: (typeof window.turn!=='undefined') ? window.turn : null,
+      epTarget: (typeof window.epTarget!=='undefined' && window.epTarget) ? {r:window.epTarget.r,c:window.epTarget.c} : null,
+      pendingShift: (typeof window.pendingShift!=='undefined' && window.pendingShift) ? {row:window.pendingShift.row, who:window.pendingShift.who} : null,
+      pendingChoice: (typeof window.pendingChoice!=='undefined') ? window.pendingChoice : null
+    };
+  }
+  function startNewGameLogIfNeeded(){
+    if(CURRENT_GAME_ID) return;
+    const id = Date.now().toString();
+    CURRENT_GAME_ID = id;
+    const logs = getLogs();
+    logs.push({
+      id, startedAt: new Date().toISOString(),
+      mode: (window.GAME_MODE || 'pvp-local'),
+      result: 'en curso', winner: null, moves: 0,
+      history: [{ t:'start', idx:0, when: Date.now(), state: snapshotState(), label:'Inicio' }],
+      meta:{}
+    });
+    saveLogs(logs);
+  }
+  function incrementMove(){ const logs=getLogs(); const i=logs.findIndex(x=>x.id===CURRENT_GAME_ID); if(i>=0){ logs[i].moves=(logs[i].moves||0)+1; saveLogs(logs);} }
+  function logMoveEvent(payload){
+    const logs=getLogs(); const i=logs.findIndex(x=>x.id===CURRENT_GAME_ID); if(i<0) return;
+    const h=logs[i].history||(logs[i].history=[]); const stepIdx=h.length;
+    h.push({ t:'move', idx:stepIdx, when:Date.now(), ...payload, state:snapshotState() });
+    saveLogs(logs);
+  }
+  function logShiftEvent(payload){
+    const logs=getLogs(); const i=logs.findIndex(x=>x.id===CURRENT_GAME_ID); if(i<0) return;
+    const h=logs[i].history||(logs[i].history=[]); const stepIdx=h.length;
+    h.push({ t:'shift', idx:stepIdx, when:Date.now(), ...payload, state:snapshotState() });
+    saveLogs(logs);
+  }
+  function finalizeGameLog(result, winner){
+    const logs=getLogs(); const i=logs.findIndex(x=>x.id===CURRENT_GAME_ID);
+    if(i>=0){
+      logs[i].result = result || 'finalizado';
+      logs[i].winner = winner || null;
+      logs[i].finishedAt = new Date().toISOString();
+      const h=logs[i].history||(logs[i].history=[]); const stepIdx=h.length;
+      h.push({ t:'end', idx:stepIdx, when:Date.now(), result:logs[i].result, winner:logs[i].winner, state:snapshotState(), label:'Fin' });
+      saveLogs(logs);
+    }
+  }
+  window.finalizeGameLog = finalizeGameLog;
+
+  // ======= Notación algebraica SAN (simple, con fallback) =======
+  function coordToAlgebra(c){ return String.fromCharCode(97+(c.c)) + String(8-c.r); }
+  function pieceAt(board, r, c){ try{ return board[r][c]; }catch(_){ return null; } }
+  function letterFor(piece){
+    if(!piece) return '';
+    const p = (typeof piece === 'string') ? piece : piece.type || piece.p || '';
+    const m = p.toLowerCase();
+    if(m==='p') return ''; // peón sin letra en SAN
+    if(m==='n') return 'N';
+    if(m==='b') return 'B';
+    if(m==='r') return 'R';
+    if(m==='q') return 'Q';
+    if(m==='k') return 'K';
+    return '';
+  }
+  function computeSAN(prevBoard, from, to, special, captured){
+    try{
+      // Enroques
+      if(special && special.castle==='K') return 'O-O';
+      if(special && special.castle==='Q') return 'O-O-O';
+      const piece = pieceAt(prevBoard, from.r, from.c);
+      const letter = letterFor(piece);
+      const takes = captured ? 'x' : '';
+      const toSq = coordToAlgebra(to);
+
+      // Para peón que captura, prefijo con archivo de origen (e.g. exd5)
+      if(letter===''){
+        const file = String.fromCharCode(97 + from.c);
+        return captured ? (file + 'x' + toSq) : toSq;
+      }
+      // Desambiguación básica omitida (se puede ampliar), jaque/mate se puede añadir luego
+      return letter + takes + toSq;
+    }catch(_){
+      // Fallback: from->to
+      const a = coordToAlgebra(from), b = coordToAlgebra(to);
+      return a + '–' + b;
+    }
+  }
+
+  // ======= Render tabla de logs =======
+  function renderLogs(){
+    const t = safeGet('logsTable'); if(!t) return;
+    const tbody = t.querySelector('tbody'); if(!tbody) return;
+    const logs = getLogs().slice().reverse();
+    tbody.innerHTML='';
+    let w=0,b=0,d=0;
+    logs.forEach(log=>{
+      if(log.result==='mate'){ if(log.winner==='w') w++; else if(log.winner==='b') b++; }
+      else if(log.result==='tablas'){ d++; }
+      const tr = document.createElement('tr');
+      const fmt = (s)=>{ try{ const d=new Date(s); return d.toLocaleString(); }catch(_){ return s; } };
+      const winner = log.winner==='w' ? 'Blancas' : (log.winner==='b' ? 'Negras' : (log.result==='tablas' ? '-' : (log.winner||'-')));
+      const btn = '<button class="btn small secondary btn-view" data-id="'+log.id+'" type="button">Ver</button>';
+      tr.innerHTML = '<td>'+fmt(log.startedAt)+'</td><td>'+(log.mode||'-')+'</td><td>'+(log.result||'-')+'</td><td>'+winner+'</td><td>'+(log.moves||0);
+      tbody.appendChild(tr);
+    });
+    const elT=safeGet('statTotal'), elW=safeGet('statW'), elB=safeGet('statB'), elD=safeGet('statD');
+    if(elT) elT.textContent = logs.length;
+    if(elW) elW.textContent = w;
+    if(elB) elB.textContent = b;
+    if(elD) elD.textContent = d;
+  }
+  window.renderLogs = renderLogs;
+
+  // Botón borrar, si existe
+  const btnClear = document.getElementById('btnClearLogs');
+  if(btnClear){ btnClear.addEventListener('click', function(){ if(confirm('¿Borrar historial?')){ localStorage.removeItem(LS_KEY); renderLogs(); } }); }
+
+  // ======= Reproductor =======
+  (function(){
+    const panel = safeGet('replayPanel');
+    if(!panel) return;
+    const meta  = safeGet('replayMeta');
+    const list  = safeGet('rpList');
+    const speedSel = safeGet('rpSpeed');
+    const btnPlay  = safeGet('rpPlay');
+    const btnPause = safeGet('rpPause');
+    const btnPrev  = safeGet('rpPrev');
+    const btnNext  = safeGet('rpNext');
+    const btnReset = safeGet('rpReset');
+    const btnExit  = safeGet('rpExit');
+    const logsTable = safeGet('logsTable');
+
+    let savedLive=null, currentLog=null, steps=[], idx=0, timer=null, replayMode=false;
+    function takeLive(){ return snapshotState(); }
+    function restoreLive(s){
+      if(!s || !s.board) return;
+      window.board = deepClone(s.board);
+      window.offsets = (s.offsets||[]).slice();
+      window.turn = s.turn;
+      window.epTarget = s.epTarget? {r:s.epTarget.r,c:s.epTarget.c} : null;
+      window.pendingShift = s.pendingShift? {row:s.pendingShift.row, who:s.pendingShift.who} : null;
+      window.pendingChoice = s.pendingChoice;
+      if(typeof window.render==='function') window.render();
+    }
+    function setReplay(on){
+      replayMode = !!on;
+      const el = document.getElementById('board');
+      if(el){ el.style.pointerEvents = on? 'none' : ''; el.style.opacity = on? '0.98' : ''; }
+    }
+    function applyStep(i){
+      const s = steps[i]; if(!s) return;
+      const st = s.state; if(!st || !st.board) return;
+      window.board = deepClone(st.board);
+      window.offsets = (st.offsets||[]).slice();
+      window.turn = st.turn;
+      window.epTarget = st.epTarget? {r:st.epTarget.r,c:st.epTarget.c} : null;
+      window.pendingShift = st.pendingShift? {row:st.pendingShift.row, who:st.pendingShift.who} : null;
+      window.pendingChoice = st.pendingChoice;
+      if(typeof window.render==='function') window.render();
+      idx = i;
+      if(list){
+        Array.from(list.querySelectorAll('a')).forEach(a=>{
+          a.style.fontWeight = (Number(a.getAttribute('data-i'))===idx)? '900' : '';
+          a.style.textDecoration = (Number(a.getAttribute('data-i'))===idx)? 'underline' : '';
+        });
+      }
+    }
+    function playTick(){
+      if(idx >= steps.length-1){ pause(); return; }
+      applyStep(idx+1);
+      timer = setTimeout(playTick, Number(speedSel && speedSel.value || 1200));
+    }
+    function play(){ if(timer) return; if(btnPlay) btnPlay.style.display='none'; if(btnPause) btnPause.style.display=''; playTick(); }
+    function pause(){ if(timer){ clearTimeout(timer); timer=null; } if(btnPlay) btnPlay.style.display=''; if(btnPause) btnPause.style.display='none'; }
+
+    if(btnPlay) btnPlay.addEventListener('click', play);
+    if(btnPause) btnPause.addEventListener('click', pause);
+    if(btnPrev) btnPrev.addEventListener('click', function(){ pause(); if(idx>0) applyStep(idx-1); });
+    if(btnNext) btnNext.addEventListener('click', function(){ pause(); if(idx<steps.length-1) applyStep(idx+1); });
+    if(btnReset) btnReset.addEventListener('click', function(){ pause(); applyStep(0); });
+    if(list) list.addEventListener('click', function(e){
+      const a=e.target.closest('.rpJump'); if(!a) return;
+      e.preventDefault(); pause(); applyStep(Number(a.getAttribute('data-i')));
+    });
+    if(btnExit) btnExit.addEventListener('click', function(){
+      pause(); if(panel) panel.style.display='none'; setReplay(false); restoreLive(savedLive);
+      currentLog=null; steps=[]; idx=0;
+    });
+
+    if(logsTable){
+      logsTable.addEventListener('click', function(e){
+        const b = e.target.closest('.btn-view'); if(!b) return;
+        const id = b.getAttribute('data-id');
+        const logs = getLogs();
+        currentLog = logs.find(x=>x.id===id);
+        if(!currentLog || !currentLog.history || !currentLog.history.length){ alert('Esta partida no tiene historial.'); return; }
+        savedLive = takeLive(); setReplay(true);
+        steps = currentLog.history.slice();
+        // Construir lista con SAN si existe en el paso
+        if(list){
+          list.innerHTML='';
+          steps.forEach((s,i)=>{
+            const tag = (s.t==='move' ? 'Jugada' : (s.t==='shift' ? 'Sección' : (s.t==='start'?'Inicio':'Fin')));
+            const side = s.side ? (s.side==='w'?'(B) ':'(N) ') : '';
+            const lab = s.san ? (' — '+s.san) : (s.label ? (' — '+s.label) : '');
+            const li = document.createElement('li');
+            li.innerHTML = '<a href="#" data-i="'+i+'" class="rpJump">'+String(i).padStart(2,'0')+' · '+tag+' '+side+lab+'</a>';
+            list.appendChild(li);
+          });
+        }
+        // meta
+        if(meta){
+          const fmt = (s)=>{ try{ const d=new Date(s); return d.toLocaleString(); }catch(_){ return s; } };
+          const winner = currentLog.winner==='w'?'Blancas':(currentLog.winner==='b'?'Negras':(currentLog.result==='tablas'?'—':'—'));
+          meta.textContent = 'Fecha: '+fmt(currentLog.startedAt)+' · Modo: '+(currentLog.mode||'-')+' · Resultado: '+(currentLog.result||'-')+' · Ganador: '+winner+' · Pasos: '+steps.length;
+        }
+        if(panel) panel.style.display='';
+        applyStep(0);
+      });
+    }
+  })();
+
+  // ======= Monkey-patch seguro de funciones del juego =======
+  function installPatches(){
+    // playMove wrapper
+    if(typeof window.playMove==='function' && !window.playMove.__patched){
+      const orig = window.playMove;
+      window.playMove = function(from, to, special, capturesKing){
+        // snapshot previo para SAN
+        const prevBoard = (typeof window.board!=='undefined') ? deepClone(window.board) : null;
+        const prevFrom = from && {r:from.r, c:from.c};
+        const prevTo   = to   && {r:to.r, c:to.c};
+        const prevSpecial = special;
+        startNewGameLogIfNeeded();
+        const res = orig.apply(this, arguments);
+        try{
+          const captured = (res && res.captured) ? true : false;
+          const san = computeSAN(prevBoard, prevFrom, prevTo, prevSpecial, captured);
+          logMoveEvent({ side: window.turn, from: prevFrom, to: prevTo, special: prevSpecial||null, captured, san: san });
+          incrementMove();
+        }catch(_){}
+        if(capturesKing){ try{ finalizeGameLog('mate', window.turn); }catch(_){ } }
+        return res;
+      };
+      window.playMove.__patched = true;
+    }
+    // doShiftTo wrapper
+    if(typeof window.doShiftTo==='function' && !window.doShiftTo.__patched){
+      const orig2 = window.doShiftTo;
+      window.doShiftTo = function(row, target){
+        const res = orig2.apply(this, arguments);
+        try{ logShiftEvent({ row: row, action:'shift', target: target, by: (window.pendingShift && window.pendingShift.who) || window.turn }); }catch(_){}
+        return res;
+      };
+      window.doShiftTo.__patched = true;
+    }
+    // keepRow wrapper
+    if(typeof window.keepRow==='function' && !window.keepRow.__patched){
+      const orig3 = window.keepRow;
+      window.keepRow = function(){
+        const res = orig3.apply(this, arguments);
+        try{ if(window.pendingShift) logShiftEvent({ row: window.pendingShift.row, action:'keep', target:null, by: window.pendingShift.who || window.turn }); }catch(_){}
+        return res;
+      };
+      window.keepRow.__patched = true;
+    }
+    // renderLogs on start
+    try{ if(typeof window.renderLogs==='function') window.renderLogs(); }catch(_){}
+  }
+
+  // Instalar parches cuando el juego esté listo
+  if(document.readyState==='complete' || document.readyState==='interactive'){
+    setTimeout(installPatches, 0);
+  }else{
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(installPatches, 0); });
+  }
+
+})();
+</script>
+
+
+<script>
+// Asegurar que exista la columna "Acciones" y que se repinten filas con botón "Ver"
+(function(){
+  function ensureHeader(){
+    var t = document.getElementById('logsTable');
+    if(!t) return;
+    var th = t.querySelector('thead tr');
+    if(!th) return;
+    var has = Array.from(th.children).some(function(el){ return (el.textContent||'').trim().toLowerCase()==='acciones'; });
+    if(!has){
+      var thAcc = document.createElement('th');
+      thAcc.textContent = 'Acciones';
+      th.appendChild(thAcc);
+    }
+  }
+  function boot(){
+    try{ ensureHeader(); }catch(_) {}
+    try{ if(typeof window.renderLogs==='function') window.renderLogs(); }catch(_) {}
+  }
+  if(document.readyState==='complete' || document.readyState==='interactive'){ setTimeout(boot, 0); }
+  else { document.addEventListener('DOMContentLoaded', function(){ setTimeout(boot, 0); }); }
+})();
+</script>
+
+
+<script>
+(function(){
+  var t = document.getElementById('logsTable');
+  function enterReplayById(id){
+    if(window.__AJ_REPLAY__ && typeof window.__AJ_REPLAY__.enterReplay==='function'){
+      window.__AJ_REPLAY__.enterReplay(id); 
+      return;
+    }
+    // Fallback mínimo si no existe el helper
+    var panel = document.getElementById('replayPanel');
+    if(panel) panel.style.display='';
+  }
+  if(t){
+    t.addEventListener('click', function(e){
+      var a = e.target.closest('.log-open');
+      if(!a) return;
+      e.preventDefault();
+      var id = a.getAttribute('data-id');
+      if(id) enterReplayById(id);
+    });
+  }
+  window.__AJ_REPLAY__ = window.__AJ_REPLAY__ || {};
+  if(!window.__AJ_REPLAY__.enterReplay) window.__AJ_REPLAY__.enterReplay = enterReplayById;
+})();
+</script>
+
+
+<script>
+(function(){
+  var panel = document.getElementById('replayPanel');
+  if(!panel) return;
+  // Move panel to body and set floating styles
+  panel.classList.add('rp-float');
+  if(panel.parentElement !== document.body){
+    document.body.appendChild(panel);
+  }
+  // Create backdrop
+  var bd = document.getElementById('rpBackdrop');
+  if(!bd){
+    bd = document.createElement('div'); bd.id = 'rpBackdrop'; document.body.appendChild(bd);
+  }
+  function show(){ bd.style.display=''; panel.style.display=''; }
+  function hide(){ panel.style.display='none'; bd.style.display='none'; }
+  // Hook close actions
+  var exitBtn = document.getElementById('rpExit');
+  if(exitBtn){ exitBtn.addEventListener('click', function(){ hide(); }, true); }
+  bd.addEventListener('click', hide);
+  // Patch enterReplay to always show floating panel
+  window.__AJ_REPLAY__ = window.__AJ_REPLAY__ || {};
+  var prevEnter = window.__AJ_REPLAY__.enterReplay;
+  window.__AJ_REPLAY__.enterReplay = function(id){
+    if(typeof prevEnter === 'function'){ prevEnter(id); }
+    // ensure visible on top
+    show();
+  };
+  // Also ensure our table click fallback shows it
+  var t = document.getElementById('logsTable');
+  if(t){
+    t.addEventListener('click', function(e){
+      var a = e.target.closest('.log-open'); if(!a) return;
+      // small delay to let list render by prevEnter, then show
+      setTimeout(show, 0);
+    });
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  // Ensure panel exists and is attached to body as floating modal.
+  function ensurePanel(){
+    var panel = document.getElementById('replayPanel');
+    if(!panel){
+      // minimal fallback panel if original markup is missing
+      panel = document.createElement('div');
+      panel.id = 'replayPanel';
+      panel.innerHTML = '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px;">'
+        + '<strong style="font-size:18px">Reproductor de partida</strong>'
+        + '<button class="btn small" id="rpExit">Cerrar</button></div>'
+        + '<div class="row" style="gap:6px;margin-bottom:8px;"><button class="btn small" id="rpReset">Reiniciar</button>'
+        + '<button class="btn small" id="rpPrev">◀</button><button class="btn small" id="rpPlay">▶</button>'
+        + '<button class="btn small" id="rpPause" style="display:none;">⏸</button><button class="btn small" id="rpNext">▶</button>'
+        + '<select id="rpSpeed" class="sel small"><option value="1200">x1</option><option value="700">x1.7</option><option value="400">x3</option></select>'
+        + '</div><div class="pill" id="replayMeta" style="margin-bottom:8px;">—</div><ol id="rpList" style="margin:0;padding-left:20px;max-height:58vh;overflow:auto;"></ol>';
+      document.body.appendChild(panel);
+    }
+    if(!panel.classList.contains('rp-float')) panel.classList.add('rp-float');
+    if(panel.parentElement !== document.body) document.body.appendChild(panel);
+    // Backdrop
+    var bd = document.getElementById('rpBackdrop');
+    if(!bd){ bd = document.createElement('div'); bd.id = 'rpBackdrop'; document.body.appendChild(bd); }
+    return {panel:panel, backdrop:bd};
+  }
+
+  // Hard show/hide
+  function hardShow(){
+    var o = ensurePanel();
+    o.panel.classList.add('rp-force-show');
+    o.backdrop.style.display='block';
+  }
+  function hardHide(){
+    var panel = document.getElementById('replayPanel');
+    var bd = document.getElementById('rpBackdrop');
+    if(panel) panel.classList.remove('rp-force-show');
+    if(panel) panel.style.display='none';
+    if(bd) bd.style.display='none';
+  }
+
+  // Upgrade enterReplay to ALWAYS show the modal on top
+  window.__AJ_REPLAY__ = window.__AJ_REPLAY__ || {};
+  var prevEnter = window.__AJ_REPLAY__.enterReplay;
+  window.__AJ_REPLAY__.enterReplay = function(id){
+    // call previous logic if present (build list, snapshots, etc.)
+    if(typeof prevEnter === 'function'){ prevEnter(id); }
+    // force on top
+    hardShow();
+  };
+
+  // Also intercept clicks on date cells (in case previous handler didn't run)
+  var t = document.getElementById('logsTable');
+  if(t){
+    t.addEventListener('click', function(e){
+      var a = e.target.closest('.log-open');
+      if(!a) return;
+      e.preventDefault();
+      var id = a.getAttribute('data-id');
+      if(window.__AJ_REPLAY__ && typeof window.__AJ_REPLAY__.enterReplay==='function'){
+        window.__AJ_REPLAY__.enterReplay(id);
+      }else{
+        hardShow();
+      }
+    }, true);
+  }
+
+  // Close handlers
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.id === 'rpExit'){ e.preventDefault(); hardHide(); }
+    if(e.target && e.target.id === 'rpBackdrop'){ hardHide(); }
+  }, true);
+
+  // If something makes the panel hidden, keep it above via MutationObserver
+  var panel = document.getElementById('replayPanel');
+  if(panel){
+    var mo = new MutationObserver(function(){
+      if(panel.classList.contains('rp-float') && panel.classList.contains('rp-force-show')){
+        panel.style.display = 'block';
+      }
+    });
+    mo.observe(panel, {attributes:true, attributeFilter:['style','class']});
+  }
+
+})();
+</script>
+
+
+<script>
+(function(){
+  function ensureTop(){
+    var p = document.getElementById('replayPanel');
+    if(!p) return;
+    // Quitar estilos previos de centrado vertical y forzar modo "TOP"
+    p.classList.add('rp-top');
+    p.classList.add('rp-float'); // seguimos usando flotante
+    if(p.parentElement !== document.body) document.body.appendChild(p);
+  }
+  function showTop(){
+    ensureTop();
+    var p = document.getElementById('replayPanel');
+    if(!p) return;
+    p.style.display = 'block';
+    p.classList.add('rp-force-show');
+  }
+  function hideTop(){
+    var p = document.getElementById('replayPanel');
+    if(!p) return;
+    p.style.display = 'none';
+    p.classList.remove('rp-force-show');
+  }
+
+  // Integrar con enterReplay
+  window.__AJ_REPLAY__ = window.__AJ_REPLAY__ || {};
+  var prevEnter = window.__AJ_REPLAY__.enterReplay;
+  window.__AJ_REPLAY__.enterReplay = function(id){
+    if(typeof prevEnter === 'function'){ prevEnter(id); }
+    showTop();
+  };
+
+  // Cerrar con botón "Salir" / "Cerrar"
+  document.addEventListener('click', function(e){
+    if(e.target && (e.target.id === 'rpExit' || (e.target.matches && e.target.matches('#replayPanel .btn.close')))){
+      e.preventDefault();
+      hideTop();
+    }
+  }, true);
+
+  // Abrir al click en fecha (por si el helper no ejecuta)
+  var t = document.getElementById('logsTable');
+  if(t){
+    t.addEventListener('click', function(e){
+      var a = e.target.closest('.log-open');
+      if(!a) return;
+      e.preventDefault();
+      var id = a.getAttribute('data-id');
+      if(window.__AJ_REPLAY__ && typeof window.__AJ_REPLAY__.enterReplay==='function'){
+        window.__AJ_REPLAY__.enterReplay(id);
+      }else{
+        showTop();
+      }
+    }, true);
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  function dockReplay(){
+    var dock = document.getElementById('replayDock');
+    if(!dock) return;
+    var panel = document.getElementById('replayPanel');
+    if(!panel){
+      // Create minimal structure if missing
+      panel = document.createElement('div');
+      panel.id = 'replayPanel';
+      panel.innerHTML = ''
+        + '<div class="row" style="align-items:flex-end;gap:12px;">'
+        + '  <div class="field" style="min-width:220px;"><label>Partida seleccionada</label><div class="pill" id="replayMeta">—</div></div>'
+        + '  <div class="row controls-row" role="group" aria-label="Controles" style="gap:6px;">'
+        + '    <button class="btn small" id="rpReset">Reiniciar</button>'
+        + '    <button class="btn small" id="rpPrev">◀</button>'
+        + '    <button class="btn small" id="rpPlay">▶</button>'
+        + '    <button class="btn small" id="rpPause" style="display:none;">⏸</button>'
+        + '    <button class="btn small" id="rpNext">▶</button>'
+        + '    <select id="rpSpeed" class="sel small"><option value="1200">x1</option><option value="700">x1.7</option><option value="400">x3</option></select>'
+        + '  </div>'
+        + '</div>'
+        + '<div style="max-height:300px;overflow:auto;margin-top:10px;border-top:1px dashed #ddd;padding-top:8px;">'
+        + '  <ol id="rpList" style="margin:0;padding-left:20px;"></ol>'
+        + '</div>';
+    }
+    // Remove modal/backdrop classes
+    panel.classList.remove('rp-float', 'rp-top', 'rp-force-show');
+    panel.style.cssText = ''; // clear inline modal styles
+    // Place inside dock
+    dock.innerHTML = '';
+    dock.appendChild(panel);
+    // Ensure visible
+    panel.style.display = 'block';
+    var hint = document.getElementById('rpEmptyHint'); if(hint) hint.style.display='none';
+  }
+
+  // Hook enterReplay to dock and show
+  window.__AJ_REPLAY__ = window.__AJ_REPLAY__ || {};
+  var prevEnter = window.__AJ_REPLAY__.enterReplay;
+  window.__AJ_REPLAY__.enterReplay = function(id){
+    if(typeof prevEnter === 'function'){ prevEnter(id); }
+    dockReplay();
+  };
+
+  // Also run on first click by date
+  var t = document.getElementById('logsTable');
+  if(t){
+    t.addEventListener('click', function(e){
+      var a = e.target.closest('.log-open'); if(!a) return;
+      setTimeout(dockReplay, 0);
+    });
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  var canvas = null, ctx = null, size = 260;
+  function initCanvas(){
+    canvas = document.getElementById('ghostCanvas');
+    if(!canvas) return false;
+    ctx = canvas.getContext('2d');
+    // match CSS size
+    canvas.width = 520; canvas.height = 520; // high DPI
+    size = Math.min(canvas.clientWidth, canvas.clientHeight);
+    return true;
+  }
+  function squareColor(r,c){ return ((r+c)%2===0)? '#eedac5' : '#b89a7a'; }
+  function toGlyph(piece){
+    // Try to detect color/type from multiple shapes commonly used
+    if(!piece) return {glyph:'', col:'#222'};
+    var t=null, color=null;
+    if(typeof piece==='string'){
+      // strings like 'wP','bQ','P','p'
+      var s = piece;
+      if(s.length===2 && (s[0]==='w' || s[0]==='b')){ color = (s[0]==='w')?'w':'b'; t = s[1]; }
+      else { color = (s===s.toUpperCase())?'w':'b'; t = s.toLowerCase(); }
+    }else if(typeof piece==='object'){
+      t = piece.type || piece.p || piece.kind || null;
+      if(t && t.length>1) t = t[0];
+      color = piece.color || piece.c || piece.side || (piece.owner? (piece.owner==='white'?'w':'b') : null);
+      if(!color && piece.side==='white') color='w';
+      if(!color && piece.side==='black') color='b';
+    }
+    if(!t) return {glyph:'', col:'#222'};
+    var mapW = {p:'♙', r:'♖', n:'♘', b:'♗', q:'♕', k:'♔'};
+    var mapB = {p:'♟', r:'♜', n:'♞', b:'♝', q:'♛', k:'♚'};
+    t = (''+t).toLowerCase();
+    var glyph = (color==='w')? (mapW[t]||'') : (mapB[t]||'');
+    return {glyph:glyph, col: (color==='w')?'#111':'#111'};
+  }
+  function drawGhost(state, highlight){
+    if(!ctx && !initCanvas()) return;
+    var W = canvas.width, H = canvas.height;
+    var cell = Math.floor(Math.min(W,H)/8);
+    // Background
+    ctx.clearRect(0,0,W,H);
+    // Board squares
+    for(var r=0;r<8;r++){
+      for(var c=0;c<8;c++){
+        ctx.fillStyle = squareColor(r,c);
+        ctx.fillRect(c*cell, r*cell, cell, cell);
+      }
+    }
+    // Highlight move
+    if(highlight && highlight.from){
+      ctx.fillStyle = 'rgba(255,235,59,0.55)'; // amber
+      ctx.fillRect(highlight.from.c*cell, highlight.from.r*cell, cell, cell);
+    }
+    if(highlight && highlight.to){
+      ctx.fillStyle = 'rgba(76,175,80,0.55)'; // green
+      ctx.fillRect(highlight.to.c*cell, highlight.to.r*cell, cell, cell);
+    }
+    // Pieces
+    var b = state && state.board ? state.board : null;
+    if(!b) return;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font = (cell*0.62)+'px serif';
+    for(var r=0;r<8;r++){
+      for(var c=0;c<8;c++){
+        var piece = null;
+        try{ piece = b[r][c]; }catch(_){ piece = null; }
+        var g = toGlyph(piece);
+        if(!g.glyph) continue;
+        ctx.fillStyle = '#111';
+        ctx.fillText(g.glyph, c*cell + cell/2, r*cell + cell/2 + 1);
+      }
+    }
+  }
+
+  // Hook into replay step application to update ghost board
+  window.__AJ_GHOST__ = { drawGhost: drawGhost };
+
+  // Patch applyStep if available via __AJ_REPLAY__, else hook our list clicks
+  (function(){
+    var list = document.getElementById('rpList');
+    function readStep(i){
+      // Try to read the steps from current log shown in list via dataset (if any)
+      // Fallback: use globals set by the replay script (board/offsets already set)
+      var st = {
+        board: (typeof window.board!=='undefined')? JSON.parse(JSON.stringify(window.board)) : null
+      };
+      return st;
+    }
+    function updateGhostFromGlobals(highlight){
+      var st = { board: (typeof window.board!=='undefined')? JSON.parse(JSON.stringify(window.board)) : null };
+      drawGhost(st, highlight||null);
+    }
+
+    // If the replay script exposes applyStep, monkey-patch
+    if(window.__AJ_REPLAY__ && window.__AJ_REPLAY__.applyStep && !window.__AJ_REPLAY__.applyStep.__ghost_patched){
+      var orig = window.__AJ_REPLAY__.applyStep;
+      window.__AJ_REPLAY__.applyStep = function(i, meta){
+        var ret = orig.apply(this, arguments);
+        try{
+          var hl = meta && meta.move ? meta.move : null;
+          updateGhostFromGlobals(hl);
+        }catch(_){ updateGhostFromGlobals(null); }
+        return ret;
+      };
+      window.__AJ_REPLAY__.applyStep.__ghost_patched = true;
+    }else{
+      // As a fallback, whenever user clicks next/prev/list, redraw from globals after a tick
+      var ids = ['rpPrev','rpNext','rpReset','rpPlay','rpPause'];
+      ids.forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){
+          el.addEventListener('click', function(){ setTimeout(function(){ updateGhostFromGlobals(null); }, 0); });
+        }
+      });
+      if(list){
+        list.addEventListener('click', function(e){ var a=e.target.closest('.rpJump'); if(!a)return;
+          setTimeout(function(){ updateGhostFromGlobals(null); }, 0);
+        });
+      }
+    }
+
+    // Initial draw empty
+    setTimeout(function(){ updateGhostFromGlobals(null); }, 0);
+  })();
+})();
+</script>
+
+
+<!-- AJETREZ: Dificultad del Bot (easy/medium/hard) -->
+<script>
+(function(){
+  // Avoid double-injection
+  if(window.__AJ_BOT_DIFF__) return;
+  window.__AJ_BOT_DIFF__ = true;
+
+  // === Configuración de dificultad ===
+  window.BOT_DIFFICULTY = localStorage.getItem('aj:difficulty') || 'easy';
+  const BOT_LEVELS = {
+    easy:   { maxDepth: 0, timeMs:  80, quiescence: false },
+    medium: { maxDepth: 2, timeMs: 220, quiescence: false },
+    hard:   { maxDepth: 4, timeMs: 800, quiescence: true  }
+  };
+  function setBotDifficulty(level){
+    window.BOT_DIFFICULTY = (level==='medium'||level==='hard') ? level : 'easy';
+    try{ localStorage.setItem('aj:difficulty', window.BOT_DIFFICULTY); }catch(_){}
+    try{
+      if(window.BOT_UI && typeof window.BOT_UI.showFor==='function'){
+        window.BOT_UI.showFor(`🤖 Dificultad: ${window.BOT_DIFFICULTY}`, 1000);
+      }
+    }catch(_){}
+  }
+  // init from storage
+  setBotDifficulty(window.BOT_DIFFICULTY);
+
+  // === Utilidades de clon/restore para búsqueda ===
+  function cloneState(){
+    try{
+      return {
+        b: deepCopyBoard(board),
+        off: (offsets ? offsets.slice() : null),
+        ep: typeof epTarget!=='undefined' ? epTarget : null,
+        t: typeof turn!=='undefined' ? turn : 'w',
+        g: typeof gameOver!=='undefined' ? gameOver : false,
+        ps: typeof pendingShift!=='undefined' ? pendingShift : false
+      };
+    }catch(e){
+      return null;
+    }
+  }
+  function restoreState(s){
+    if(!s) return;
+    try{
+      board = deepCopyBoard(s.b);
+      if(Array.isArray(s.off)) offsets = s.off.slice();
+      if('ep' in s) epTarget = s.ep;
+      if('t' in s) turn = s.t;
+      if('g' in s) gameOver = s.g;
+      if('ps' in s) pendingShift = s.ps;
+    }catch(e){}
+  }
+
+  // === Generador y evaluación ===
+  function __evalNode(perspective){
+    if(typeof window.evaluatePosition === 'function'){
+      return window.evaluatePosition(board, (typeof offsets!=='undefined'?offsets:null), perspective || 'w');
+    }
+    // Fallback: material básico con buildVisible
+    try{
+      const vis = buildVisible(board, offsets);
+      let matW=0, matB=0;
+      const val = t=>({P:100,N:320,B:330,R:500,Q:900,K:0}[t]||0);
+      for(let r=0;r<8;r++) for(let c=0;c<16;c++){
+        const p = vis[r][c]; if(!p) continue;
+        if(p.color==='w') matW+=val(p.type); else matB+=val(p.type);
+      }
+      return (perspective==='w') ? (matW-matB) : (matB-matW);
+    }catch(e){ return 0; }
+  }
+
+  function __generateMoves(color){
+    if(typeof allLegalMoves==='function') return allLegalMoves(color);
+    // Fallback mínimo
+    return [];
+  }
+
+  function __makeMove(m){
+    // playMove(from, to, special, capturesKing=false) según tu firma actual
+    try{ return playMove(m.from, m.to, m.special, false); }catch(e){}
+  }
+
+  // === Búsqueda minimax (negamax con alfa-beta + tiempo) ===
+  function pickMoveMinimax(color, maxDepth, timeMs, useQuiescence){
+    const start = performance.now();
+    const base = cloneState();
+    if(!base) return null;
+
+    let best=null, bestScore=-Infinity;
+    const targetDepth = Math.max(1, maxDepth||1);
+
+    // iterative deepening 1..targetDepth
+    for(let depth=1; depth<=targetDepth; depth++){
+      const res = rootSearch(depth);
+      if(res && res.move){ best = res.move; bestScore = res.score; }
+      if(performance.now()-start > timeMs) break;
+    }
+    restoreState(base);
+    return best;
+
+    function rootSearch(depth){
+      let alpha=-1e9, beta=1e9;
+      const moves = __generateMoves(color);
+      // Ordena: capturas primero
+      moves.sort((a,b)=> (b.isCapture?1:0) - (a.isCapture?1:0));
+      let localBest=null, score=-Infinity;
+      for(const m of moves){
+        const st = cloneState();
+        __makeMove(m);
+        const sc = -negamax(opp(color), depth-1, -beta, -alpha, start, timeMs, useQuiescence);
+        restoreState(st);
+        if(sc>score){ score=sc; localBest=m; }
+        if(sc>alpha) alpha=sc;
+        if(alpha>=beta) break;
+        if(performance.now()-start > timeMs) break;
+      }
+      return {move:localBest, score};
+    }
+
+    function negamax(side, depth, alpha, beta, start, timeMs, q){
+      if(performance.now()-start > timeMs) return __evalNode(color);
+      if(depth===0){
+        if(q){
+          const caps = __generateMoves(side).filter(x=>x.isCapture || x.special==='x');
+          let stand = __evalNode(color);
+          for(const m of caps){
+            const st = cloneState();
+            __makeMove(m);
+            const sc = -negamax(opp(side), 0, -beta, -alpha, start, timeMs, false);
+            restoreState(st);
+            if(sc>stand) stand=sc;
+            if(stand>alpha) alpha=stand;
+            if(alpha>=beta) break;
+          }
+          return stand;
+        }
+        return __evalNode(color);
+      }
+      const moves = __generateMoves(side);
+      if(!moves.length) return __evalNode(color);
+      moves.sort((a,b)=> (b.isCapture?1:0) - (a.isCapture?1:0));
+      let val=-1e9;
+      for(const m of moves){
+        const st = cloneState();
+        __makeMove(m);
+        const sc = -negamax(opp(side), depth-1, -beta, -alpha, start, timeMs, q);
+        restoreState(st);
+        if(sc>val) val=sc;
+        if(sc>alpha) alpha=sc;
+        if(alpha>=beta) break;
+        if(performance.now()-start > timeMs) break;
+      }
+      return val;
+    }
+    function opp(c){ return c==='w' ? 'b' : 'w'; }
+  }
+
+  // === Router de dificultad: reencamina pickMove() global de forma segura ===
+  function installRouter(){
+    if(typeof window.pickMove !== 'function') return;
+    if(window._origPickMove) return; // ya instalado
+    window._origPickMove = window.pickMove;
+    window.pickMove = function(color){
+      try{
+        const cfg = BOT_LEVELS[window.BOT_DIFFICULTY] || BOT_LEVELS.easy;
+        if(!cfg || (cfg.maxDepth||0)<=0) return window._origPickMove(color); // Fácil
+        const mv = pickMoveMinimax(color, cfg.maxDepth, cfg.timeMs, !!cfg.quiescence);
+        return mv || window._origPickMove(color);
+      }catch(e){
+        return window._origPickMove(color);
+      }
+    };
+  }
+  installRouter();
+
+  // === UI: inserta selector en pestaña "Personalización" del menú ===
+  function insertDifficultyControl(){
+    const html = `
+      <div class="field aj-bot-diff-field" style="margin-top:10px;">
+        <label for="selBotDiff"><strong>Dificultad del bot</strong></label>
+        <select id="selBotDiff" style="display:block; margin-top:6px; padding:4px 6px;">
+          <option value="easy">Fácil (rápido)</option>
+          <option value="medium">Media (intermedia)</option>
+          <option value="hard">Difícil (piensa más)</option>
+        </select>
+        <div class="hint-sm" style="font-size:12px;opacity:.8;margin-top:4px;">Afecta Player vs Bot y Bot vs Bot.</div>
+      </div>`;
+
+    const candidates = [
+      '#tab-personalizacion .content',
+      '#tab-personalizacion',
+      '#personalizacion .content',
+      '#personalizacion',
+      '.tab-personalizacion',
+      '[data-tab="personalizacion"]',
+      '#menu-panel .tab-content[data-tab="personalizacion"]',
+      '#menu-panel .tab-content.personalizacion',
+      '#menu-panel',
+      '#panel'
+    ];
+    let host=null;
+    for(const sel of candidates){
+      const el = document.querySelector(sel);
+      if(el){ host = el; break; }
+    }
+    if(!host){ host = document.body; }
+    // Evita duplicados
+    if(!host.querySelector('#selBotDiff')){
+      const wrap = document.createElement('div');
+      wrap.innerHTML = html;
+      host.appendChild(wrap);
+      const sel = host.querySelector('#selBotDiff');
+      if(sel){
+        const saved = localStorage.getItem('aj:difficulty') || 'easy';
+        sel.value = saved;
+        sel.addEventListener('change', function(){
+          setBotDifficulty(this.value);
+          try{
+            // Reagendar si es turno del bot
+            if(window.GAME_STARTED && typeof scheduleBotMove==='function' && typeof isBotEnabled==='function' && isBotEnabled()){
+              window.__BOT_SCHEDULED__ = false;
+              scheduleBotMove();
+            }
+          }catch(_){}
+        });
+      }
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', insertDifficultyControl, {once:true});
+  }else{
+    insertDifficultyControl();
+  }
+})();
+</script>
+
+<!-- AJETREZ: Selector de dificultad dentro de "Modos de juego" -->
+<script>
+(function(){
+  if(window.__AJ_BOT_DIFF_MODES__) return;
+  window.__AJ_BOT_DIFF_MODES__ = true;
+
+  function insertDifficultyInModes(){
+    const block = `
+      <div class="field aj-bot-diff-modes" style="margin-top:14px;">
+        <label for="selBotDiffModes"><strong>Dificultad del bot</strong></label>
+        <select id="selBotDiffModes" style="display:block; margin-top:6px; padding:4px 6px;">
+          <option value="easy">Fácil (rápido)</option>
+          <option value="medium">Media (intermedia)</option>
+          <option value="hard">Difícil (piensa más)</option>
+        </select>
+        <div class="hint-sm" style="font-size:12px;opacity:.8;margin-top:4px;">
+          Aplica a Player vs Bot y Bot vs Bot.
+        </div>
+      </div>`;
+
+    // Candidatos de contenedor en la pestaña Modos
+    const candidates = [
+      '#tab-modos .content',
+      '#tab-modos',
+      '#modos .content',
+      '#modos',
+      '.tab-modos',
+      '[data-tab="modos"]',
+      '#menu-panel .tab-content[data-tab="modos"]',
+      '#menu-panel .tab-content.modos',
+    ];
+    let host=null;
+    for(const sel of candidates){
+      const el = document.querySelector(sel);
+      if(el){ host = el; break; }
+    }
+    if(!host) return;
+
+    if(!host.querySelector('#selBotDiffModes')){
+      const wrap = document.createElement('div');
+      wrap.innerHTML = block;
+      host.appendChild(wrap);
+      const sel = host.querySelector('#selBotDiffModes');
+      if(sel){
+        const saved = localStorage.getItem('aj:difficulty') || 'easy';
+        sel.value = saved;
+        sel.addEventListener('change', ()=>{
+          if(typeof setBotDifficulty==='function') setBotDifficulty(sel.value);
+          // sincroniza con el selector de Personalización si existe
+          const other = document.getElementById('selBotDiff'); if(other) other.value = sel.value;
+          // reprograma si corresponde
+          try{
+            if(window.GAME_STARTED && typeof scheduleBotMove==='function' && typeof isBotEnabled==='function' && isBotEnabled()){
+              window.__BOT_SCHEDULED__ = false;
+              scheduleBotMove();
+            }
+          }catch(_){}
+        });
+      }
+    }
+  }
+
+  // Inserta cuando el DOM esté listo y cada vez que se abra el panel por si renderiza tardíamente
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', insertDifficultyInModes, {once:true});
+  }else{
+    insertDifficultyInModes();
+  }
+
+  // Si hay una función para abrir pestañas, observamos cambios de pestaña para (re)inyectar
+  try{
+    const panel = document.querySelector('#menu-panel') || document;
+    const obs = new MutationObserver(()=>{
+      const el = document.querySelector('#selBotDiffModes');
+      const tabVisible = document.querySelector('#tab-modos, #modos, .tab-modos, [data-tab="modos"]');
+      if(tabVisible && !el) insertDifficultyInModes();
+    });
+    obs.observe(panel, { childList:true, subtree:true });
+  }catch(_){}
+})();
+</script>
+
+<!-- AJETREZ: Mostrar selector de dificultad solo en modos con bot -->
+<script>
+(function(){
+  // v2 controller
+  try{ window.__AJ_BOT_DIFF_SHOWCTRL__ = 'v2'; }catch(_){}
+
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+  function qsa(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function toggle(show){
+    const wrap = qs('.aj-bot-diff-modes');
+    if(!wrap) return;
+    wrap.style.display = show ? 'block' : 'none';
+  }
+
+  function desiredFromActive(){
+    const active = qs('#tab-modos .btn.mode.active, #modos .btn.mode.active');
+    const gm = active ? (active.getAttribute('data-gmode')||'') : '';
+    if(gm==='bot' || gm==='bot-vs-bot') return true;
+    return false;
+  }
+
+  function desiredFromLastClick(){
+    return window.__AJ_LAST_MODE_CLICK__==='bot' || window.__AJ_LAST_MODE_CLICK__==='bot-vs-bot';
+  }
+
+  function reevaluate(){
+    // Preferir estado activo; si no hay, usar último click; por defecto oculto
+    let show = desiredFromActive();
+    if(!show && typeof window.__AJ_LAST_MODE_CLICK__!=='undefined'){
+      show = desiredFromLastClick();
+    }
+    toggle(show);
+  }
+
+  function ensurePlacement(){
+    // Si el selector no está justo después de la fila de botones, lo movemos ahí
+    const row = qs('#tab-modos .row, #modos .row');
+    const wrap = qs('.aj-bot-diff-modes');
+    if(row && wrap && wrap.parentNode !== row.parentNode){
+      row.parentNode.insertBefore(wrap, row.nextSibling);
+    }
+  }
+
+  function bindClicks(){
+    const btns = qsa('#tab-modos .btn.mode, #modos .btn.mode');
+    btns.forEach(btn=>{
+      if(btn.__aj_bot_diff_bound__) return;
+      btn.__aj_bot_diff_bound__ = true;
+      btn.addEventListener('click', ()=>{
+        const gm = btn.getAttribute('data-gmode')||'';
+        window.__AJ_LAST_MODE_CLICK__ = gm;
+        // defer reevaluate a unos ms por si el panel marca .active después del click
+        setTimeout(reevaluate, 60);
+      }, {passive:true});
+    });
+  }
+
+  function init(){
+    ensurePlacement();
+    bindClicks();
+    // Inicial: oculto salvo que ya esté activo un modo con bot
+    setTimeout(reevaluate, 60);
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
+  }
+
+  // Observar cambios para re-ubicar y re-evaluar
+  try{
+    const panel = qs('#tab-modos') || document;
+    const obs = new MutationObserver(()=>{
+      ensurePlacement();
+      bindClicks();
+      // Re-evaluar sin forzar oculto
+      reevaluate();
+    });
+    obs.observe(panel, {childList:true, subtree:true, attributes:true, attributeFilter:['class']});
+  }catch(_){}
+})();
+</script>
+
+<!-- AJETREZ: UI para "Modo Online" (activo + aviso dentro del panel) -->
+<style>
+  /* Aviso interno en la pestaña Modos */
+  .aj-online-notice{
+    margin-top:14px; padding:12px 14px;
+    background:#f4efe6; color:#222; border:1px solid rgba(0,0,0,.12);
+    border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.08);
+    max-width:760px;
+  }
+  .aj-online-notice h4{ margin:0 0 6px 0; font-size:18px; }
+  .aj-online-notice p{ margin:4px 0; line-height:1.4; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_ONLINE_MODE_UI__) return;
+  window.__AJ_ONLINE_MODE_UI__ = true;
+
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+  function qsa(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function getModesScope(){
+    return qs('#tab-modos, #modos, .tab-modos, [data-tab="modos"]') || document;
+  }
+  function findOnlineButton(){
+    const scope = getModesScope();
+    const btns = qsa('button, .btn, [role="button"]', scope);
+    return btns.find(b => (b.textContent||'').trim().toLowerCase().includes('modo online'));
+  }
+  function findModeButtons(){
+    const scope = getModesScope();
+    return qsa('.btn.mode, button.mode, .btn', scope);
+  }
+  function ensureNoticeHost(){
+    const scope = getModesScope();
+    const row = qs('.row', scope) || scope;
+    let host = qs('.aj-online-host', scope);
+    if(!host){
+      host = document.createElement('div');
+      host.className = 'aj-online-host';
+      row.parentNode.insertBefore(host, row.nextSibling);
+    }
+    return host;
+  }
+  function hideExternalToast(){
+    // Intenta ocultar el cartel flotante si existiera
+    try{
+      const t = qs('.toast, .banner, .hud, .info-banner');
+      if(t) t.style.display='none';
+    }catch(_){}
+  }
+  function showInPanelNotice(){
+    const host = ensureNoticeHost();
+    let box = qs('#aj-online-notice', host);
+    if(!box){
+      box = document.createElement('div');
+      box.id = 'aj-online-notice';
+      box.className = 'aj-online-notice';
+      box.innerHTML = `
+        <h4>Modo Online — próximamente</h4>
+        <p>Pronto estará disponible para jugar online. Para eso, necesitamos de todo tu apoyo y difusión.</p>
+        <p>Queremos que Ajetrez sea gratuito. Si podes colaborar con una donación, nos ayudás a mejorar y mantener el proyecto. ¡Muchas gracias!</p>
+      `;
+      host.appendChild(box);
+    }else{
+      box.style.display='block';
+    }
+  }
+  function hideInPanelNotice(){
+    const host = ensureNoticeHost();
+    const box = qs('#aj-online-notice', host);
+    if(box) box.style.display='none';
+  }
+  function setActive(btn){
+    const scope = getModesScope();
+    // Quita activo en los otros
+    findModeButtons().forEach(b => b.classList && b.classList.remove('active'));
+    // Marca activo el online
+    if(btn.classList) btn.classList.add('active');
+  }
+
+  function wire(){
+    const onlineBtn = findOnlineButton();
+    if(!onlineBtn) return false;
+    if(onlineBtn.__aj_online_bound__) return true;
+    onlineBtn.__aj_online_bound__ = true;
+    onlineBtn.addEventListener('click', (ev)=>{
+      try{
+        setActive(onlineBtn);
+        showInPanelNotice();
+        hideExternalToast();
+        // Evita que un handler anterior cambie la UI y saque el aviso; re-evaluamos luego de un tick
+        setTimeout(()=>{
+          setActive(onlineBtn);
+          showInPanelNotice();
+          hideExternalToast();
+        }, 50);
+      }catch(_){}
+    }, {passive:true});
+    return true;
+  }
+
+  function init(){
+    wire();
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
+  }
+
+  // Observa re-render del panel para re-vincular
+  try{
+    const panel = getModesScope();
+    const obs = new MutationObserver(()=>{ wire(); });
+    obs.observe(panel, {childList:true, subtree:true});
+  }catch(_){}
+})();
+</script>
+
+<!-- AJETREZ: Click en "Modo Online" -> activar botón y subir cartel flotante ~4 casilleros -->
+<script>
+(function(){
+  if(window.__AJ_ONLINE_OFFSET_FIX__) return;
+  window.__AJ_ONLINE_OFFSET_FIX__ = true;
+
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+  function qsa(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findOnlineBtn(){
+    const scope = qs('#tab-modos, #modos, .tab-modos, [data-tab="modos"]') || document;
+    const btns = qsa('button, .btn, [role="button"]', scope);
+    return btns.find(b => (b.textContent||'').toLowerCase().includes('modo online'));
+  }
+
+  function squareSize(){
+    // Estima tamaño de un casillero central a partir del ancho del tablero 8x8
+    const board = qs('#board, #mobile-board, #mobile-board-down-1square, .board, .tablero');
+    if(board){
+      const w = board.getBoundingClientRect().width || 0;
+      // si el tablero es 8x8 visible, cada casillero ≈ w/8
+      return (w>0 ? (w/8) : 48);
+    }
+    return 48; // fallback
+  }
+
+  function moveToastUp(){
+    const delta = Math.round(squareSize() * 4); // ~4 casilleros
+    const candidates = ['.toast','.banner','.hud','.info-banner','.ajetrez-banner','.notify','.notification'];
+    let toast = null;
+    for(const sel of candidates){
+      toast = qs(sel);
+      if(toast) break;
+    }
+    if(!toast) return false;
+    // Aplica un translateY negativo acumulable
+    const current = getComputedStyle(toast).transform;
+    const translate = `translateY(-${delta}px)`;
+    if(current && current !== 'none'){
+      toast.style.transform = current + ' ' + translate;
+    }else{
+      toast.style.transform = translate;
+    }
+    // Si usaba bottom:0 para posicionarse, ajustamos bottom por si acaso
+    const btm = getComputedStyle(toast).bottom;
+    if(btm && btm !== 'auto'){
+      const px = parseFloat(btm) || 0;
+      toast.style.bottom = (px + delta) + 'px';
+    }
+    // Elevar z-index para que quede encima dentro del panel si se solapa
+    toast.style.zIndex = 9999;
+    return true;
+  }
+
+  function setActiveOnline(btn){
+    // Quitar active de sus hermanos y activar online
+    const scope = qs('#tab-modos, #modos, .tab-modos, [data-tab="modos"]') || document;
+    qsa('.btn.mode, button.mode, .btn', scope).forEach(b=> b.classList && b.classList.remove('active'));
+    if(btn && btn.classList) btn.classList.add('active');
+  }
+
+  function wire(){
+    const btn = findOnlineBtn();
+    if(!btn || btn.__aj_online_offset_bound__) return;
+    btn.__aj_online_offset_bound__ = true;
+    btn.addEventListener('click', ()=>{
+      setActiveOnline(btn);
+      // Mover el toast inmediatamente y también reintentar por si aparece con delay
+      let tries = 0;
+      const iv = setInterval(()=>{
+        tries++;
+        const ok = moveToastUp();
+        if(ok || tries>20){ clearInterval(iv); }
+      }, 60);
+    }, {passive:true});
+  }
+
+  function init(){
+    wire();
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
+  }
+
+  // Observar cambios en el panel para re-vincular si re-renderiza
+  try{
+    const panel = qs('#menu-panel') || document;
+    const obs = new MutationObserver(()=> wire());
+    obs.observe(panel, {childList:true, subtree:true});
+  }catch(_){}
+})();
+</script>
+
+<!-- AJETREZ: Fondo rojo para el aviso de Modo Online -->
+<script>
+(function(){
+  if(window.__AJ_ONLINE_REDSTYLE__) return;
+  window.__AJ_ONLINE_REDSTYLE__ = true;
+
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+
+  function styleToast(toast){
+    toast.style.background = "#c00";   // rojo intenso
+    toast.style.color = "#fff";        // texto blanco
+    toast.style.borderRadius = "8px";
+    toast.style.padding = "10px 14px";
+    toast.style.fontWeight = "bold";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,.25)";
+  }
+
+  function enhance(){
+    const candidates = ['.toast','.banner','.hud','.info-banner','.ajetrez-banner','.notify','.notification'];
+    for(const sel of candidates){
+      const toast = qs(sel);
+      if(toast){ styleToast(toast); }
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', enhance, {once:true});
+  }else{
+    enhance();
+  }
+
+  // Reintenta cuando aparezca dinámicamente
+  const obs = new MutationObserver(enhance);
+  obs.observe(document.body, {childList:true, subtree:true});
+})();
+</script>
+
+<script>
+(function(){
+  if(window.__AJ_MOVE_DIFF_UNDER_HINT__) return;
+  window.__AJ_MOVE_DIFF_UNDER_HINT__ = true;
+
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+  function qsa(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findModosScope(){
+    return qs('#tab-modos, #modos, .tab-modos, [data-tab="modos"]') || document;
+  }
+
+  function findHintParagraph(scope){
+    const els = qsa('p, .hint, .hint-sm, .legend, .subtitle, .help', scope);
+    for(const el of els){
+      const txt = (el.textContent||'').trim().toLowerCase();
+      if(txt.includes('al elegir un modo') && txt.includes('se reinicia')) return el;
+    }
+    return null;
+  }
+
+  function relocate(){
+    const scope = findModosScope();
+    const target = findHintParagraph(scope);
+    const diff = qs('.aj-bot-diff-modes', scope);
+    if(scope && target && diff && target.nextSibling !== diff){
+      // Mover justo después del texto
+      target.parentNode.insertBefore(diff, target.nextSibling);
+    }
+  }
+
+  function init(){ relocate(); }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
+  }
+
+  // Observer por si el panel re-renderiza
+  try{
+    const panel = findModosScope();
+    const obs = new MutationObserver(()=> relocate());
+    obs.observe(panel, {childList:true, subtree:true});
+  }catch(_){}
 })();
 </script>
 </body>
