@@ -2412,13 +2412,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   height: calc(32px * 0.9) !important; /* de 32px a 28.8px */
 }
 </style>
-<style id="panelCenterFix">
-/* Centrar el panel del menú (izq/der) respecto al tablero */
-#megaPanel{
-  /* ancho actual del panel: 10.8 casilleros (definido en panelMinus10) */
-  left: calc( (var(--square) * (var(--board-cols) - 10.8)) / 2 ) !important;
-}
-</style>
+
 <style id="panelBtnsMinus10">
 /* Reducir -10% los botones dentro del panel */
 #megaPanel .tab-btn{
@@ -2444,25 +2438,14 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   padding: 6px 8px;
 }
 </style>
-<style id="panelWiden40">
-/* Ancho del panel +40% y re-centrado */
+
+
+
+<style id="panelWidthVar">
+:root{ --panel-w: 18.2952; }
 #megaPanel{
-  width: calc(var(--square) * 15.12) !important;  /* 10.8 -> 15.12 */
-  left: calc( (var(--square) * (var(--board-cols) - 15.12)) / 2 ) !important; /* centrado */
-}
-</style>
-<style id="panelWidenPlus10">
-/* Ancho del panel +10% adicional (total ~+54% desde 10.8) y re-centrado */
-#megaPanel{
-  width: calc(var(--square) * 16.632) !important;
-  left: calc( (var(--square) * (var(--board-cols) - 16.632)) / 2 ) !important;
-}
-</style>
-<style id="panelWidenPlus20">
-/* Ancho del panel +10% adicional (total ~+69% desde 10.8) y re-centrado */
-#megaPanel{
-  width: calc(var(--square) * 18.295200000000005) !important;
-  left: calc( (var(--square) * (var(--board-cols) - 18.295200000000005)) / 2 ) !important;
+  width: calc(var(--square) * var(--panel-w)) !important;
+  left: calc( (var(--square) * (var(--board-cols) - var(--panel-w))) / 2 ) !important;
 }
 </style>
 </body>
