@@ -2444,6 +2444,27 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   padding: 6px 8px;
 }
 </style>
+<style id="panelWiden40">
+/* Ancho del panel +40% y re-centrado */
+#megaPanel{
+  width: calc(var(--square) * 15.12) !important;  /* 10.8 -> 15.12 */
+  left: calc( (var(--square) * (var(--board-cols) - 15.12)) / 2 ) !important; /* centrado */
+}
+</style>
+<style id="panelWidenPlus10">
+/* Ancho del panel +10% adicional (total ~+54% desde 10.8) y re-centrado */
+#megaPanel{
+  width: calc(var(--square) * 16.632) !important;
+  left: calc( (var(--square) * (var(--board-cols) - 16.632)) / 2 ) !important;
+}
+</style>
+<style id="panelWidenPlus20">
+/* Ancho del panel +10% adicional (total ~+69% desde 10.8) y re-centrado */
+#megaPanel{
+  width: calc(var(--square) * 18.295200000000005) !important;
+  left: calc( (var(--square) * (var(--board-cols) - 18.295200000000005)) / 2 ) !important;
+}
+</style>
 </body>
 </html>
 
