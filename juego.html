@@ -2374,6 +2374,32 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   height: calc(var(--square) * 9) !important;    /* 10 -> 9 */
 }
 </style>
+<style id="loginTighten">
+/* Subir login 1 casillero y compactar espaciados */
+#megaPanel #loginView{
+  padding-top: calc(20px - var(--square)) !important; /* desplaza visualmente 1 casillero arriba */
+}
+#megaPanel #loginView .field{
+  margin: 0 !important;
+}
+#megaPanel #loginView label{
+  margin-bottom: 4px !important;
+}
+#megaPanel #loginView input{
+  margin: 0 0 8px 0 !important;
+}
+#megaPanel #loginView .actions,
+#megaPanel #loginView button{
+  margin-top: 6px !important;
+}
+</style>
+<style id="loginUp3mm">
+/* Posicionar login dejando ~3mm desde la cabecera negra */
+#megaPanel #loginView{
+  margin-top: 3mm !important;
+  padding-top: 0 !important; /* anula patch previo que restaba 1 casillero */
+}
+</style>
 </body>
 </html>
 
