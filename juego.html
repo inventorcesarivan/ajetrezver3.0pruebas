@@ -529,7 +529,8 @@ body[data-theme="madera"] .board-wrap{
           </div>
 
           <div id="tabsView">
-            <div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-info">Info de tus partidas</button><button class="tab-btn" data-tab="tab-mas">Más (próximamente)</button></div>
+            <div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-info">Info de tus partidas</button>
+</div>
             <div class="mp-content">
               <div class="tab" id="tab-personalizacion" style="display:none">
                 <h3>Personalización del juego</h3>
@@ -2416,6 +2417,31 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
 #megaPanel{
   /* ancho actual del panel: 10.8 casilleros (definido en panelMinus10) */
   left: calc( (var(--square) * (var(--board-cols) - 10.8)) / 2 ) !important;
+}
+</style>
+<style id="panelBtnsMinus10">
+/* Reducir -10% los botones dentro del panel */
+#megaPanel .tab-btn{
+  font-size: 90% !important;
+  padding: 7.2px 10.8px !important; /* 8px 12px -> -10% */
+}
+#megaPanel .btn{
+  font-size: 90% !important;
+  padding: 7.2px 10.8px !important;
+}
+/* Botones muy pequeños (si aplica) */
+#megaPanel .btn.small{
+  font-size: 90% !important;
+  padding: 5.4px 8.1px !important; /* 6px 9px aprox -> -10% */
+}
+</style>
+
+<style id="tabsHeaderCream">
+/* Fondo crema para el contenedor de los botones superiores (mp-tabs) */
+#megaPanel .mp-tabs{
+  background: #f7f1e1 !important;
+  border-radius: 12px;
+  padding: 6px 8px;
 }
 </style>
 </body>
