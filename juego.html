@@ -4298,6 +4298,78 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   }catch(_){}
 })();
 </script>
+
+
+<!-- AJETREZ: Indicaciones de login arriba de los campos -->
+<script>
+(function(){
+  if(window.__AJ_LOGIN_HINT_POS__) return;
+  window.__AJ_LOGIN_HINT_POS__ = true;
+  function qs(sel, root){ return (root||document).querySelector(sel); }
+  function addHint(){
+    const loginPanel = qs('#loginPanel, .login-panel, #login, .login');
+    if(!loginPanel) return;
+    if(qs('#login-hint', loginPanel)) return;
+    const div = document.createElement('div');
+    div.id = 'login-hint';
+    div.innerHTML = 'Usuario: <span class="cred">prueba</span>  -  Contraseña: <span class="cred">123</span>';
+    // Insertar al inicio del panel, antes de los campos
+    if(loginPanel.firstChild){
+      loginPanel.insertBefore(div, loginPanel.firstChild);
+    }else{
+      loginPanel.appendChild(div);
+    }
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', addHint, {once:true});
+  }else{
+    addHint();
+  }
+})();
+</script>
+
+
+<!-- AJETREZ: Fix hint de login (usa #loginView real) -->
+<style>
+  #login-hint{
+    margin: 8px 0 14px 0;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+  }
+  #login-hint .cred{ color: #d00; font-weight: 800; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_LOGIN_HINT_FIX__) return;
+  window.__AJ_LOGIN_HINT_FIX__ = true;
+
+  function qs(s, r){ return (r||document).querySelector(s); }
+
+  function addHintReal(){
+    const view = qs('#loginView');
+    if(!view) return;
+    if(qs('#login-hint', view)) return;
+    const h2 = qs('h2', view);
+    const div = document.createElement('div');
+    div.id = 'login-hint';
+    div.innerHTML = 'Usuario: <span class="cred">prueba</span>  -  Contraseña: <span class="cred">123</span>';
+    if(h2 && h2.nextSibling){
+      view.insertBefore(div, h2.nextSibling);
+    }else if(h2){
+      view.appendChild(div);
+    }else{
+      view.insertBefore(div, view.firstChild);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', addHintReal, {once:true});
+  }else{
+    addHintReal();
+  }
+})();
+</script>
 </body>
 </html>
 
