@@ -2448,6 +2448,84 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   left: calc( (var(--square) * (var(--board-cols) - var(--panel-w))) / 2 ) !important;
 }
 </style>
+<style id="panelCompact">
+/* Compacción vertical general en el panel (todas las secciones) */
+#megaPanel .mp-header{
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}
+#megaPanel .mp-tabs{
+  padding: 4px 6px !important;      /* era 6px 8px en crema */
+  margin: 6px 0 8px 0 !important;   /* reduce separación */
+}
+/* Contenido de pestañas y grupos */
+#megaPanel .tab{ 
+  padding: 8px 10px !important;
+}
+#megaPanel .tab .group,
+#megaPanel .tab .row,
+#megaPanel .tab .section{
+  gap: 8px !important;              /* reduce gaps entre controles */
+}
+#megaPanel .field{ 
+  margin: 6px 0 !important;         /* inputs/labels más cercanos */
+}
+#megaPanel label{ 
+  margin-bottom: 4px !important;
+}
+#megaPanel input,
+#megaPanel select,
+#megaPanel textarea{
+  margin: 0 0 6px 0 !important;
+}
+/* Tipografía más eficiente en altura */
+#megaPanel h2, 
+#megaPanel h3{
+  margin: 4px 0 6px 0 !important;
+  line-height: 1.15 !important;
+}
+#megaPanel p, 
+#megaPanel li, 
+#megaPanel .hint-sm,
+#megaPanel label{
+  line-height: 1.25 !important;
+  margin-top: 2px !important;
+  margin-bottom: 4px !important;
+}
+/* Botones dentro del panel: margen superior suave para cerrar bloques */
+#megaPanel .btn{ 
+  margin-top: 6px !important;
+}
+/* Footer del panel un poco más compacto */
+#megaPanel .mp-footer{
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}
+</style>
+<style id="panelTaller5">
+/* Altura del panel +~5% y ajuste simétrico (sube y baja por igual) */
+:root{ --panel-h: 9.45; } /* antes 9 */
+#megaPanel{
+  height: calc(var(--square) * var(--panel-h)) !important;
+  top: calc(var(--square) * -1.225) !important; /* -1 - (0.45/2) */
+}
+</style>
+<style id="panelTopTighten">
+/* Acerca el contenido de todas las secciones al borde crema (mitad de margen) */
+#megaPanel .mp-tabs{
+  margin-bottom: 4px !important;   /* antes ~8px */
+}
+#megaPanel .tab{
+  padding-top: 4px !important;     /* antes ~8px */
+}
+#megaPanel .tab > :first-child{
+  margin-top: 0 !important;        /* elimina espacio extra del primer bloque */
+}
+#megaPanel h2, 
+#megaPanel h3{
+  margin-top: 2px !important;      /* aún más cerca del borde crema */
+}
+</style>
 </body>
 </html>
 
