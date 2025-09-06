@@ -2352,6 +2352,29 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   #board{ overflow: hidden; }
 }
 </style>
+<style id="menuHeaderShrink">
+/* Reducir altura de cabecera del panel (~15%) y su tipografía/botones */
+#megaPanel .mp-header{
+  padding: 8.5px 10.2px !important; /* 10px 12px -> -15% */
+}
+#megaPanel .mp-header #mpTitle{
+  font-size: 0.85em !important;     /* -15% */
+}
+#megaPanel .mp-header .hint-sm{
+  font-size: 0.85em !important;     /* -15% */
+}
+#megaPanel .mp-header .btn{
+  font-size: 0.85em !important;     /* -15% */
+  padding: 6.8px 10.2px !important; /* 8px 12px -> -15% */
+}
+</style>
+<style id="panelMinus10">
+/* Reducir tamaño total del panel (ancho y alto) un 10% */
+#megaPanel{
+  width: calc(var(--square) * 10.8) !important;  /* 12 -> 10.8 */
+  height: calc(var(--square) * 9) !important;    /* 10 -> 9 */
+}
+</style>
 </body>
 </html>
 
