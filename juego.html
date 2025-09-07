@@ -3732,11 +3732,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
     const html = `
       <div class="field aj-bot-diff-field" style="margin-top:10px;">
         <label for="selBotDiff"><strong>Dificultad del bot</strong></label>
-        <select id="selBotDiff" style="display:block; margin-top:6px; padding:4px 6px;">
-          <option value="easy">Fácil (rápido)</option>
-          <option value="medium">Media (intermedia)</option>
-          <option value="hard">Difícil (piensa más)</option>
-        </select>
+        <select id="selBotDiff" style="display:block; margin-top:6px; padding:4px 6px;" onchange="if(window.setBotDifficulty){setBotDifficulty(this.value)}"><option value="muy-facil">Muy fácil</option><option value="easy">Fácil</option><option value="medium">Media</option><option value="hard">Difícil</option><option value="expert">Experto</option><option value="master">Maestro</option></select>
         <div class="hint-sm" style="font-size:12px;opacity:.8;margin-top:4px;">Afecta Player vs Bot y Bot vs Bot.</div>
       </div>`;
 
@@ -3799,11 +3795,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
     const block = `
       <div class="field aj-bot-diff-modes" style="margin-top:14px;">
         <label for="selBotDiffModes"><strong>Dificultad del bot</strong></label>
-        <select id="selBotDiffModes" style="display:block; margin-top:6px; padding:4px 6px;">
-          <option value="easy">Fácil (rápido)</option>
-          <option value="medium">Media (intermedia)</option>
-          <option value="hard">Difícil (piensa más)</option>
-        </select>
+        <select id="selBotDiffModes" style="display:block; margin-top:6px; padding:4px 6px;" onchange="if(window.setBotDifficulty){setBotDifficulty(this.value)}"><option value="muy-facil">Muy fácil</option><option value="easy">Fácil</option><option value="medium">Media</option><option value="hard">Difícil</option><option value="expert">Experto</option><option value="master">Maestro</option></select>
         <div class="hint-sm" style="font-size:12px;opacity:.8;margin-top:4px;">
           Aplica a Player vs Bot y Bot vs Bot.
         </div>
@@ -4367,6 +4359,994 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
     document.addEventListener('DOMContentLoaded', addHintReal, {once:true});
   }else{
     addHintReal();
+  }
+})();
+</script>
+
+<!-- AJETREZ: Dificultad del Bot (6 niveles unificados) -->
+<script>
+(function(){
+  if(window.__AJ_BOT_DIFF__) return;
+  window.__AJ_BOT_DIFF__ = true;
+  const BOT_LEVELS = {
+    "muy-facil": { maxDepth: 0, timeMs:  40, quiescence: false },
+    "easy":      { maxDepth: 1, timeMs:  80, quiescence: false },
+    "medium":    { maxDepth: 2, timeMs: 220, quiescence: false },
+    "hard":      { maxDepth: 4, timeMs: 800, quiescence: true  },
+    "expert":    { maxDepth: 5, timeMs:1400, quiescence: true  },
+    "master":    { maxDepth: 6, timeMs:2200, quiescence: true  }
+  };
+  window.BOT_LEVELS = BOT_LEVELS;
+  function normalizeLevel(level){ return (level && BOT_LEVELS[level]) ? level : "easy"; }
+  window.BOT_DIFFICULTY = normalizeLevel(localStorage.getItem('aj:difficulty'));
+  function setBotDifficulty(level){
+    const lvl = normalizeLevel(level);
+    window.BOT_DIFFICULTY = lvl;
+    try{ localStorage.setItem('aj:difficulty', lvl); }catch(_){}
+    try{
+      if(window.BOT_UI && typeof window.BOT_UI.showFor==='function'){
+        const labelMap = {
+          "muy-facil":"Muy fácil",
+          "easy":"Fácil",
+          "medium":"Media",
+          "hard":"Difícil",
+          "expert":"Experto",
+          "master":"Maestro"
+        };
+        window.BOT_UI.showFor(`🤖 Dificultad: ${labelMap[lvl]||lvl}`, 1000);
+      }
+    }catch(_){}
+    try{
+      const ids = ["selBotDiffModes","selBotDiff"];
+      ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = lvl; });
+    }catch(_){}
+  }
+  window.setBotDifficulty = setBotDifficulty;
+  setBotDifficulty(window.BOT_DIFFICULTY);
+})();
+</script>
+
+
+<!-- === Bot Chooser Floating Panel (auto-sync with menu selectors) === -->
+<style>
+  #botChooserBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:saturate(120%) blur(1px);display:none;z-index:9998;}
+  #botChooserPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);min-width:320px;max-width:92vw;background:#fff;border:2px solid #222;border-radius:14px;padding:14px 14px 12px;box-shadow:0 18px 50px rgba(0,0,0,.25);display:none;z-index:9999;}
+  #botChooserPanel .row{display:flex;gap:10px;align-items:center;justify-content:space-between;}
+  #botChooserPanel h3{margin:0 0 10px 0;font-size:18px;}
+  #botChooserPanel .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+  #botChooserPanel .btn{appearance:none;border:none;border-radius:999px;padding:8px 12px;font-weight:800;cursor:pointer;background:#111;color:#fff;}
+  #botChooserPanel .btn.secondary{background:#e9e9e9;color:#111;border:1px solid #bbb;}
+  #botChooserPanel select{width:100%;padding:8px;border-radius:8px;border:1px solid #bbb;}
+</style>
+
+<!-- === Bot Chooser Floating Panel (per-color for Bot vs Bot) === -->
+<style>
+  #botChooserBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:saturate(120%) blur(1px);display:none;z-index:9998;}
+  #botChooserPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);min-width:340px;max-width:92vw;background:#fff;border:2px solid #222;border-radius:14px;padding:14px 14px 12px;box-shadow:0 18px 50px rgba(0,0,0,.25);display:none;z-index:9999;}
+  #botChooserPanel .row{display:flex;gap:10px;align-items:center;justify-content:space-between;}
+  #botChooserPanel h3{margin:0 0 10px 0;font-size:18px;}
+  #botChooserPanel .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+  #botChooserPanel .btn{appearance:none;border:none;border-radius:999px;padding:8px 12px;font-weight:800;cursor:pointer;background:#111;color:#fff;}
+  #botChooserPanel .btn.secondary{background:#e9e9e9;color:#111;border:1px solid #bbb;}
+  #botChooserPanel select{width:100%;padding:8px;border-radius:8px;border:1px solid #bbb;}
+  #bcSingle, #bcDual {display:none;}
+  #bcDual .col{display:flex;flex-direction:column;gap:6px;flex:1;}
+  #bcDual .cols{display:flex;gap:12px;}
+  #bcHelp{font-size:12px;opacity:.8;margin-top:6px;}
+</style>
+<div id="botChooserBackdrop" aria-hidden="true"></div>
+<div id="botChooserPanel" role="dialog" aria-modal="true" aria-labelledby="botChooserTitle">
+  <div class="row" style="margin-bottom:6px;">
+    <h3 id="botChooserTitle">Elegí la dificultad del bot</h3>
+    <button id="botChooserClose" class="btn secondary" type="button" aria-label="Cerrar">Cerrar</button>
+  </div>
+
+  <!-- Single-select (Player vs Bot) -->
+  <div id="bcSingle">
+    <label for="botChooserSelect" style="font-weight:700;display:block;margin-bottom:6px;">Dificultad</label>
+    <select id="botChooserSelect">
+      <option value="muy-facil">Muy fácil</option>
+      <option value="easy">Fácil</option>
+      <option value="normal">Normal</option>
+      <option value="hard">Difícil</option>
+      <option value="expert">Experto</option>
+      <option value="master">Maestro</option>
+    </select>
+  </div>
+
+  <!-- Dual-select (Bot vs Bot) -->
+  <div id="bcDual">
+    <div class="cols">
+      <div class="col">
+        <label for="botChooserSelectW" style="font-weight:700;">Blancas</label>
+        <select id="botChooserSelectW">
+          <option value="muy-facil">Muy fácil</option>
+          <option value="easy">Fácil</option>
+          <option value="normal">Normal</option>
+          <option value="hard">Difícil</option>
+          <option value="expert">Experto</option>
+          <option value="master">Maestro</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="botChooserSelectB" style="font-weight:700;">Negras</label>
+        <select id="botChooserSelectB">
+          <option value="muy-facil">Muy fácil</option>
+          <option value="easy">Fácil</option>
+          <option value="normal">Normal</option>
+          <option value="hard">Difícil</option>
+          <option value="expert">Experto</option>
+          <option value="master">Maestro</option>
+        </select>
+      </div>
+    </div>
+    <div id="bcHelp">En <strong>Bot vs Bot</strong> podés setear una dificultad distinta para cada color.</div>
+  </div>
+
+  <div class="actions">
+    <button id="botChooserApply" class="btn" type="button">Usar configuración</button>
+  </div>
+</div>
+<script>
+(function(){
+  if(window.__AJ_BOT_CHOOSER_DUAL__) return; window.__AJ_BOT_CHOOSER_DUAL__=true;
+
+  const $ = (sel,root=document)=>root.querySelector(sel);
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+
+  const backdrop = $('#botChooserBackdrop');
+  const panel = $('#botChooserPanel');
+
+  const bcSingle = $('#bcSingle');
+  const bcDual = $('#bcDual');
+
+  const selSingle = $('#botChooserSelect');
+  const selW = $('#botChooserSelectW');
+  const selB = $('#botChooserSelectB');
+
+  const btnClose = $('#botChooserClose');
+  const btnApply = $('#botChooserApply');
+
+  let pendingMode = null; // 'bot' | 'bot-vs-bot'
+
+  function showSingle(){ bcSingle.style.display='block'; bcDual.style.display='none'; }
+  function showDual(){ bcSingle.style.display='none'; bcDual.style.display='block'; }
+
+  function seedFromStorage(){
+    try{
+      const g = localStorage.getItem('ajetrez.bot.difficulty');
+      if(g) selSingle.value = g;
+      const w = localStorage.getItem('ajetrez.bot.difficulty.white');
+      const b = localStorage.getItem('ajetrez.bot.difficulty.black');
+      if(w) selW.value = w;
+      if(b) selB.value = b;
+    }catch(_){}
+    // Si existen selectores incrustados, obtener su valor como fallback
+    const embedded = $('#selBotDiff') || $('#selBotDiffModes');
+    if(embedded && embedded.value && !selSingle.value){ selSingle.value = embedded.value; }
+  }
+
+  function openChooser(mode){
+    pendingMode = mode || pendingMode;
+    if(pendingMode === 'bot-vs-bot') showDual(); else showSingle();
+    seedFromStorage();
+    backdrop.style.display='block'; panel.style.display='block';
+    setTimeout(()=>{ (pendingMode==='bot-vs-bot' ? selW : selSingle).focus(); }, 0);
+  }
+  function closeChooser(){ panel.style.display='none'; backdrop.style.display='none'; pendingMode=null; }
+
+  function syncEmbedded(value){
+    ['#selBotDiff','#selBotDiffModes'].forEach(sel=>{
+      const el = document.querySelector(sel);
+      if(el){
+        el.value = value;
+        try{ el.dispatchEvent(new Event('change', {bubbles:true})); }catch(_){}
+      }
+    });
+  }
+
+  function updateHUDLabels(){
+    try{
+      const hud = document.querySelector('#botHUDText');
+      const pill = document.querySelector('#modeGroup .mode-indicator');
+      if(pendingMode === 'bot-vs-bot'){
+        const lw = selW.options[selW.selectedIndex].textContent.trim();
+        const lb = selB.options[selB.selectedIndex].textContent.trim();
+        if(hud){ hud.textContent = 'Blancas: ' + lw + '  |  Negras: ' + lb; }
+        if(pill && /bot/i.test(pill.textContent||'')){
+          pill.textContent = 'Bot vs Bot ( ' + lw + ' / ' + lb + ' )';
+        }
+      }else{
+        const l = selSingle.options[selSingle.selectedIndex].textContent.trim();
+        if(hud){ hud.textContent = 'Bot: ' + l; }
+        if(pill && /bot/i.test(pill.textContent||'')){
+          pill.textContent = pill.textContent.replace(/\s*\(.*\)\s*$/,'') + ' ( ' + l + ' )';
+        }
+      }
+    }catch(_){}
+  }
+
+  function applyBotChoice(autoSwitchMode=true){
+    if(pendingMode === 'bot-vs-bot'){
+      const vW = selW.value, vB = selB.value;
+      try{
+        window.__BOT_DIFF_WHITE__ = vW;
+        window.__BOT_DIFF_BLACK__ = vB;
+        localStorage.setItem('ajetrez.bot.difficulty.white', vW);
+        localStorage.setItem('ajetrez.bot.difficulty.black', vB);
+      }catch(_){}
+      // Preferimos sincronizar el selector incrustado con el valor de BLANCAS (o cualquiera)
+      syncEmbedded(vW);
+      // Notificar, si existen APIs
+      try{ if(typeof window.setBotDifficultySide==='function'){ window.setBotDifficultySide('white', vW); } }catch(_){}
+      try{ if(typeof window.setBotDifficultySide==='function'){ window.setBotDifficultySide('black', vB); } }catch(_){}
+      // Fallback global si solo hay una API genérica
+      try{ if(typeof window.setBotDifficulty==='function'){ window.setBotDifficulty(vW); } }catch(_){}
+    }else{
+      const v = selSingle.value;
+      try{
+        window.__BOT_DIFFICULTY__ = v;
+        localStorage.setItem('ajetrez.bot.difficulty', v);
+      }catch(_){}
+      syncEmbedded(v);
+      try{ if(typeof window.setBotDifficulty==='function'){ window.setBotDifficulty(v); } }catch(_){}
+    }
+
+    updateHUDLabels();
+
+    if(autoSwitchMode && pendingMode){
+      try{
+        const btn = document.querySelector('.btn.mode[data-gmode="'+pendingMode+'"]');
+        if(btn){ btn.__aj_no_intercept__ = true; btn.click(); setTimeout(()=>btn.__aj_no_intercept__=false, 100); }
+      }catch(_){}
+    }
+  }
+
+  // Interceptar botones de modo que usan bots
+  function installInterceptors(){
+    $$('.btn.mode[data-gmode="bot"], .btn.mode[data-gmode="bot-vs-bot"]').forEach(btn=>{
+      if(btn.__aj_installed__) return; btn.__aj_installed__=true;
+      btn.addEventListener('click', (e)=>{
+        if(btn.__aj_no_intercept__) return;
+        e.preventDefault(); e.stopPropagation();
+        const gmode = btn.getAttribute('data-gmode');
+        openChooser(gmode);
+      }, true);
+    });
+  }
+
+  [btnClose, backdrop].forEach(el=> el && el.addEventListener('click', closeChooser));
+  btnApply && btnApply.addEventListener('click', function(){ applyBotChoice(true); closeChooser(); });
+
+  // También aplicar en vivo al cambiar cualquiera de los selects (sin esperar botón)
+  ;[selSingle, selW, selB].forEach(el=> el && el.addEventListener('change', function(){
+    applyBotChoice(false);
+  }));
+
+  // API pública
+  window.openBotChooser = openChooser;
+  window.applyBotChoice = applyBotChoice;
+
+  // Seed inicial
+  seedFromStorage();
+  updateHUDLabels();
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', installInterceptors, {once:true});
+  }else{
+    installInterceptors();
+  }
+})();
+</script>
+
+<!-- === In-menu dual bot difficulty selectors (visible only in Bot vs Bot) === -->
+<style>
+  /* Containers inside menu */
+  .aj-dual-diff-box{ display:none; margin-top:10px; padding:10px; border:1px dashed #bbb; border-radius:10px; background:#f9f9f9; }
+  .aj-dual-diff-box .cols{ display:flex; gap:12px; }
+  .aj-dual-diff-box .col{ flex:1; display:flex; flex-direction:column; gap:6px; }
+  .aj-dual-diff-box label{ font-weight:700; }
+  .aj-dual-diff-box select{ padding:8px; border:1px solid #bbb; border-radius:8px; }
+  .aj-dual-note{ font-size:12px; opacity:.8; margin-top:6px; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_MENU_DUAL_SELECTORS__) return; window.__AJ_MENU_DUAL_SELECTORS__=true;
+
+  const $ = (s,r=document)=>r.querySelector(s);
+  const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  // Helpers
+  function currentMode(){
+    try{
+      if (window.GAME_MODE) return window.GAME_MODE;
+    }catch(_){}
+    // Fallback: inspect mode pill text
+    const pill = $('#modeGroup .mode-indicator');
+    const txt = (pill && pill.textContent || '').toLowerCase();
+    if(txt.includes('bot vs bot')) return 'bot-vs-bot';
+    if(txt.includes('player vs bot')) return 'bot';
+    return 'pvp-local';
+  }
+  function ensureDualBoxes(){
+    // Insert dual selector in Personalización
+    let persHost = $('#personalizacion .content') || $('#personalizacion') || $('[data-tab="personalizacion"]') || $('#tab-personalizacion');
+    const singleSelPers = $('#selBotDiff');
+    if(persHost && singleSelPers && !$('#ajDualDiffPers')){
+      const box = document.createElement('div');
+      box.id = 'ajDualDiffPers';
+      box.className = 'aj-dual-diff-box';
+      box.innerHTML = '<div class="cols">'
+        + '<div class="col"><label for="selBotDiffWMenu">Blancas</label><select id="selBotDiffWMenu">'
+        + optionsHTML(singleSelPers) + '</select></div>'
+        + '<div class="col"><label for="selBotDiffBMenu">Negras</label><select id="selBotDiffBMenu">'
+        + optionsHTML(singleSelPers) + '</select></div>'
+        + '</div><div class="aj-dual-note">En Bot vs Bot podés setear distinta dificultad por color.</div>';
+      singleSelPers.parentElement && singleSelPers.parentElement.after(box);
+    }
+    // Insert dual selector in Modos tab (if our helper created the single there)
+    let modosHost = $('#tab-modos .content') || $('#tab-modos') || $('#modos .content') || $('#modos') || $('#menu-panel .tab-content[data-tab="modos"]');
+    const singleSelModos = $('#selBotDiffModes') || $('#selBotDiff'); // fallback
+    if(modosHost && singleSelModos && !$('#ajDualDiffModos')){
+      const box = document.createElement('div');
+      box.id = 'ajDualDiffModos';
+      box.className = 'aj-dual-diff-box';
+      box.innerHTML = '<div class="cols">'
+        + '<div class="col"><label for="selBotDiffWMenu2">Blancas</label><select id="selBotDiffWMenu2">'
+        + optionsHTML(singleSelModos) + '</select></div>'
+        + '<div class="col"><label for="selBotDiffBMenu2">Negras</label><select id="selBotDiffBMenu2">'
+        + optionsHTML(singleSelModos) + '</select></div>'
+        + '</div><div class="aj-dual-note">En Bot vs Bot podés setear distinta dificultad por color.</div>';
+      singleSelModos.parentElement && singleSelModos.parentElement.after(box);
+    }
+  }
+  function optionsHTML(selectEl){
+    return Array.from(selectEl.querySelectorAll('option')).map(o=>'<option value="'+o.value+'">'+o.textContent+'</option>').join('');
+  }
+
+  function seedFromStorage(){
+    const pairs = [
+      ['#selBotDiffWMenu','ajetrez.bot.difficulty.white'],
+      ['#selBotDiffBMenu','ajetrez.bot.difficulty.black'],
+      ['#selBotDiffWMenu2','ajetrez.bot.difficulty.white'],
+      ['#selBotDiffBMenu2','ajetrez.bot.difficulty.black'],
+    ];
+    pairs.forEach(([sel,key])=>{
+      const el = $(sel);
+      try{
+        const v = localStorage.getItem(key);
+        if(el && v) el.value = v;
+      }catch(_){}
+    });
+  }
+
+  function updateMenuDiffUI(){
+    ensureDualBoxes();
+    const mode = currentMode();
+    const isDual = (mode === 'bot-vs-bot');
+    const singleBoxes = ['#selBotDiff','#selBotDiffModes'];
+    const dualBoxes = ['#ajDualDiffPers','#ajDualDiffModos'];
+
+    // Toggle visibility
+    singleBoxes.forEach(sel=>{
+      const el = $(sel);
+      if(el){
+        const wrap = el.closest('.field') || el.parentElement;
+        if(wrap) wrap.style.display = isDual ? 'none' : '';
+      }
+    });
+    dualBoxes.forEach(sel=>{ const el=$(sel); if(el) el.style.display = isDual ? 'block' : 'none'; });
+
+    // Keep values in sync if switching between modes
+    if(!isDual){
+      // When returning to single, prefer white value
+      const w = ($('#selBotDiffWMenu')||{}).value || ($('#selBotDiffWMenu2')||{}).value;
+      if(w){
+        ['#selBotDiff','#selBotDiffModes'].forEach(id=>{
+          const el = $(id);
+          if(el){ el.value = w; try{ el.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){ } }
+        });
+      }
+    }
+  }
+
+  function applySide(side, value){
+    try{ localStorage.setItem('ajetrez.bot.difficulty.'+side, value); }catch(_){}
+    try{ if(typeof window.setBotDifficultySide==='function'){ window.setBotDifficultySide(side, value); } }catch(_){}
+    // Fallback: update global for compatibility
+    if(side==='white'){ try{ localStorage.setItem('ajetrez.bot.difficulty', value); }catch(_){} }
+  }
+
+  function hookListeners(){
+    // Change handlers for the 4 dual selects
+    ['#selBotDiffWMenu','#selBotDiffBMenu','#selBotDiffWMenu2','#selBotDiffBMenu2'].forEach(sel=>{
+      const el = $(sel);
+      if(el && !el.__aj_listened__){
+        el.__aj_listened__=true;
+        el.addEventListener('change', e=>{
+          const id = e.target.id.toLowerCase();
+          const side = id.includes('w') ? 'white' : 'black';
+          applySide(side, e.target.value);
+          // Update HUD labels if available
+          try{
+            const hud = $('#botHUDText');
+            const lw = ($('#selBotDiffWMenu')||$('#selBotDiffWMenu2')).value || '';
+            const lb = ($('#selBotDiffBMenu')||$('#selBotDiffBMenu2')).value || '';
+            if(hud && lw && lb){
+              const lwTxt = e.target.options[e.target.selectedIndex].textContent;
+              const otherSel = side==='white' ? ($('#selBotDiffBMenu')||$('#selBotDiffBMenu2')) : ($('#selBotDiffWMenu')||$('#selBotDiffWMenu2'));
+              const otherTxt = otherSel ? otherSel.options[otherSel.selectedIndex].textContent : '';
+              hud.textContent = 'Blancas: ' + (side==='white'?lwTxt:otherTxt) + '  |  Negras: ' + (side==='white'?otherTxt:lwTxt);
+            }
+          }catch(_){}
+          // Sync floating panel if open
+          const wPanel = $('#botChooserSelectW'); if(wPanel) wPanel.value = ($('#selBotDiffWMenu')||$('#selBotDiffWMenu2')).value;
+          const bPanel = $('#botChooserSelectB'); if(bPanel) bPanel.value = ($('#selBotDiffBMenu')||$('#selBotDiffBMenu2')).value;
+        });
+      }
+    });
+
+    // Watch mode button clicks to toggle UI
+    $$('.btn.mode').forEach(btn=>{
+      if(btn.__aj_mode_watch__) return; btn.__aj_mode_watch__ = true;
+      btn.addEventListener('click', ()=>{
+        // Give the app a moment to update GAME_MODE, then toggle
+        setTimeout(updateMenuDiffUI, 60);
+      }, true);
+    });
+  }
+
+  function init(){
+    ensureDualBoxes();
+    seedFromStorage();
+    updateMenuDiffUI();
+    hookListeners();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
+  }
+})();
+</script>
+
+<script>
+(function(){
+  if(window.__AJ_DD_INTEGRATION__) return; window.__AJ_DD_INTEGRATION__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+  const modeDD = $('#modeDropdown');
+  const btnMode = $('#btnMode');
+
+  function openChooserFor(mode){
+    window.__AJ_LAST_PENDING_MODE__ = mode;
+    try{
+      if(typeof window.openBotChooser==='function'){ window.openBotChooser(mode); }
+    }catch(_){}
+  }
+
+  // Intercept dd-item clicks for bot modes (capture phase to beat existing handler)
+  if(modeDD){
+    modeDD.addEventListener('click', function(e){
+      const item = e.target.closest('.dd-item'); if(!item) return;
+      const mode = (item.getAttribute('data-mode')||'').toLowerCase();
+      if(mode==='bot' || mode==='bot-vs-bot'){
+        e.preventDefault(); e.stopPropagation();
+        // close the dropdown
+        modeDD.classList.remove('open'); if(btnMode) btnMode.setAttribute('aria-expanded','false');
+        openChooserFor(mode);
+      }
+    }, true);
+  }
+
+  // Monkey-patch applyBotChoice to also switch the top-left mode via setGameMode
+  (function(){
+    const orig = window.applyBotChoice;
+    window.applyBotChoice = function(autoSwitchMode){
+      try{ orig && orig.apply(this, arguments); }catch(_){}
+      if(autoSwitchMode && window.__AJ_LAST_PENDING_MODE__){
+        // Use setGameMode if available
+        const mode = window.__AJ_LAST_PENDING_MODE__;
+        let label = '';
+        try{
+          const item = document.querySelector('#modeDropdown .dd-item[data-mode="'+mode+'"]');
+          label = (item && (item.getAttribute('data-label') || item.textContent)) || '';
+        }catch(_){}
+        try{
+          if(typeof window.setGameMode==='function'){
+            window.setGameMode(mode, label);
+          }else{
+            // Fallback: simulate click on the dd item
+            const item = document.querySelector('#modeDropdown .dd-item[data-mode="'+mode+'"]');
+            if(item){ item.click(); }
+          }
+        }catch(_){}
+        window.__AJ_LAST_PENDING_MODE__ = null;
+      }
+    };
+  })();
+
+  // Ensure the pill text renders desired per-color labels when in Bot vs Bot
+  window.addEventListener('aj:mode:change', function(ev){
+    try{
+      if(ev && ev.detail && ev.detail.mode==='bot-vs-bot'){
+        const pill = document.querySelector('#modeGroup .mode-indicator');
+        const w = localStorage.getItem('ajetrez.bot.difficulty.white');
+        const b = localStorage.getItem('ajetrez.bot.difficulty.black');
+        const wLabel = mapLabel(w), bLabel = mapLabel(b);
+        if(pill){ pill.textContent = 'Bot vs Bot ( ' + (wLabel||'—') + ' / ' + (bLabel||'—') + ' )'; }
+      }
+    }catch(_){}
+  });
+
+  function mapLabel(val){
+    switch(val){
+      case 'muy-facil': return 'Muy fácil';
+      case 'easy': return 'Fácil';
+      case 'normal': return 'Normal';
+      case 'hard': return 'Difícil';
+      case 'expert': return 'Experto';
+      case 'master': return 'Maestro';
+      default: return '';
+    }
+  }
+})();
+</script>
+
+<!-- === Top-right Game Timer Indicator === -->
+<style>
+  #timeIndicator{
+    position:absolute; top:6px; right:10px;
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 10px; border-radius:999px;
+    background:rgba(0,0,0,.75); color:#fff; font-weight:800;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+    z-index:21; /* above dropdown */
+    user-select:none;
+  }
+  #timeIndicator .dot{ width:8px; height:8px; border-radius:50%; background:#9ae6b4; box-shadow:0 0 10px rgba(154,230,180,.8); }
+  #timeIndicator.paused .dot{ background:#f6ad55; box-shadow:none; }
+  #timeIndicator.finished .dot{ background:#fc8181; }
+  #timeIndicator .label{ font-size:12px; opacity:.85; font-weight:700; }
+  #timeTxt{ font-variant-numeric:tabular-nums; letter-spacing:.5px; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_TIMER__) return; window.__AJ_TIMER__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+  const topBar = $('#topBar');
+
+  // UI
+  let box = document.createElement('div');
+  box.id = 'timeIndicator';
+  box.innerHTML = '<span class="dot" aria-hidden="true"></span><span class="label">Tiempo</span><span id="timeTxt">00:00</span>';
+  (topBar||document.body).appendChild(box);
+
+  // State
+  let startTS = null;     // timestamp (ms) when running started
+  let acc = 0;            // accumulated ms when paused
+  let tick = null;        // interval id
+  let running = false;
+
+  function fmt(ms){
+    ms = Math.max(0, ms|0);
+    const s = Math.floor(ms/1000);
+    const m = Math.floor(s/60);
+    const h = Math.floor(m/60);
+    const mm = (m%60).toString().padStart(2,'0');
+    const ss = (s%60).toString().padStart(2,'0');
+    return (h>0? (h.toString().padStart(2,'0')+':') : '') + mm + ':' + ss;
+  }
+  function render(){
+    const txt = $('#timeTxt');
+    if(!txt) return;
+    const now = Date.now();
+    const val = running ? (acc + (now - startTS)) : acc;
+    txt.textContent = fmt(val);
+  }
+  function start(){
+    if(running) return;
+    running = true; startTS = Date.now();
+    box.classList.remove('paused','finished');
+    if(tick) clearInterval(tick);
+    tick = setInterval(render, 250);
+    render();
+  }
+  function stop() {
+    if(!running) return;
+    acc += (Date.now() - startTS);
+    running = false; startTS = null;
+    box.classList.add('paused');
+    if(tick) { clearInterval(tick); tick=null; }
+    render();
+  }
+  function reset(){
+    acc = 0; startTS = null; running=false;
+    box.classList.remove('paused','finished');
+    render();
+  }
+  function finish(){
+    stop(); box.classList.add('finished');
+  }
+
+  // Expose for other scripts (optional)
+  window.__AJ_TIMER_API__ = { start, stop, reset, finish, render };
+
+  // Hook restartGame to reset timer
+  (function(){
+    const g = window;
+    const orig = g.restartGame;
+    g.restartGame = function(){
+      try{ reset(); }catch(_){}
+      return orig ? orig.apply(this, arguments) : undefined;
+    };
+  })();
+
+  // Start on pressing "Comenzar partida" (overlay)
+  document.addEventListener('click', (e)=>{
+    if(e.target && e.target.id === 'btnStartGame'){
+      setTimeout(()=>{ try{ start(); }catch(_){}} , 10);
+    }
+  }, true);
+
+  // Observe start overlay visibility changes (covers auto-inicio o cambios indirectos)
+  const startOv = $('#startOverlay');
+  if(startOv && window.MutationObserver){
+    const mo = new MutationObserver(()=>{
+      const style = window.getComputedStyle(startOv);
+      if(style.display==='none' || style.visibility==='hidden' || style.opacity==='0'){
+        start(); // overlay oculto => partida en curso
+      }else{
+        stop();  // overlay visible => pausa/espera
+      }
+    });
+    mo.observe(startOv, { attributes:true, attributeFilter:['style','class'] });
+  }
+
+  // Stop when FIN overlay appears
+  const fin = $('#overlay');
+  if(fin && window.MutationObserver){
+    const mf = new MutationObserver(()=>{
+      const style = window.getComputedStyle(fin);
+      const visible = (style.display!=='none' && style.visibility!=='hidden' && style.opacity!=='0');
+      if(visible){ finish(); }
+    });
+    mf.observe(fin, { attributes:true, attributeFilter:['style','class'] });
+  }
+
+  // Also respond to custom events if the app emits them
+  window.addEventListener('aj:mode:change', ()=>{ reset(); });      // switching modes resets clock
+  window.addEventListener('aj:game:end', ()=>{ finish(); });
+  window.addEventListener('aj:game:pause', ()=>{ stop(); });
+  window.addEventListener('aj:game:resume', ()=>{ start(); });
+
+  // Initial render
+  render();
+})();
+</script>
+
+<style>
+  #pauseBtn{
+    cursor:pointer; border:none; outline:none;
+    background:#e53e3e; color:#fff; font-weight:700;
+    padding:6px 10px; border-radius:8px;
+    transition:background .2s; font-size:12px;
+  }
+  #pauseBtn:hover{ background:#c53030; }
+  #pauseBtn.paused{ background:#2b6cb0; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_TIMER_PAUSE_BTN__) return; window.__AJ_TIMER_PAUSE_BTN__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+  const box = document.getElementById('timeIndicator');
+  if(!box) return;
+  const btn = document.createElement('button');
+  btn.id = 'pauseBtn';
+  btn.textContent = '⏸ Pausa';
+  box.appendChild(btn);
+
+  function togglePause(){
+    if(!window.__AJ_TIMER_API__) return;
+    if(btn.classList.contains('paused')){
+      // resume
+      window.__AJ_TIMER_API__.start();
+      btn.classList.remove('paused');
+      btn.textContent = '⏸ Pausa';
+    }else{
+      // pause
+      window.__AJ_TIMER_API__.stop();
+      btn.classList.add('paused');
+      btn.textContent = '▶ Reanudar';
+    }
+  }
+  btn.addEventListener('click', togglePause);
+})();
+</script>
+
+<style>
+  /* Overlay to block interactions when paused */
+  #pauseOverlay{
+    position:absolute; inset:0;
+    background:rgba(0,0,0,.25);
+    display:none; align-items:center; justify-content:center;
+    z-index:15; /* above board, below menus */
+    pointer-events:auto;
+  }
+  #pauseOverlay .card{
+    background:rgba(0,0,0,.75);
+    color:#fff; padding:12px 16px; border-radius:12px; font-weight:800;
+    box-shadow:0 8px 24px rgba(0,0,0,.3);
+  }
+  /* Visual dim & block shift controls while paused */
+  body.aj-paused #shiftCtrl{ opacity:.5; pointer-events:none; }
+</style>
+<script>
+(function(){
+  if(window.__AJ_PAUSE_BLOCK__) return; window.__AJ_PAUSE_BLOCK__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+
+  const boardWrap = $('#boardWrap') || $('#board') || document.body;
+  const ov = document.createElement('div');
+  ov.id = 'pauseOverlay';
+  ov.innerHTML = '<div class="card">⏸ Pausa</div>';
+  (boardWrap || document.body).appendChild(ov);
+
+  // Global pause state
+  window.__AJ_PAUSED__ = false;
+
+  function showPauseUI(on){
+    document.body.classList.toggle('aj-paused', !!on);
+    ov.style.display = on ? 'flex' : 'none';
+  }
+
+  // Hook pause button if present
+  const pauseBtn = document.getElementById('pauseBtn');
+  function pause(){ try{ window.__AJ_TIMER_API__ && window.__AJ_TIMER_API__.stop(); }catch(_){}
+    window.__AJ_PAUSED__ = true; showPauseUI(true);
+    window.dispatchEvent(new CustomEvent('aj:game:pause'));
+  }
+  function resume(){ try{ window.__AJ_TIMER_API__ && window.__AJ_TIMER_API__.start(); }catch(_){}
+    window.__AJ_PAUSED__ = false; showPauseUI(false);
+    window.dispatchEvent(new CustomEvent('aj:game:resume'));
+  }
+  if(pauseBtn && !pauseBtn.__aj_bound__){
+    pauseBtn.__aj_bound__ = true;
+    pauseBtn.addEventListener('click', function(){
+      // button text/state already toggled by previous script; just sync overlay here
+      if(pauseBtn.classList.contains('paused')) pause(); else resume();
+    });
+  }
+
+  // Guard bot scheduling
+  (function(){
+    const g = window;
+    const origSchedule = g.scheduleBotMove;
+    g.scheduleBotMove = function(){
+      if(window.__AJ_PAUSED__){
+        // cancel any previous flag if app uses it
+        try{ g.__BOT_SCHEDULED__ = false; }catch(_){}
+        return; // do not schedule while paused
+      }
+      return origSchedule ? origSchedule.apply(this, arguments) : undefined;
+    };
+  })();
+
+  // Optional: guard immediate bot move executor if exists
+  (function(){
+    const g = window;
+    const origMake = g.makeBotMove || g.executeBotMove;
+    if(origMake){
+      const key = origMake===g.makeBotMove ? 'makeBotMove' : 'executeBotMove';
+      const orig = origMake;
+      g[key] = function(){
+        if(window.__AJ_PAUSED__) return;
+        return orig.apply(this, arguments);
+      };
+    }
+  })();
+
+  // Block pointer events on board while paused
+  ['#board','#boardWrap'].forEach(sel=>{
+    const el = $(sel);
+    if(el){
+      el.addEventListener('click', function(e){
+        if(window.__AJ_PAUSED__){
+          e.preventDefault(); e.stopPropagation();
+        }
+      }, true);
+    }
+  });
+
+  // Reset pause on restart/mode change
+  function resetPause(){
+    window.__AJ_PAUSED__ = false; showPauseUI(false);
+    const btn = document.getElementById('pauseBtn');
+    if(btn){ btn.classList.remove('paused'); btn.textContent='⏸ Pausa'; }
+  }
+  const g = window;
+  const origRestart = g.restartGame;
+  g.restartGame = function(){
+    resetPause();
+    return origRestart ? origRestart.apply(this, arguments) : undefined;
+  };
+  window.addEventListener('aj:mode:change', resetPause);
+
+})();
+</script>
+
+<script>
+(function(){
+  if(window.__AJ_START_GUARD__) return; window.__AJ_START_GUARD__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+
+  // Global flag: game truly started only after pressing the central Start button
+  window.__AJ_GAME_STARTED__ = false;
+
+  // Disable pause button until started
+  function setPauseEnabled(on){
+    const btn = document.getElementById('pauseBtn');
+    if(!btn) return;
+    if(on){
+      btn.removeAttribute('disabled');
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+      btn.title = 'Pausar partida';
+    }else{
+      btn.setAttribute('disabled','true');
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+      btn.title = 'Disponible cuando comience la partida';
+      // Normalize visual state
+      btn.classList.remove('paused');
+      btn.textContent = '⏸ Pausa';
+    }
+  }
+  setPauseEnabled(false);
+
+  // Guard the timer API: don't allow start() before the game has started
+  (function(){
+    if(!window.__AJ_TIMER_API__) return;
+    const api = window.__AJ_TIMER_API__;
+    const origStart = api.start;
+    api.start = function(){
+      if(!window.__AJ_GAME_STARTED__) return;  // ignore starts before pressing the Start button
+      return origStart ? origStart.apply(this, arguments) : undefined;
+    };
+    // stopping/resetting is fine anytime
+  })();
+
+  // Hook the central "Comenzar partida" button
+  document.addEventListener('click', (e)=>{
+    if(e && e.target && e.target.id==='btnStartGame'){
+      window.__AJ_GAME_STARTED__ = true;
+      setPauseEnabled(true);
+      // Now actually start the timer
+      try{ window.__AJ_TIMER_API__ && window.__AJ_TIMER_API__.start(); }catch(_){}
+    }
+  }, true);
+
+  // If the app programmatically hides/shows the start overlay, don't auto-start.
+  // We only react to explicit button press to avoid conflicts.
+  const startOv = $('#startOverlay');
+  if(startOv && window.MutationObserver){
+    const mo = new MutationObserver(()=>{
+      // If overlay reappears, consider it "not started"
+      const style = window.getComputedStyle(startOv);
+      const visible = !(style.display==='none' || style.visibility==='hidden' || style.opacity==='0');
+      if(visible){
+        window.__AJ_GAME_STARTED__ = false;
+        setPauseEnabled(false);
+        try{ window.__AJ_TIMER_API__ && window.__AJ_TIMER_API__.reset(); }catch(_){}
+      }
+    });
+    mo.observe(startOv, { attributes:true, attributeFilter:['style','class'] });
+  }
+
+  // Reset flag on restart/mode change/end
+  function resetAll(){
+    window.__AJ_GAME_STARTED__ = false;
+    setPauseEnabled(false);
+  }
+  window.addEventListener('aj:mode:change', resetAll);
+  window.addEventListener('aj:game:end', resetAll);
+  // Also patch restartGame to clear
+  (function(){
+    const g = window;
+    const orig = g.restartGame;
+    g.restartGame = function(){
+      resetAll();
+      return orig ? orig.apply(this, arguments) : undefined;
+    };
+  })();
+
+})();
+</script>
+
+<script>
+(function(){
+  if(window.__AJ_START_FIX2__) return; window.__AJ_START_FIX2__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+
+  function setPauseEnabled(on){
+    const btn = document.getElementById('pauseBtn');
+    if(!btn) return;
+    if(on){
+      btn.removeAttribute('disabled');
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+      btn.title = 'Pausar partida';
+    }else{
+      btn.setAttribute('disabled','true');
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+      btn.title = 'Disponible cuando comience la partida';
+    }
+  }
+
+  function markStarted(){
+    window.__AJ_GAME_STARTED__ = true;
+    setPauseEnabled(true);
+  }
+
+  // If the app emits a first turn change, consider the game started
+  let startArmed = true;
+  window.addEventListener('aj:turn:change', function onTurn(ev){
+    if(startArmed && !window.__AJ_GAME_STARTED__){
+      startArmed = false;
+      markStarted();
+    }
+  }, { once:false });
+
+  // As a fallback, if someone programmatically hides the start overlay and a move happens soon after,
+  // we enable pause; additionally, enable when the overlay is hidden and any click occurs on the board.
+  document.addEventListener('click', function(e){
+    const startOv = document.getElementById('startOverlay');
+    const board = document.getElementById('board');
+    if(!window.__AJ_GAME_STARTED__ && startOv && board){
+      const cs = window.getComputedStyle(startOv);
+      const hidden = (cs.display==='none' || cs.visibility==='hidden' || cs.opacity==='0');
+      if(hidden && (board===e.target || (board.contains && board.contains(e.target)))){
+        markStarted();
+      }
+    }
+  }, true);
+})();
+</script>
+
+<script>
+(function(){
+  if(window.__AJ_START_ENABLE_ON_HIDE__) return; window.__AJ_START_ENABLE_ON_HIDE__=true;
+  const $ = (s,r=document)=>r.querySelector(s);
+
+  function setPauseEnabled(on){
+    const btn = document.getElementById('pauseBtn');
+    if(!btn) return;
+    if(on){
+      btn.removeAttribute('disabled');
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+      btn.title = 'Pausar partida';
+    }else{
+      btn.setAttribute('disabled','true');
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+      btn.title = 'Disponible cuando comience la partida';
+    }
+  }
+
+  const startOv = $('#startOverlay');
+  if(startOv && window.MutationObserver){
+    const mo = new MutationObserver(()=>{
+      const cs = window.getComputedStyle(startOv);
+      const hidden = (cs.display==='none' || cs.visibility==='hidden' || cs.opacity==='0');
+      if(hidden){
+        // Consider game "started" from a UX perspective: allow pausing immediately
+        window.__AJ_GAME_STARTED__ = true;
+        setPauseEnabled(true);
+      }
+    });
+    mo.observe(startOv, { attributes:true, attributeFilter:['style','class'] });
   }
 })();
 </script>
