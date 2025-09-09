@@ -860,10 +860,22 @@ body, html{overflow:visible!important;}
 </style>
 
 
-<style id="aj-bottombar-height-minus-3mm">
-  /* Achicar la altura del contenedor inferior ~3mm desde abajo hacia arriba */
+
+
+
+<style id="aj-container-symmetric-3mm">
+  /* Achicar 3mm arriba y 3mm abajo el "contenedor" del juego
+     reduciendo los separadores que están antes y después del tablero. */
+
+  /* Los separadores son <div style="height:var(--toolbar-gap)"> */
+  div[style*="height:var(--toolbar-gap)"]{
+    height: max(0px, calc(var(--toolbar-gap) - 3mm)) !important;
+  }
+
+  /* Asegurar que el alto del bottom bar vuelva a su valor base para mantener simetría
+     (ya no restamos 3mm aquí, porque los recortamos con el separador inferior). */
   #bottomBar{
-    height: calc(var(--toolbar-h) - (var(--square) * 1.5) - 3mm) !important;
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5)) !important;
   }
 </style>
 
@@ -6377,3 +6389,73 @@ div[style="height:var(--toolbar-gap)"]{
   });
 })();
 </script>
+
+
+<style id="aj-bars-minus-3mm">
+  /* Achicar 3 mm los contenedores de botones superior e inferior */
+  #topBar{
+    min-height: calc(var(--toolbar-h) - 3mm) !important;
+  }
+  #bottomBar{
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5) - 3mm) !important;
+  }
+</style>
+
+
+<style id="aj-bars-trim-system">
+  /* Sistema de recorte para barras superior e inferior
+     Problemas detectados que impedían achicar más:
+     1) .bar { height: var(--toolbar-h); } fija la altura del #topBar en 64px.
+        => Solución: sobrescribir sólo #topBar con height reducido vía variable.
+     2) #bottomBar usa height: calc(var(--toolbar-h) - (var(--square) * 1.5) ...);
+        y además algunos botones dentro tienen transform: translateY(-3mm), lo que
+        visualmente “compensa” el recorte y parece que no baja.
+        => Solución: aplicar un recorte explícito y neutralizar ese transform.
+     3) Separadores con height: var(--toolbar-gap) arriba/abajo del tablero
+        agregan altura total, pero no impiden achicar la barra en sí. */
+
+  :root{
+    --bar-trim: 3mm; /* Ajustá este valor para recortar más/menos */
+  }
+
+  /* TOP BAR: anula la altura fija de .bar para este caso */
+  #topBar.bar{
+    height: calc(var(--toolbar-h) - var(--bar-trim)) !important;
+  }
+
+  /* Mantener alineados los elementos absolutamente posicionados del top bar */
+  #topBar .mode-group{ top: calc(6px + var(--bar-trim)) !important; }
+  #timeIndicator{ top: calc(6px + var(--bar-trim)) !important; }
+
+  /* BOTTOM BAR: recorte explícito adicional coherente con el cálculo existente */
+  #bottomBar{
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5) - var(--bar-trim)) !important;
+  }
+
+  /* Evitar que el transform de los botones “suba” el contenido,
+     enmascarando el recorte real del contenedor */
+  #bottomBar .btn,
+  #bottomBar button,
+  #bottomBar a.btn,
+  #bottomBar .button{
+    transform: none !important;
+  }
+</style>
+
+
+<style id="aj-regpanel-trim-1sq">
+  /* Recorte simétrico del panel de Registros: -1 casillero arriba y -1 abajo */
+  #regPanel.rg-top{
+    top: calc(3mm + var(--square)) !important;
+    max-height: calc(100vh - 6mm - (var(--square) * 2)) !important;
+  }
+  /* Si hay desborde, permitimos scroll interno (ya está activo por overflow:auto) */
+</style>
+
+
+<style id="aj-bottombar-extra-minus-3mm">
+  /* Recorte adicional del contenedor inferior: -3mm desde abajo hacia arriba */
+  #bottomBar{
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5) - var(--bar-trim) - 3mm) !important;
+  }
+</style>
