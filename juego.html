@@ -1815,23 +1815,284 @@ window.addEventListener('aj:mode:change', (e)=>{
   function sameMove(a,b){ return a && b && a.from.r===b.from.r && a.from.c===b.from.c && a.to.r===b.to.r && a.to.c===b.to.c; }
   function reverseOf(a,b){ return a && b && a.from.r===b.to.r && a.from.c===b.to.c && a.to.r===b.from.r && a.to.c===b.from.c; }
   function encode(m){ return `${m.from.r},${m.from.c}->${m.to.r},${m.to.c}`; }
-  function scoreMove(m){
-    let s = 0;
-    if(m.isCapture) s += 100;
-    const enc = encode(m);
-    if(BOT_STATE.recent.includes(enc)) s -= 20;
-    if(BOT_STATE.lastBotMove && sameMove(m, BOT_STATE.lastBotMove)) s -= 100;
-    if(BOT_STATE.lastBotMove && reverseOf(m, BOT_STATE.lastBotMove)) s -= 60;
-    return s + Math.random()*5;
+  // === BOT mejorado con niveles, evaluación y búsqueda ligera ===
+
+// Parámetros por dificultad
+const BOT_PARAMS = {
+  'muy-facil': { depth: 0, noise: 0.60, blunder: 0.40, timeMs: 30,  beam: 6 },
+  'easy'     : { depth: 1, noise: 0.35, blunder: 0.20, timeMs: 60,  beam: 8 },
+  'normal'   : { depth: 1, noise: 0.15, blunder: 0.05, timeMs: 120, beam: 10 },
+  'hard'     : { depth: 2, noise: 0.05, blunder: 0.00, timeMs: 180, beam: 12 },
+  'expert'   : { depth: 2, noise: 0.00, blunder: 0.00, timeMs: 250, beam: 14 },
+  'master'   : { depth: 3, noise: 0.00, blunder: 0.00, timeMs: 350, beam: 16 },
+};
+
+function getStoredDiffFor(color){
+  // Lee almacenamiento según modo
+  try{
+    const s = (typeof loadStored==='function') ? loadStored() : null;
+    const mode = (typeof window!=='undefined' && window.GAME_MODE) ? window.GAME_MODE : 'bot';
+    if(!s) return 'normal';
+    if(mode==='bot-vs-bot'){
+      return (color==='w') ? (s.w || 'muy-facil') : (s.b || 'muy-facil');
+    } else {
+      return s.single || 'muy-facil';
+    }
+  }catch(_){ return 'muy-facil'; }
+}
+
+function getParamsFor(color){
+  const key = getStoredDiffFor(color);
+  return BOT_PARAMS[key] || BOT_PARAMS['normal'];
+}
+
+// Valores de piezas (centipawns)
+const PV = { 'P':100, 'N':320, 'B':330, 'R':500, 'Q':900, 'K':20000 };
+
+// Tablas piece-square muy simples (orientadas para blancas).
+// Para negras se espeja por filas (r -> 7-r).
+const PST_P = [
+  [ 0,  0,  0,  0,  0,  0,  0,  0],
+  [50, 50, 50, 50, 50, 50, 50, 50],
+  [10, 10, 20, 30, 30, 20, 10, 10],
+  [ 5,  5, 10, 25, 25, 10,  5,  5],
+  [ 0,  0,  0, 20, 20,  0,  0,  0],
+  [ 5, -5,-10,  0,  0,-10, -5,  5],
+  [ 5, 10, 10,-20,-20, 10, 10,  5],
+  [ 0,  0,  0,  0,  0,  0,  0,  0],
+];
+const PST_N = [
+  [-50,-40,-30,-30,-30,-30,-40,-50],
+  [-40,-20,  0,  0,  0,  0,-20,-40],
+  [-30,  0, 10, 15, 15, 10,  0,-30],
+  [-30,  5, 15, 20, 20, 15,  5,-30],
+  [-30,  0, 15, 20, 20, 15,  0,-30],
+  [-30,  5, 10, 15, 15, 10,  5,-30],
+  [-40,-20,  0,  5,  5,  0,-20,-40],
+  [-50,-40,-30,-30,-30,-30,-40,-50],
+];
+const PST_B = [
+  [-20,-10,-10,-10,-10,-10,-10,-20],
+  [-10,  5,  0,  0,  0,  0,  5,-10],
+  [-10, 10, 10, 10, 10, 10, 10,-10],
+  [-10,  0, 10, 10, 10, 10,  0,-10],
+  [-10,  5,  5, 10, 10,  5,  5,-10],
+  [-10,  0,  5, 10, 10,  5,  0,-10],
+  [-10,  0,  0,  0,  0,  0,  0,-10],
+  [-20,-10,-10,-10,-10,-10,-10,-20],
+];
+const PST_R = [
+  [ 0,  0,  0,  5,  5,  0,  0,  0],
+  [-5,  0,  0,  0,  0,  0,  0, -5],
+  [-5,  0,  0,  0,  0,  0,  0, -5],
+  [-5,  0,  0,  0,  0,  0,  0, -5],
+  [-5,  0,  0,  0,  0,  0,  0, -5],
+  [-5,  0,  0,  0,  0,  0,  0, -5],
+  [ 5, 10, 10, 10, 10, 10, 10,  5],
+  [ 0,  0,  0,  0,  0,  0,  0,  0],
+];
+const PST_Q = [
+  [-20,-10,-10, -5, -5,-10,-10,-20],
+  [-10,  0,  5,  0,  0,  0,  0,-10],
+  [-10,  5,  5,  5,  5,  5,  0,-10],
+  [ -5,  0,  5,  5,  5,  5,  0, -5],
+  [ -5,  0,  5,  5,  5,  5,  0, -5],
+  [-10,  0,  5,  5,  5,  5,  0,-10],
+  [-10,  0,  0,  0,  0,  0,  0,-10],
+  [-20,-10,-10, -5, -5,-10,-10,-20],
+];
+const PST_K = [
+  [-30,-40,-40,-50,-50,-40,-40,-30],
+  [-30,-40,-40,-50,-50,-40,-40,-30],
+  [-30,-40,-40,-50,-50,-40,-40,-30],
+  [-30,-30,-30,-40,-40,-30,-30,-30],
+  [-20,-20,-20,-20,-20,-20,-20,-20],
+  [-10,-10,-10,-10,-10,-10,-10,-10],
+  [ 20, 20,  0,  0,  0,  0, 20, 20],
+  [ 20, 30, 10,  0,  0, 10, 30, 20],
+];
+
+function pstFor(type){
+  switch(type){
+    case 'P': return PST_P;
+    case 'N': return PST_N;
+    case 'B': return PST_B;
+    case 'R': return PST_R;
+    case 'Q': return PST_Q;
+    case 'K': return PST_K;
   }
-  function pickMove(color){
-    const ms = allLegalMoves(color);
-    if(ms.length===0) return null;
-    ms.sort((a,b)=> scoreMove(b) - scoreMove(a));
-    return ms[0];
+  return PST_P;
+}
+
+// Utilidades
+function mirrorRow(r){ return 7 - r; }
+function sgn(x){ return x<0? -1 : 1; }
+function clamp(x,a,b){ return x<a? a : (x>b? b : x); }
+
+// Generar movimientos para un (board,offs) dado
+function genMoves(boardState, offsState, color, ep){
+  const vis = buildVisible(boardState, offsState);
+  const out = [];
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const p = vis[r][c];
+      if(!p || p.color!==color) continue;
+      const ms = legalMovesFor(vis, boardState, offsState, r, c, color, ep);
+      for(const m of ms){
+        const rr=m[0], cc=m[1], special=m[2]||null;
+        const target = vis[rr][cc];
+        const isCap = !!(target && target.color!==color);
+        out.push({from:{r,c}, to:{r:rr,c:cc}, special, isCapture:isCap, piece:p, victim:target||null});
+      }
+    }
+  }
+  return out;
+}
+
+// Evaluación (desde la perspectiva de 'side')
+function evaluate(boardState, offsState, side){
+  const vis = buildVisible(boardState, offsState);
+  let white = 0, black = 0;
+
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const p = vis[r][c]; if(!p) continue;
+      const base = PV[p.type] || 0;
+      const pst = pstFor(p.type);
+      const rr = (p.color==='w') ? mirrorRow(r) : r; // orientar PST a blancas
+      const ps = pst[rr][c];
+      const val = base + ps;
+      if(p.color==='w') white += val; else black += val;
+    }
   }
 
-  async function scheduleBotMove(){
+  // Movilidad (peso suave)
+  try{
+    const wMoves = genMoves(boardState, offsState, 'w', epTarget).length;
+    const bMoves = genMoves(boardState, offsState, 'b', epTarget).length;
+    white += clamp(wMoves, 0, 40) * 2;
+    black += clamp(bMoves, 0, 40) * 2;
+  }catch(_){}
+
+  let score = white - black;
+  return (side==='w') ? score : -score;
+}
+
+// Ordenar movimientos (capturas primero, MVV-LVA básico)
+function orderMoves(moves){
+  return moves.slice().sort((a,b)=>{
+    const av = a.isCapture ? (PV[a.victim?.type||'P'] - (PV[a.piece.type]||0)*0.01) : -1e6;
+    const bv = b.isCapture ? (PV[b.victim?.type||'P'] - (PV[b.piece.type]||0)*0.01) : -1e6;
+    if(av!==bv) return bv - av;
+    return (PV[b.piece.type]||0) - (PV[a.piece.type]||0);
+  });
+}
+
+// Quiescence: sólo capturas hasta estabilizar
+function qsearch(boardState, offsState, side, alpha, beta, deadline){
+  if(performance && performance.now && performance.now()>deadline) return evaluate(boardState, offsState, side);
+  let stand = evaluate(boardState, offsState, side);
+  if(stand >= beta) return beta;
+  if(stand > alpha) alpha = stand;
+
+  const caps = orderMoves(genMoves(boardState, offsState, side, epTarget).filter(m=>m.isCapture));
+  for(const m of caps){
+    if(performance && performance.now && performance.now()>deadline) break;
+    const nxt = applyMove(boardState, offsState, m.from, m.to, m.special);
+    const score = -qsearch(nxt.board, offsState, (side==='w'?'b':'w'), -beta, -alpha, deadline);
+    if(score >= beta) return beta;
+    if(score > alpha) alpha = score;
+  }
+  return alpha;
+}
+
+// Minimax con poda alfa-beta + quiescence en hoja
+function search(boardState, offsState, side, depth, alpha, beta, deadline){
+  if(performance && performance.now && performance.now()>deadline){
+    return evaluate(boardState, offsState, side);
+  }
+  if(depth <= 0){
+    return qsearch(boardState, offsState, side, alpha, beta, deadline);
+  }
+  const moves = orderMoves(genMoves(boardState, offsState, side, epTarget));
+  if(moves.length===0){
+    // Sin jugadas: posición "muerta" para el que mueve
+    return evaluate(boardState, offsState, side);
+  }
+  for(const m of moves){
+    const nxt = applyMove(boardState, offsState, m.from, m.to, m.special);
+    const score = -search(nxt.board, offsState, (side==='w'?'b':'w'), depth-1, -beta, -alpha, deadline);
+    if(score >= beta) return beta;
+    if(score > alpha) alpha = score;
+    if(performance && performance.now && performance.now()>deadline) break;
+  }
+  return alpha;
+}
+
+// scoreMove heredado (ya no usado para elegir mejor jugada, pero se deja por compatibilidad si algún otro módulo lo usa)
+function scoreMove(m){
+  let s = 0;
+  if(m.isCapture) s += PV[m.victim?.type || 'P'] || 100;
+  // Pequeño ruido para desempatar
+  return s + Math.random()*3;
+}
+
+// pickMove con dificultad real
+function pickMove(color){
+  const params = getParamsFor(color);
+  const moves = genMoves(board, offsets, color, epTarget);
+  if(moves.length===0) return null;
+
+  // Orden inicial y recorte por haz (beam)
+  let ordered = orderMoves(moves);
+  if(params.depth>0 && params.beam && ordered.length>params.beam){
+    ordered = ordered.slice(0, params.beam).concat(ordered.slice(params.beam).sort(()=>Math.random()-0.5).slice(0, 4));
+  }
+
+  const deadline = (performance && performance.now) ? (performance.now() + (params.timeMs||120)) : Number.POSITIVE_INFINITY;
+
+  // Si profundidad 0: selección heurística simple con ruido y posible blunder
+  if(params.depth===0){
+    // Evaluar superficialmente
+    const scored = ordered.map(m=>{
+      const victimVal = m.isCapture ? (PV[m.victim?.type||'P']||100) : 0;
+      const base = victimVal + (PV[m.piece.type]||0)*0.01;
+      const jitter = (params.noise||0)* (Math.random()*100);
+      return {m, v: base + jitter};
+    }).sort((a,b)=>b.v-a.v);
+    let choice = scored[0].m;
+    if(params.blunder && Math.random()<params.blunder){
+      // elegir una del tercio inferior si hay
+      const idx = Math.floor(Math.random() * Math.max(1, Math.floor(scored.length/3)));
+      choice = scored[scored.length-1 - idx].m;
+    }
+    return choice;
+  }
+
+  // Búsqueda con alfa-beta + qsearch, con tope de tiempo
+  let best = null, bestScore = -1e9;
+  const side = color;
+  for(const m of ordered){
+    if(performance && performance.now && performance.now()>deadline) break;
+    const nxt = applyMove(board, offsets, m.from, m.to, m.special);
+    const sc = -search(nxt.board, offsets, (side==='w'?'b':'w'), params.depth-1, -1e9, 1e9, deadline);
+    const noise = (params.noise||0) * (Math.random()*20);
+    const score = sc + noise;
+    if(score > bestScore){ bestScore = score; best = m; }
+  }
+
+  // Blunder opcional
+  if(best && params.blunder && Math.random()<params.blunder && ordered.length>1){
+    const k = Math.min(3, Math.floor(ordered.length/2));
+    const i = Math.floor(1 + Math.random()*k);
+    best = ordered[i];
+  }
+
+  return best || ordered[0];
+}
+
+  function nextFrame(){ return new Promise(r=> (window.requestAnimationFrame? requestAnimationFrame(()=>r()) : setTimeout(()=>r(),0)) ); }
+async function scheduleBotMove(){
     // In-flight guard
     if(window.__BOT_SCHEDULED__) return;
     const __sessionAtSchedule = (window.__GAME_SESSION__|0);
@@ -1839,7 +2100,7 @@ window.addEventListener('aj:mode:change', (e)=>{
     window.__BOT_SCHEDULED__ = true; window.__BOT_SCHEDULED_SIDE__ = __sideAtSchedule;
  if(!window.GAME_STARTED) return;
     if(!botEnabled || gameOver || pendingShift || turn !== botSide) return;
-    const mv = pickMove(botSide); if(!mv) return;
+    await nextFrame(); const mv = pickMove(botSide); if(!mv) return;
     const pieceName = (window.piezaNombre? window.piezaNombre(mv.piece.type) : 'pieza');
     const msg = `🤖 Bot mueve: ${pieceName} ${algebra(mv.from.r, mv.from.c)} → ${algebra(mv.to.r, mv.to.c)}`;
     await BOT_UI.showFor(msg, BOT_TIMING.announceMove, ()=>{
