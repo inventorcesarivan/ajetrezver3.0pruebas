@@ -1563,36 +1563,55 @@ body, html{overflow:visible!important;}
 </style>
 
 
-<style id="aj-mobile-bottom-inside-v3">
+<style id="aj-mobile-root-fix-v1">
+  /* ✔ Arreglo de raíz SOLO en móvil / pantallas táctiles */
   @media (max-width: 900px), (pointer: coarse){
-    /* Extiende la base gris hasta el borde inferior en móvil */
-    .frame::before{
-      bottom: 0 !important;  /* cubre completamente debajo de la barra inferior */
+    /* 1) El separador que está inmediatamente antes de la barra inferior:
+          reducirlo para que la barra quede pegada al tablero (debajo de las secciones). */
+    .frame > div[style*="height:var(--toolbar-gap)"]:last-of-type{
+      height: 2px !important;
     }
-    /* Coloca la barra inferior inmediatamente debajo de las secciones,
-       y completamente dentro de la base gris */
+
+    /* 2) Altura natural para #bottomBar (el error venía de fórmulas con --square).
+          Evitamos calc() encadenados y damos un min-height estable. */
     #bottomBar{
-      margin-top: calc(-1 * var(--toolbar-gap)) !important; /* elimina el gap de 10px bajo el tablero */
-      padding-top: 3px !important;                          /* pequeño respiro sin solapar */
-      align-items: flex-start !important;
-      background: transparent !important;                   /* fondo lo pinta .frame::before */
+      height: auto !important;
+      min-height: clamp(46px, calc(var(--toolbar-h) * 0.9), 64px) !important;
+      padding: 6px 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      background: transparent !important; /* la base gris la pinta .frame::before */
+      margin-top: 0 !important; /* sin “rebote” */
     }
-    /* Neutraliza cualquier offset residual en los contenidos del bottom bar
-       para evitar que queden fuera de la base gris en móvil */
+
+    /* 3) Neutralizar offsets residuales que empujaban los controles fuera de la base gris. */
     #bottomBar .btn,
-    #bottomBar .label,
-    #bottomBar .pill,
+    #bottomBar .button,
+    #bottomBar button,
+    #bottomBar a.btn,
+    #bottomBar .group,
     #bottomBar #donateGroup,
     #bottomBar #audioGroup,
     #bottomBar #rightControls,
+    #bottomBar .pill,
     #bottomBar select,
     #bottomBar .imgbtn,
-    #bottomBar .sel{
+    #bottomBar .label{
       position: static !important;
-      top: 0 !important;
+      top: auto !important;
+      bottom: auto !important;
       transform: none !important;
       margin-top: 0 !important;
       margin-bottom: 0 !important;
+    }
+
+    /* 4) Imágenes de PayPal/MercadoPago: que nunca desborden la barra. */
+    #bottomBar img{
+      max-height: 28px !important;
+      height: auto !important;
+      width: auto !important;
     }
   }
 </style>
