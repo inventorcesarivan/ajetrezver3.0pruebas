@@ -6429,6 +6429,20 @@ div[style="height:var(--toolbar-gap)"]{
   }
 </style>
 
+
+<style id="aj-bottomBar-mobile-down-half-square-0909c">
+  /* Versión móvil: bajar los botones inferiores medio casillero */
+  @media (max-width: 900px), (pointer: coarse){
+    #bottomBar{
+      position: relative !important;
+      top: 0 !important; /* neutraliza otros 'top' previos */
+      /* respecto al estado actual (subido 2 casilleros), bajamos 0.5 */
+      margin-top: calc(-1 * var(--toolbar-gap) - 2mm - (var(--square) * 1.5)) !important;
+      padding-top: 2px !important;
+    }
+  }
+</style>
+
 </body></html><!-- Session guard and HUD cancel on mode/restart --><script>
 (function(){
   window.__GAME_SESSION__ = window.__GAME_SESSION__ || 0;
