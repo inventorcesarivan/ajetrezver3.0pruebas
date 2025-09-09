@@ -1345,6 +1345,67 @@ body, html{overflow:visible!important;}
     transform-origin: top center !important;
   }
 </style>
+
+<!-- AJETREZ: Alineación fina de barra inferior (vFINAL) -->
+<style id="aj-bottomBar-align-tight-vFINAL">
+  /* 1) La barra inferior toca visualmente el tablero (sin separación) */
+  #bottomBar{
+    margin-top: calc(-1 * var(--toolbar-gap)) !important; /* neutraliza el gap de 10px */
+    align-items: flex-start !important;                   /* contenidos pegados al borde superior */
+    padding-top: 2px !important;                          /* micro-respiro para no superponer borde */
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5)) !important; /* compacta la altura útil */
+    background: transparent !important;                   /* fondo gestionado por .frame::before */
+  }
+
+  /* 2) Reset total de offsets heredados en *todos* los elementos de la barra inferior */
+  #bottomBar .btn,
+  #bottomBar .label,
+  #bottomBar .pill,
+  #bottomBar .right-ctrls,
+  #bottomBar #donateGroup,
+  #bottomBar #audioGroup,
+  #bottomBar #rightControls,
+  #bottomBar select,
+  #bottomBar .imgbtn,
+  #bottomBar .sel,
+  #bottomBar [class*="audio"],
+  #bottomBar [class*="sound"],
+  #bottomBar [title*="volumen" i],
+  #bottomBar [aria-label*="volumen" i],
+  #bottomBar [title*="volume" i],
+  #bottomBar [aria-label*="volume" i]{
+    position: static !important;
+    top: 0 !important;
+    transform: none !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 3) Forzar que las 3 columnas del grid se alineen arriba */
+  #bottomBar > *{
+    align-self: start !important;
+  }
+
+  /* 4) Pequeña nivelación visual: texto "Colabora" y grupo de audio */
+  #bottomBar #donateGroup .btn.static{
+    line-height: 1.1 !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+  #bottomBar #audioGroup{
+    line-height: 1.1 !important;
+  }
+
+  /* 5) En mobile, mantener exactamente el mismo alineado */
+  @media (max-width: 900px), (pointer: coarse){
+    #bottomBar{
+      margin-top: calc(-1 * var(--toolbar-gap)) !important;
+      padding-top: 2px !important;
+    }
+    #bottomBar > *{ align-self: start !important; }
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
