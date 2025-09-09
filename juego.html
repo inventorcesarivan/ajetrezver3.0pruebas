@@ -1030,6 +1030,46 @@ body, html{overflow:visible!important;}
   .frame{ box-shadow: none !important; }
   .frame::before{ box-shadow: 0 6px 20px rgba(0,0,0,.08); }
 </style>
+
+<style id="aj-mobile-match-desktop">
+  /* Igualar configuración de móvil a la de web (posiciones, recortes y márgenes) */
+  @media (max-width: 900px), (pointer: coarse) {
+    /* Fondo del juego recortado y su contorno/sombra */
+    .frame{ border: none !important; background: transparent !important; }
+    .frame::before{
+      top: 3mm !important;
+      bottom: 3mm !important;
+      border: var(--border) solid #c9c9c9 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,.08) !important;
+    }
+
+    /* Barra superior igual que web */
+    #topBar{ --bar-trim: 0mm !important; transform: none !important; }
+    #topBar .right-ctrls{ transform: none !important; }
+    #topBar #modeGroup, #topBar #timeIndicator{ top: 6px !important; }
+    #topBar .btn{ margin-top: 0 !important; margin-bottom: 0 !important; }
+
+    /* Barra inferior: mismos offsets y márgenes que web */
+    #bottomBar .btn{ position: relative !important; top: -2mm !important; }
+    #bottomBar #audioGroup .btn,
+    #bottomBar #volumeButton,
+    #bottomBar .audio,
+    #bottomBar .sound,
+    #bottomBar [title*="volumen" i],
+    #bottomBar [aria-label*="volumen" i],
+    #bottomBar [title*="volume" i],
+    #bottomBar [aria-label*="volume" i]{
+      position: relative !important;
+      top: -4mm !important;   /* +2mm adicionales respecto a los demás */
+    }
+    #bottomBar #audioGroup,
+    #bottomBar #audioGroup .btn,
+    #bottomBar #audioGroup button,
+    #bottomBar #volumeButton,
+    #bottomBar #audioGroup [class*="btn"]{ margin: 0 !important; }
+  }
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
