@@ -1406,6 +1406,131 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<!-- AJETREZ: Offset 1mm para botones MercadoPago & PayPal -->
+<style id="aj-donate-down-1mm">
+  /* Selecciona específicamente los botones de donación por su destino */
+  #bottomBar #donateGroup a[href*="mercado"],
+  #bottomBar #donateGroup a[href*="mercadopago"],
+  #bottomBar #donateGroup a[href*="paypal"]{
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-top: 1mm !important;     /* ↓ 1 mm */
+  }
+
+  /* Si por alguna razón el clic está solo en la <img>, bajamos también la imagen */
+  #bottomBar #donateGroup img[src*="mercado"],
+  #bottomBar #donateGroup img[src*="mercadopago"],
+  #bottomBar #donateGroup img[src*="paypal"]{
+    display: inline-block !important;
+    margin-top: 1mm !important;     /* respaldo visual */
+  }
+</style>
+
+
+<!-- AJETREZ: Subir solo "Colabora" 1mm -->
+<style id="aj-colabora-up-1mm">
+  /* Apunta a la etiqueta/botón estático que muestra "Colabora" dentro del grupo de donaciones */
+  #bottomBar #donateGroup .btn.static,
+  #bottomBar #donateGroup .label-colabora{
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-top: -1mm !important;   /* ↑ 1 mm */
+  }
+</style>
+
+
+<!-- AJETREZ: Subir "Colabora" +1mm adicional (total 2mm) -->
+<style id="aj-colabora-up-2mm">
+  #bottomBar #donateGroup .btn.static,
+  #bottomBar #donateGroup .label-colabora{
+    margin-top: -2mm !important;   /* ↑ total 2 mm */
+  }
+</style>
+
+
+<!-- AJETREZ: Botón de sonido (más ancho + más bajo) -->
+<style id="aj-audio-button-tweak-2025-09-09">
+  /* Apunta al control de sonido dentro del grupo de audio (icono/btn) */
+  #bottomBar #audioGroup :is(button, a, .btn, .imgbtn, [role="button"], [title*="volumen" i], [aria-label*="volumen" i], [title*="volume" i], [aria-label*="volume" i]){
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    /* Más ancho: aumenta padding horizontal */
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    /* Más bajo: reduce padding vertical */
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    line-height: 1.0 !important;
+    /* Limita la altura si existía un alto fijo mayor */
+    min-height: 26px !important;
+    height: auto !important;
+  }
+
+  /* Si el control es una imagen/ícono, aseguramos que no estire en vertical */
+  #bottomBar #audioGroup img{
+    max-height: 20px !important;   /* ligeramente más bajo */
+  }
+
+  /* Mantén el resto del grupo sin cambios de tamaño */
+  #bottomBar #audioGroup{ white-space: nowrap !important; }
+</style>
+
+
+<!-- AJETREZ: FIX — asegurar que el control de sonido (select) se pueda modificar -->
+<style id="aj-audio-select-override-strong">
+  /* 1) Apuntar específicamente al SELECT del sonido dentro de la barra inferior */
+  #bottomBar #audioGroup select{
+    /* Ancho visual: más padding horizontal */
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+
+    /* Bajo de altura: bajar el alto efectivo */
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    line-height: 20px !important;
+    min-height: 22px !important;
+    height: 22px !important;
+
+    /* Estética coherente */
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+  }
+
+  /* 2) Asegurar que el grupo no fuerce alturas inesperadas */
+  #bottomBar #audioGroup{
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  /* 3) Nivelación mínima de la etiqueta "Sonido" */
+  #bottomBar #audioGroup .label{
+    margin-right: 6px !important;
+    line-height: 1.1 !important;
+  }
+</style>
+
+
+<!-- AJETREZ: Igualar altura del botón "Modo de juego" al indicador -->
+<style id="aj-mode-button-match-indicator-2025-09-09">
+  /* El indicador usa: padding:6px 14px; line-height:1; min-height:36px; borde 2px */
+  /* Igualamos el botón #btnMode a esos valores para que queden exactamente a la misma altura visual */
+  #topBar #modeGroup #btnMode{
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    line-height: 1 !important;
+    min-height: 36px !important;
+    height: 36px !important;             /* fuerza igualdad exacta */
+    border-width: 2px !important;         /* igual al indicador */
+    border-radius: 999px !important;      /* conserva estilo pill */
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
