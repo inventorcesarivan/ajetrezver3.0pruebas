@@ -1547,6 +1547,21 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<!-- AJETREZ: Mobile — subir barra inferior ~1 casillero -->
+<style id="aj-bottomBar-mobile-up-1square-0909">
+  @media (max-width: 900px), (pointer: coarse){
+    #bottomBar{
+      /* Mantener neutralización previa del 'top' */
+      position: relative !important;
+      top: 0 !important;
+      /* Subir ~1 casillero adicional respecto al estado actual */
+      margin-top: calc(-1 * var(--toolbar-gap) - 2mm - var(--square)) !important;
+      padding-top: 2px !important;
+    }
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
