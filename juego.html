@@ -1562,6 +1562,84 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<!-- AJETREZ: UNIFICACIÓN DE CONFIGURACIÓN (web = todas las versiones) -->
+<style id="aj-unify-any-version">
+  /* === Objetivo: que TODAS las vistas (web, móvil, fullscreen) usen la misma configuración que la versión web === */
+
+  /* Contenedor visual base (recorte y contorno) */
+  .frame{ border: none !important; background: transparent !important; }
+  .frame::before{
+    /* Mantener el mismo fondo/contorno definido previamente, solo unificamos márgenes verticales */
+    top: 7mm !important;     /* igual para todas las vistas */
+    bottom: 5mm !important;  /* igual para todas las vistas */
+    /* el resto (background, border, shadow) lo conserva del CSS ya presente */
+  }
+  .frame > *{ position: relative; z-index: 1; }
+
+  /* Barra superior: anclada al borde inferior, sin desplazamientos adicionales */
+  #topBar{ position: relative !important; transform: none !important; }
+  #topBar #modeGroup,
+  #topBar #timeIndicator,
+  #topBar .bot-hud,
+  #topBar .right-ctrls{
+    position: absolute !important;
+    top: auto !important;
+    bottom: 0 !important;
+    transform: none !important;
+  }
+  #topBar .btn,
+  #topBar .mode-indicator{
+    position: relative !important;
+    top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  #topBar .dropdown{ transform: none !important; }
+
+  /* Barra inferior: pegada al tablero, altura compacta y contenidos sin rebotes */
+  #bottomBar{
+    margin-top: calc(-1 * var(--toolbar-gap)) !important;  /* toca visualmente el tablero */
+    align-items: flex-start !important;                     /* contenidos pegados arriba */
+    padding-top: 2px !important;                            /* micro-respiro */
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5)) !important;
+    background: transparent !important;                     /* el fondo lo da .frame::before */
+  }
+
+  /* Reset de offsets verticales en la barra inferior (conservamos excepciones más abajo) */
+  #bottomBar .btn,
+  #bottomBar .label,
+  #bottomBar .pill,
+  #bottomBar .right-ctrls,
+  #bottomBar #donateGroup,
+  #bottomBar #audioGroup,
+  #bottomBar #rightControls,
+  #bottomBar select,
+  #bottomBar .imgbtn,
+  #bottomBar .sel{
+    position: relative !important;
+    top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Excepciones que están presentes en la versión web (se mantienen) */
+  #btnMegaMenu{ top: -2mm !important; }
+  #donateGroup .btn.static{ top: 1mm !important; margin-right: 4px !important; }
+
+  /* Forzar que móvil use exactamente la misma configuración que web */
+  @media (max-width: 900px), (pointer: coarse){
+    .frame::before{ top: 7mm !important; bottom: 5mm !important; }
+    #topBar, #bottomBar{ transform: none !important; }
+  }
+
+  /* Contrastes del panel/selector iguales a web (texto oscuro sobre fondo claro, botones blancos) */
+  #megaPanel #tabsView{ color: #111 !important; }
+  #megaPanel .tab-btn{ color: #fff !important; }
+  #megaPanel .btn, #megaPanel .btn *{ color: #fff !important; }
+  #botChooserPanel, #regPanel{ color: #111 !important; }
+  #regPanel .btn, #regPanel .btn *{ color: #fff !important; }
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
