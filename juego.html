@@ -1616,6 +1616,15 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<style id="aj-frame-cut-2squares">
+  /* Achicar la base contenedora del tablero:
+     recortamos desde abajo hacia arriba ~2 casilleros */
+  .frame::before{
+    bottom: calc(5mm + (2 * var(--square))) !important; /* antes: 5mm */
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
