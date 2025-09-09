@@ -6401,7 +6401,20 @@ div[style="height:var(--toolbar-gap)"]{
     width: calc(min(820px, 96vw) * 0.90) !important;
     max-height: calc(70vh - (var(--square) * 1.5)) !important;
   }
-</style></body></html><!-- Session guard and HUD cancel on mode/restart --><script>
+</style>
+<style id="aj-bottomBar-mobile-up-1more-square-0909b">
+  /* Subir TODOS los botones inferiores +1 casillero en versión móvil */
+  @media (max-width: 900px), (pointer: coarse){
+    #bottomBar{
+      position: relative !important;
+      top: 0 !important; /* neutraliza desplazamientos previos */
+      margin-top: calc(-1 * var(--toolbar-gap) - 2mm - (var(--square) * 2)) !important;
+      padding-top: 2px !important;
+    }
+  }
+</style>
+
+</body></html><!-- Session guard and HUD cancel on mode/restart --><script>
 (function(){
   window.__GAME_SESSION__ = window.__GAME_SESSION__ || 0;
 
