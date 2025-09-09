@@ -1195,6 +1195,21 @@ body, html{overflow:visible!important;}
     top: 1mm !important;
   }
 </style>
+
+<style id="aj-mobile-bottombar-inside">
+  /* En móvil, extiende el contorno/fondo hasta el borde inferior
+     para que la barra inferior quede claramente "dentro" del contenedor. */
+  @media (max-width: 900px), (pointer: coarse){
+    .frame::before{
+      bottom: 0 !important; /* antes: 3mm */
+    }
+    /* Asegura que no haya offsets residuales */
+    #bottomBar{
+      margin-bottom: 0 !important;
+      transform: none !important;
+    }
+  }
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
