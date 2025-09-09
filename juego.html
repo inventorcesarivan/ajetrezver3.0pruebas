@@ -1251,6 +1251,100 @@ body, html{overflow:visible!important;}
     }
   }
 </style>
+
+<style id="aj-bottombar-lower-others-2mm">
+  /* Bajar 2mm todos los items de la barra inferior,
+     EXCEPTO el botón de Menú y el texto "Colabora". */
+  #bottomBar .btn,
+  #bottomBar .label,
+  #bottomBar .pill,
+  #bottomBar .right-ctrls,
+  #bottomBar #audioGroup,
+  #bottomBar #rightControls,
+  #bottomBar select,
+  #bottomBar .imgbtn,
+  #bottomBar .sel{
+    position: relative !important;
+    top: 0 !important;     /* de -2mm -> 0mm  (baja 2mm) */
+  }
+  /* Excepciones: mantener su estado */
+  #btnMegaMenu{
+    top: -2mm !important;  /* Menú sigue 2mm arriba */
+  }
+  #donateGroup .btn.static{
+    top: 1mm !important;   /* "Colabora" queda como estaba */
+  }
+</style>
+
+<style id="aj-megaPanel-scale-95">
+  /* Achicar el panel de menú un 5% (general: web + móvil) */
+  #megaPanel{
+    transform: scale(0.95) !important;
+    transform-origin: top left !important;
+  }
+</style>
+
+<style id="aj-megaPanel-scale-90">
+  /* Achicar el panel de menú un 5% adicional (total ~10%) */
+  #megaPanel{
+    transform: scale(0.90) !important;
+    transform-origin: top left !important;
+  }
+</style>
+
+<style id="aj-megaPanel-shift">
+  /* Desplazar un poco a la derecha y hacia abajo, manteniendo scale(0.90) */
+  #megaPanel{
+    transform: translate(6mm, 3mm) scale(0.90) !important;
+    transform-origin: top left !important;
+  }
+</style>
+
+<style id="aj-megaPanel-shift-half-square">
+  /* Desplazar medio casillero a la derecha (+ mantener 3mm abajo) */
+  #megaPanel{
+    transform: translate(calc(var(--square) * 0.5), 3mm) scale(0.90) !important;
+    transform-origin: top left !important;
+  }
+</style>
+
+<style id="aj-megaPanel-centered-to-board">
+  /* Centrado perfecto entre derecha e izquierda respecto al tablero */
+  #megaPanel{
+    left: calc( (var(--square) * (var(--board-cols) - var(--panel-w)) ) / 2 ) !important;
+    right: auto !important;
+    transform: translateY(3mm) scale(0.90) !important; /* mantenemos el descenso leve */
+    transform-origin: top center !important;          /* escala alrededor del centro horizontal */
+  }
+</style>
+
+<style id="aj-registro-minus-1_5-square">
+  /* Achicar altura del panel de registros ~1.5 casilleros */
+  /* 1) Versión flotante del panel de registros */
+  #replayPanel.rp-float{
+    max-height: calc(78vh - (var(--square) * 1.5)) !important;
+  }
+  /* 2) Modo "top" (si se usa anclado arriba) */
+  #replayPanel.rp-top{
+    max-height: calc(70vh - (var(--square) * 1.5)) !important;
+  }
+  /* 3) Tabla/lista de movimientos dentro del panel */
+  .moves-table{
+    max-height: calc(42vh - (var(--square) * 1.5)) !important;
+  }
+</style>
+
+<style id="aj-replayPanel-scale-90">
+  /* Achicar tamaño TOTAL del panel de registros un 10% */
+  #replayPanel.rp-float{
+    transform: translate(-50%, -50%) scale(0.90) !important;
+    transform-origin: center center !important;
+  }
+  #replayPanel.rp-top{
+    transform: translateX(-50%) scale(0.90) !important;
+    transform-origin: top center !important;
+  }
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
@@ -6707,6 +6801,26 @@ div[style="height:var(--toolbar-gap)"]{
   font-size: 0.9em;
   padding: 0.9em 0.9em;
 }
+</style>
+
+<style id="aj-replayPanel-override-final">
+  /* Override final para que el tamaño del panel de registros sí cambie (gana al rpEnforcerStyles). */
+  /* Flotante centrado */
+  #replayPanel.rp-float{
+    /* mantener centrado y aplicar escala */
+    transform: translate(-50%, -50%) scale(0.90) !important;
+    transform-origin: center center !important;
+    /* opcional: reducir caja real para que el área clickeable acompañe */
+    width: calc(min(760px, 94vw) * 0.90) !important;
+    max-height: calc(78vh - (var(--square) * 1.5)) !important;
+  }
+  /* Modal anclado arriba */
+  #replayPanel.rp-top{
+    transform: translateX(-50%) scale(0.90) !important;
+    transform-origin: top center !important;
+    width: calc(min(820px, 96vw) * 0.90) !important;
+    max-height: calc(70vh - (var(--square) * 1.5)) !important;
+  }
 </style>
 </body>
 </html>
