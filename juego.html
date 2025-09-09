@@ -6414,6 +6414,21 @@ div[style="height:var(--toolbar-gap)"]{
   }
 </style>
 
+
+<style id="aj-frame-mobile-taller-bottom-2sq-0909">
+  /* Versión móvil: aumentar la altura de la base hacia abajo en +2 casilleros */
+  @media (max-width: 900px), (pointer: coarse){
+    .frame{
+      /* sumamos 2×casillero a la base inferior */
+      padding-bottom: calc(14px + (var(--square) * 2)) !important;
+    }
+    /* Aseguramos que el fondo cubra hasta el nuevo borde inferior */
+    .frame::before{
+      bottom: 0 !important;
+    }
+  }
+</style>
+
 </body></html><!-- Session guard and HUD cancel on mode/restart --><script>
 (function(){
   window.__GAME_SESSION__ = window.__GAME_SESSION__ || 0;
