@@ -848,6 +848,25 @@ body, html{overflow:visible!important;}
   height: calc(var(--toolbar-h) - (var(--square) * 1.5) - 4mm) !important;
 }
 </style>
+
+<style id="aj-topbar-down-3mm">
+  /* Bajar ~3mm los controles superiores (modo + indicador) sin afectar layout */
+  :root{ --mode-y: calc(6px + 3mm); } /* mantiene alineado el dropdown del modo */
+  #topBar .mode-group{ top: calc(6px + 3mm) !important; }
+  /* Si existen controles a la derecha, acompáñalos */
+  #topBar .right-ctrls{ transform: translateY(3mm); }
+
+  #timeIndicator{ top: calc(6px + 3mm) !important; }
+</style>
+
+
+<style id="aj-bottombar-height-minus-3mm">
+  /* Achicar la altura del contenedor inferior ~3mm desde abajo hacia arriba */
+  #bottomBar{
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5) - 3mm) !important;
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
