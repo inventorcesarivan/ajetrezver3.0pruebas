@@ -6459,3 +6459,39 @@ div[style="height:var(--toolbar-gap)"]{
     height: calc(var(--toolbar-h) - (var(--square) * 1.5) - var(--bar-trim) - 3mm) !important;
   }
 </style>
+
+<!-- Ajetrez: Master override for toolbar row heights (top/bottom) -->
+<style id="aj-bars-master-override">
+  /* Single source of truth for how much to trim */
+  :root { --bar-trim: 3mm; }
+
+  /* The grid rows themselves reserve the vertical space.
+     We shrink both the first and last rows by --bar-trim so the container actually gets smaller. */
+  .shell{
+    grid-template-rows: calc(var(--toolbar-h) - var(--bar-trim)) var(--toolbar-gap) auto var(--toolbar-gap) calc(var(--toolbar-h) - var(--bar-trim)) !important;
+  }
+
+  /* Bars visuals must match the reserved space. */
+  .bar{
+    height: calc(var(--toolbar-h) - var(--bar-trim)) !important;
+  }
+
+  /* Bottom bar had a negative top offset to align with the board; we compensate by the same trim. */
+  #bottomBar{
+    top: calc((var(--square) * -1) + var(--bar-trim)) !important;
+  }
+
+  /* Mobile: keep the same policy so it doesn't revert via media queries elsewhere. */
+  @media (max-width: 820px){
+    .shell{
+      grid-template-rows: calc(var(--toolbar-h) - var(--bar-trim)) var(--toolbar-gap) auto var(--toolbar-gap) calc(var(--toolbar-h) - var(--bar-trim)) !important;
+    }
+    .bar{
+      height: calc(var(--toolbar-h) - var(--bar-trim)) !important;
+    }
+    #bottomBar{
+      top: calc((var(--square) * -1) + var(--bar-trim)) !important;
+    }
+  }
+</style>
+
