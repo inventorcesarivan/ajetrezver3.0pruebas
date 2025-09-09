@@ -1531,6 +1531,22 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<!-- AJETREZ: Mobile tight-fix — barra inferior más cerca del tablero -->
+<style id="aj-bottomBar-mobile-tightfix-0909">
+  /* En móvil, algunas reglas previas mueven #bottomBar con 'top:-1*var(--square)'.
+     Eso puede producir una separación aparente por redondeo/altura disponible.
+     Neutralizamos 'top' y compensamos con un micro-offset adicional. */
+  @media (max-width: 900px), (pointer: coarse){
+    #bottomBar{
+      position: relative !important;
+      top: 0 !important;                                 /* anula desplazamiento vertical previo */
+      margin-top: calc(-1 * var(--toolbar-gap) - 2mm) !important; /* acércalo 2mm más */
+      padding-top: 2px !important;
+    }
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
