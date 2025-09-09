@@ -1227,6 +1227,30 @@ body, html{overflow:visible!important;}
     top: -2mm !important;
   }
 </style>
+
+<style id="aj-colabora-margin-right-4px">
+  /* Separación específica para el texto "Colabora" */
+  #bottomBar #donateGroup .btn.static{
+    margin-right: 4px !important;
+  }
+</style>
+
+<style id="aj-frame-trim-plus4mm">
+  /* Achicar 4mm en total la base que contiene todo (2mm arriba + 2mm abajo) */
+  .frame::before{
+    top: 7mm !important;   /* veníamos en 5mm; +2mm => 7mm */
+    bottom: 5mm !important;/* veníamos en 3mm; +2mm => 5mm */
+  }
+</style>
+<style id="aj-mobile-frame-trim-plus4mm">
+  /* En móvil, mantener el mismo recorte que web (evita que la barra parezca fuera) */
+  @media (max-width: 900px), (pointer: coarse){
+    .frame::before{
+      bottom: 5mm !important; /* override del fix anterior que ponía 0 */
+      top: 7mm !important;
+    }
+  }
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
