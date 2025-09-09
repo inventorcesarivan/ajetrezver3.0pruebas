@@ -6460,13 +6460,29 @@ div[style="height:var(--toolbar-gap)"]{
   }
 </style>
 
-<!-- Ajetrez: trim base from TOP by ~3mm (only top) -->
-<style id="aj-base-trim-top-3mm-only">
-  .board-wrap{
-    margin-top: -3mm !important;
-  }
-  @media (max-width: 820px){
-    .board-wrap{ margin-top: -3mm !important; }
+<!-- Ajetrez: move ALL bottom bar buttons DOWN by 1mm -->
+<style id="aj-bottom-buttons-down-1mm">
+  #bottomBar button,
+  #bottomBar .button,
+  #bottomBar .btn,
+  #bottomBar [role="button"],
+  #bottomBar .controls button,
+  #bottomBar .controls .btn,
+  #bottomBar .group button,
+  #bottomBar .group .btn,
+  #bottomBar #audioButton,
+  #bottomBar #soundButton,
+  #bottomBar #volumeButton,
+  #bottomBar .audio,
+  #bottomBar .sound,
+  #bottomBar .volume,
+  #bottomBar [aria-label*="sonido" i],
+  #bottomBar [aria-label*="audio" i],
+  #bottomBar [aria-label*="volumen" i],
+  #bottomBar [title*="sonido" i],
+  #bottomBar [title*="audio" i],
+  #bottomBar [title*="volumen" i] {
+    transform: translateY(1mm) !important;
   }
 </style>
 
