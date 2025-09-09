@@ -6443,6 +6443,109 @@ div[style="height:var(--toolbar-gap)"]{
   }
 </style>
 
+
+<!-- === Ajetrez: Panels follow fullscreen (bot chooser + registros + replay) === -->
+<script id="aj-fs-panels-follow">
+(function(){
+  if(window.__AJ_FS_PANELS_FOLLOW__) return; window.__AJ_FS_PANELS_FOLLOW__ = true;
+
+  function $(s, r){ try { return (r||document).querySelector(s); } catch(_) { return null; } }
+
+  // Root that goes fullscreen
+  var fsRoot = $('#fsRoot') || document.body;
+
+  // Elements that must remain visible in fullscreen
+  var PANEL_IDS = [
+    'botChooserBackdrop','botChooserPanel',   // selector de bot (flotante)
+    'rgBackdrop','regPanel',                  // Registros (flotante)
+    'rpBackdrop','replayPanel'                // Reproductor de partidas (flotante)
+  ];
+
+  function moveIfExists(id, parent){
+    var el = document.getElementById(id);
+    if(el && parent && el.parentElement !== parent){
+      parent.appendChild(el);
+    }
+  }
+
+  function movePanelsTo(parent){
+    PANEL_IDS.forEach(function(id){ moveIfExists(id, parent); });
+  }
+
+  function onFSChange(){
+    // When ANY element is fullscreen, keep panels under the fullscreen subtree.
+    // We specifically want them under fsRoot (the element that requests fullscreen).
+    try{
+      if(document.fullscreenElement){
+        // ensure fsRoot exists; if not, fallback to fullscreen element
+        var target = fsRoot || document.fullscreenElement;
+        movePanelsTo(target);
+      }else{
+        // back to document.body when exiting fullscreen
+        movePanelsTo(document.body);
+      }
+    }catch(e){ /* no-op */ }
+  }
+
+  // Also keep panels synced if different scripts re-attach them to <body>
+  var mo = new MutationObserver(function(muts){
+    try{
+      if(document.fullscreenElement){
+        var target = fsRoot || document.fullscreenElement;
+        movePanelsTo(target);
+      }
+    }catch(_){}
+  });
+  try { mo.observe(document.body, { childList: true, subtree: true }); } catch(_){}
+
+  document.addEventListener('fullscreenchange', onFSChange, true);
+  // run once
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onFSChange, { once: true });
+  } else {
+    onFSChange();
+  }
+})();
+</script>
+
+
+<!-- === Ajetrez: Remove 'Tiempo' label from timer control, keep clock + pause === -->
+<script id="aj-clean-timer-label">
+(function(){
+  if(window.__AJ_CLEAN_TIMER_LABEL__) return; window.__AJ_CLEAN_TIMER_LABEL__ = true;
+
+  function removeWordTiempo(root){
+    try{
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      var toEdit = [];
+      while(walker.nextNode()){
+        toEdit.push(walker.currentNode);
+      }
+      for(var i=0;i<toEdit.length;i++){
+        var n = toEdit[i];
+        var t = n.nodeValue;
+        if(!t) continue;
+        var nt = t.replace(/\b[Tt]iempo\b:?\s*/g, '');
+        if(nt !== t){ n.nodeValue = nt; }
+      }
+    }catch(_){}
+  }
+
+  function run(){
+    var topBar = document.getElementById('topBar') || document.querySelector('#topBar');
+    if(topBar){ removeWordTiempo(topBar); }
+  }
+
+  // Initial + DOM changes (in case UI re-renders)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run, { once: true });
+  } else {
+    run();
+  }
+  var mo = new MutationObserver(function(){ run(); });
+  try{ mo.observe(document.documentElement, { subtree:true, childList:true, characterData:true }); }catch(_){}
+})();
+</script>
 </body></html><!-- Session guard and HUD cancel on mode/restart --><script>
 (function(){
   window.__GAME_SESSION__ = window.__GAME_SESSION__ || 0;
