@@ -1625,6 +1625,16 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<style id="aj-mobile-bottomBar-up-2squares">
+  @media (max-width: 900px), (pointer: coarse){
+    /* Subir el contenedor inferior (#bottomBar) 2 casilleros en móvil */
+    #bottomBar{
+      transform: translateY(calc(-2 * var(--square))) !important;
+    }
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
