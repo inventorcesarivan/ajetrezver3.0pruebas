@@ -769,11 +769,11 @@ body, html{overflow:visible!important;}
   /* Achicar altura del contenedor de botones inferior ~1 casillero (desde abajo hacia arriba) */
   #bottomBar{
     /* Reduce el alto reservado del contenedor sin afectar los botones (pueden sobresalir si es necesario) */
-    height: calc(var(--toolbar-h) - var(--square));
+    height: calc(var(--toolbar-h) - (var(--square) * 1.5));
   }
   /* Mantener el ajuste también en pantallas angostas */
   @media (max-width: 820px){
-    #bottomBar{ height: calc(var(--toolbar-h) - var(--square)); }
+    #bottomBar{ height: calc(var(--toolbar-h) - (var(--square) * 1.5)); }
   }
 </style>
 
@@ -802,6 +802,52 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+<style id="aj-bottombar-buttons-offset">
+/* Levanta los botones inferiores aprox 3 mm sin afectar layout */
+#bottomBar .btn,
+#bottomBar button,
+#bottomBar a.btn,
+#bottomBar .button { transform: translateY(-3mm); }
+</style>
+<style id="aj-sound-button-size">
+/* Reduce sound button ~15% without shifting layout */
+#btnSound, .btn-sound, button[aria-label="Sonido"], button[aria-label="Sound"], 
+#soundBtn, #toggleSound, .sound-btn {
+  transform: scale(0.85);
+  transform-origin: center;
+}
+/* If the sound button uses an image inside a .imgbtn, reduce that image too */
+#btnSound img, .btn-sound img, #soundBtn img, #toggleSound img, .sound-btn img {
+  width: 85% !important;
+  height: 85% !important;
+}
+</style>
+<style id="aj-audioGroup-size">
+/* Achicar tamaño del botón/selector de sonido (~10% adicional) — mantener subida de 2mm */
+#audioGroup{
+  font-size: 0.71em !important;   /* antes: 0.79em */
+  padding: 2.7px 8.1px !important;/* antes: 3px 9px */
+  gap: 2.7px !important;          /* antes: 3px */
+  border-width: 1.25px !important;/* antes: 1.4px */
+  transform: translateY(-2mm);
+  transform-origin: center;
+}
+#selSound{
+  font-size: 0.74em !important;   /* antes: 0.82em */
+  padding: 1.8px 4.5px !important;/* antes: 2px 5px */
+  min-height: 0 !important;
+  height: auto !important;
+  line-height: 1.2 !important;
+}
+#audioGroup .label{
+  margin-right: 3.6px !important; /* antes: 4px */
+}
+</style>
+<style id="aj-bottombar-minus4mm">
+#bottomBar{
+  height: calc(var(--toolbar-h) - (var(--square) * 1.5) - 4mm) !important;
+}
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
@@ -5974,6 +6020,30 @@ function setHelp(mode){
   }
 })();
 </script>
+<style id="aj-bottombar-gap-minus4mm">
+/* Reducir la altura reservada (espaciador) y la del contenedor de botones ~4mm */
+div[style="height:var(--toolbar-gap)"]{
+  height: calc(var(--toolbar-gap) - 4mm) !important;
+}
+#bottomBar{
+  height: calc(var(--toolbar-h) - (var(--square) * 1.5) - 4mm) !important;
+}
+</style>
+<style id="aj-mode-controls-size">
+/* Reducir 15% el tamaño del selector de modo y del indicador de modo (arriba a la izquierda) */
+#btnMode, #gameModeBtn, #modeToggle, #btnGameMode, #modeBtn,
+.mode-indicator, #modeIndicator, .mode-pill, .pill.mode, .modePill,
+[aria-label="Modo de juego"], [aria-label="Seleccionar modo"], [data-role="mode-button"]{
+  transform: scale(0.85);
+  transform-origin: top left;
+}
+/* Ajustes de tipografía/padding por si no se renderiza transform en algún navegador */
+#btnMode, #gameModeBtn, #modeToggle, #btnGameMode, #modeBtn,
+.mode-indicator, #modeIndicator, .mode-pill, .pill.mode, .modePill{
+  font-size: 0.9em;
+  padding: 0.9em 0.9em;
+}
+</style>
 </body>
 </html>
 <!-- Session guard and HUD cancel on mode/restart -->
