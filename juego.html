@@ -1562,6 +1562,41 @@ body, html{overflow:visible!important;}
   }
 </style>
 
+
+<style id="aj-mobile-bottom-inside-v3">
+  @media (max-width: 900px), (pointer: coarse){
+    /* Extiende la base gris hasta el borde inferior en móvil */
+    .frame::before{
+      bottom: 0 !important;  /* cubre completamente debajo de la barra inferior */
+    }
+    /* Coloca la barra inferior inmediatamente debajo de las secciones,
+       y completamente dentro de la base gris */
+    #bottomBar{
+      margin-top: calc(-1 * var(--toolbar-gap)) !important; /* elimina el gap de 10px bajo el tablero */
+      padding-top: 3px !important;                          /* pequeño respiro sin solapar */
+      align-items: flex-start !important;
+      background: transparent !important;                   /* fondo lo pinta .frame::before */
+    }
+    /* Neutraliza cualquier offset residual en los contenidos del bottom bar
+       para evitar que queden fuera de la base gris en móvil */
+    #bottomBar .btn,
+    #bottomBar .label,
+    #bottomBar .pill,
+    #bottomBar #donateGroup,
+    #bottomBar #audioGroup,
+    #bottomBar #rightControls,
+    #bottomBar select,
+    #bottomBar .imgbtn,
+    #bottomBar .sel{
+      position: static !important;
+      top: 0 !important;
+      transform: none !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+  }
+</style>
+
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
