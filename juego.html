@@ -1070,6 +1070,131 @@ body, html{overflow:visible!important;}
     #bottomBar #audioGroup [class*="btn"]{ margin: 0 !important; }
   }
 </style>
+
+<style id="aj-topbar-buttons-down-3mm">
+  /* Bajar 3mm TODOS los botones de la parte superior (regla general) */
+  #topBar .btn{
+    position: relative !important;
+    top: 3mm !important;
+  }
+</style>
+
+<style id="aj-topbar-others-down-3mm">
+  /* Bajar también lo demás en la parte superior (indicadores, HUD y reloj) */
+  /* Reloj */
+  #topBar #timeIndicator{
+    top: calc(6px + 3mm) !important; /* antes 6px */
+    position: absolute !important;
+  }
+  /* Indicador de modo (texto a la derecha del botón) */
+  #topBar .mode-indicator{
+    position: relative !important;
+    top: 3mm !important;
+  }
+  /* HUD de bot u otros bloques de la derecha/izquierda */
+  #topBar .bot-hud,
+  #topBar .right-ctrls{
+    position: relative !important;
+    top: 3mm !important;
+  }
+  /* Menú desplegable (si aparece anclado al topbar) */
+  #topBar .dropdown{
+    transform: translateY(3mm) !important;
+  }
+</style>
+
+<style id="aj-topbar-align-bottom">
+  /* Alinear EXACTAMENTE con el borde inferior del top bar */
+  #topBar{ position: relative !important; }
+
+  /* Grupos y bloques principales anclados al borde inferior */
+  #topBar #modeGroup,
+  #topBar #timeIndicator,
+  #topBar .bot-hud,
+  #topBar .right-ctrls{
+    position: absolute !important;
+    top: auto !important;
+    bottom: 0 !important;
+    transform: none !important;
+  }
+
+  /* Botones e indicadores internos: sin desplazamientos verticales extra */
+  #topBar .btn,
+  #topBar .mode-indicator{
+    position: relative !important;
+    top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    transform: none !important;
+  }
+
+  /* El menú desplegable se mantiene sin corrimiento adicional */
+  #topBar .dropdown{
+    transform: none !important;
+  }
+</style>
+
+<style id="aj-bottombar-align-top">
+  /* Alinear EXACTAMENTE con el borde superior de la barra inferior */
+  #bottomBar{
+    align-items: flex-start !important; /* grid items pegados arriba */
+  }
+  /* Neutralizar desplazamientos verticales previos en el bottom bar */
+  #bottomBar .btn,
+  #bottomBar .label,
+  #bottomBar .pill,
+  #bottomBar .right-ctrls,
+  #bottomBar #donateGroup,
+  #bottomBar #audioGroup,
+  #bottomBar #rightControls{
+    position: relative !important;
+    top: 0 !important;
+    transform: none !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  /* Volumen/audio sin extra-offset */
+  #bottomBar #audioGroup .btn,
+  #bottomBar #volumeButton,
+  #bottomBar .audio,
+  #bottomBar .sound,
+  #bottomBar [title*="volumen" i],
+  #bottomBar [aria-label*="volumen" i],
+  #bottomBar [title*="volume" i],
+  #bottomBar [aria-label*="volume" i]{
+    top: 0 !important;
+    transform: none !important;
+  }
+</style>
+
+<style id="aj-bottombar-align-to-dashed">
+  /* Subir la barra inferior para que su borde superior toque la línea punteada del área del tablero */
+  #bottomBar{
+    margin-top: calc(-1 * var(--toolbar-gap)) !important; /* neutraliza el separador de 10px */
+  }
+</style>
+
+<style id="aj-frame-trim-top-plus-2mm">
+  /* Achica la base que contiene todo el juego 2mm SOLO desde arriba */
+  .frame::before{
+    top: 5mm !important;   /* antes 3mm; +2mm extra arriba */
+    bottom: 3mm !important;/* sin cambios abajo */
+  }
+</style>
+
+<style id="aj-lower-audio-and-colabora-1mm">
+  /* Bajar 1mm solo estos elementos en la barra inferior */
+  /* 1) Grupo de sonido (no afecta a otros) */
+  #bottomBar #audioGroup{
+    position: relative !important;
+    top: 1mm !important;
+  }
+  /* 2) Botón de texto "Colabora" (no tocar los botones de donación img) */
+  #bottomBar #donateGroup .btn.static{
+    position: relative !important;
+    top: 1mm !important;
+  }
+</style>
 </head>
 <body>
 <div class="frame" data-fullscreen-root="" id="fsRoot">
