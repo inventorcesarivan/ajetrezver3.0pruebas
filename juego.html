@@ -1132,10 +1132,10 @@ body, html{overflow:visible!important;}
     <button class="btn small" id="rp-next"  type="button">▶︎</button>
     <button class="btn small" id="rp-end"   type="button">⏭</button>
     <select id="rp-speed" aria-label="Velocidad de reproducción" class="sel small" style="width:88px">
-  <option value="0.25">0.25×</option>
+  <option value="0.25" selected>0.25×</option>
   <option value="0.5">0.5×</option>
   <option value="0.75">0.75×</option>
-  <option value="1" selected>1×</option>
+  <option value="1">1×</option>
   <option value="1.5">1.5×</option>
   <option value="2">2×</option>
   <option value="2.5">2.5×</option>
@@ -6287,7 +6287,7 @@ div[style="height:var(--toolbar-gap)"]{
   const $ = s => document.querySelector(s);
   const bar  = document.getElementById('replayBar');
 
-  let RP = { game:null, ply:0, timer:null, speed:1 };
+  let RP = { game:null, ply:0, timer:null, speed:0.25 };
 
   function fromAlg(a){
     try{
@@ -6657,7 +6657,244 @@ div[style="height:var(--toolbar-gap)"]{
 
 
 
-</body></html><!-- Session guard and HUD cancel on mode/restart --><script>
+</body>
+<!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
+<style id="aj-replay-glass-css">
+  #aj-replay-glass-pane{
+    position:absolute; inset:0;
+    display:none;
+    background: rgba(0,0,0,0.14);
+    z-index: 400; /* sobre el tablero, debajo de paneles */
+    pointer-events:auto; /* captura interacción para bloquear el tablero */
+    user-select:none;
+  }
+  #aj-replay-glass-pane .aj-replay-label{
+    position:absolute; left:50%; top:50%; transform: translate(-50%,-50%);
+    font-weight:800; font-size:1.05rem; letter-spacing:.3px;
+    color:#fff; text-shadow: 0 1px 2px rgba(0,0,0,.8), 0 0 12px rgba(0,0,0,.45);
+    padding:.45rem .7rem; border-radius:.75rem;
+    background: rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.3);
+    pointer-events:none; /* que no tape clics a botones externos si se sale del host */
+    animation: ajPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes ajPulse{
+    0%{ transform: translate(-50%,-50%) scale(1); }
+    50%{ transform: translate(-50%,-50%) scale(1.035); }
+    100%{ transform: translate(-50%,-50%) scale(1); }
+  }
+</style>
+
+
+
+<script id="aj-replay-glass-logic">
+(function(){
+  if(window.__AJ_REPLAY_GLASS_V6__) return; window.__AJ_REPLAY_GLASS_V6__=true;
+  function $(s, r){ try{ return (r||document).querySelector(s); }catch(_){ return null; } }
+
+  function findBoardWrap(){
+    return $('#boardWrap') || $('#board') || $('#aj-megaPanel-centered-to-board') || $('#aj-container-symmetric-3mm');
+  }
+
+  function ensurePane(){
+    var host = findBoardWrap();
+    if(!host) return null;
+    try{
+      var cs = window.getComputedStyle(host);
+      if(cs && cs.position === 'static'){ host.style.position='relative'; }
+    }catch(_){}
+    var pane = document.getElementById('aj-replay-glass-pane');
+    if(!pane){
+      pane = document.createElement('div');
+      pane.id = 'aj-replay-glass-pane';
+      var lbl = document.createElement('div');
+      lbl.className = 'aj-replay-label';
+      lbl.id = 'aj-replay-label';
+      lbl.textContent = 'Reproduciendo…';
+      pane.appendChild(lbl);
+      // bloquear interacciones del tablero
+      ['click','mousedown','mouseup','touchstart','touchend','touchmove','pointerdown','pointerup','pointermove','dragstart']
+        .forEach(ev => pane.addEventListener(ev, function(e){ e.stopPropagation(); e.preventDefault(); return false; }, true));
+      host.appendChild(pane);
+    }else if(pane.parentElement !== host){
+      try{ pane.parentElement && pane.parentElement.removeChild(pane); }catch(_){}
+      host.appendChild(pane);
+    }
+    return pane;
+  }
+
+  function updateProgressLabel(){
+    try{
+      var s = document.getElementById('rp-slider');
+      var lbl = document.getElementById('aj-replay-label');
+      if(!lbl) return;
+      var cur = 0, total = 0;
+      if(s){
+        cur = parseInt(s.value || '0', 10);
+        total = parseInt(s.max || '0', 10);
+      }
+      if(total && total >= 0){
+        lbl.textContent = 'Reproduciendo… ' + cur + '/' + total;
+      }else{
+        lbl.textContent = 'Reproduciendo…';
+      }
+    }catch(_){}
+  }
+
+  var progressTimer = null;
+  function startProgress(){
+    stopProgress();
+    updateProgressLabel();
+    progressTimer = setInterval(updateProgressLabel, 150);
+    var s = document.getElementById('rp-slider');
+    if(s){
+      s.addEventListener('input', updateProgressLabel, {passive:true});
+      s.addEventListener('change', updateProgressLabel, {passive:true});
+    }
+  }
+  function stopProgress(){
+    try{ if(progressTimer) clearInterval(progressTimer); }catch(_){}
+    progressTimer = null;
+  }
+
+  function hideStartButtons(hide){
+    ['btnStartGame','btnStartGameBR'].forEach(function(id){
+      var b = document.getElementById(id);
+      if(!b) return;
+      if(hide){
+        b.dataset.__aj_prev_opacity = b.style.opacity || '';
+        b.dataset.__aj_prev_pe = b.style.pointerEvents || '';
+        b.dataset.__aj_prev_display = b.style.display || '';
+        b.style.opacity='0';
+        b.style.pointerEvents='none';
+        b.style.display='none';
+        b.setAttribute('aria-hidden','true');
+        b.setAttribute('tabindex','-1');
+      }else{
+        b.style.opacity = b.dataset.__aj_prev_opacity || '';
+        b.style.pointerEvents = b.dataset.__aj_prev_pe || '';
+        b.style.display = b.dataset.__aj_prev_display || '';
+        b.removeAttribute('aria-hidden');
+        b.removeAttribute('tabindex');
+      }
+    });
+  }
+
+  // --- Velocidad por defecto y sincronización ---
+  function setSpeedValue(val){
+    var sel = document.getElementById('rp-speed');
+    if(!sel) return false;
+    sel.value = String(val);
+    try{ sel.dispatchEvent(new Event('input', {bubbles:true})); }catch(_){}
+    try{ sel.dispatchEvent(new Event('change', {bubbles:true})); }catch(_){}
+    return true;
+  }
+  function hookSpeedAutoApply(){
+    var sel = document.getElementById('rp-speed');
+    if(!sel || sel.__aj_hooked) return;
+    sel.__aj_hooked = true;
+    sel.addEventListener('input', function(){
+      try{
+        // Si está reproduciendo, re-aplicar intervalo con nueva velocidad
+        if(window.AJ_Replay && typeof window.AJ_Replay.pause==='function' && typeof window.AJ_Replay.play==='function'){
+          window.AJ_Replay.pause();
+          // pequeña espera para limpiar el timer actual
+          setTimeout(function(){ try{ window.AJ_Replay.play(); }catch(_){} }, 0);
+        }
+      }catch(_){}
+    }, true);
+  }
+
+  function showPane(){ var p = ensurePane(); if(p){ p.style.display='block'; } }
+  function hidePane(){ var p = document.getElementById('aj-replay-glass-pane'); if(p){ p.style.display='none'; } }
+
+  function closePanels(){
+    try{ if(typeof closePanelRobust==='function') closePanelRobust(); }catch(_){}
+    try{ if(typeof closeReg==='function') closeReg(); }catch(_){}
+    try{ var bd = $('#panelBackdrop'); if(bd) bd.style.display='none'; }catch(_){}
+    try{ var rb = $('#rgBackdrop'); if(rb) rb.style.display='none'; }catch(_){}
+  }
+
+  function wrapReplay(){
+    try{
+      if(!window.AJ_Replay) return false;
+      if(window.AJ_Replay.__glassWrapped_v6) return true;
+      var api = window.AJ_Replay;
+      var _start = api.start;
+      var _exit  = api.exit;
+      api.start = function(){
+        closePanels();
+        showPane();
+        hideStartButtons(true);
+        var r = _start ? _start.apply(this, arguments) : undefined;
+        // Ahora que startReplay puso RP.speed=1, forzamos 0.25×
+        hookSpeedAutoApply();
+        setSpeedValue(0.25);
+        startProgress();
+        return r;
+      };
+      api.exit = function(){
+        var r = _exit ? _exit.apply(this, arguments) : undefined;
+        hidePane();
+        hideStartButtons(false);
+        stopProgress();
+        return r;
+      };
+      api.__glassWrapped_v6 = true;
+      return true;
+    }catch(_){ return false; }
+  }
+
+  if(!wrapReplay()){
+    var iid = setInterval(function(){ if(wrapReplay()){ clearInterval(iid); } }, 80);
+    setTimeout(function(){ try{ clearInterval(iid); }catch(_){} }, 8000);
+  }
+
+  // Cierre por la "X": detener, salir, reiniciar tablero y habilitarlo
+  document.addEventListener('click', function(e){
+    var t = e && e.target;
+    if(!t) return;
+    if(t.id === 'rp-exit'){
+      try{ window.AJ_Replay && window.AJ_Replay.pause && window.AJ_Replay.pause(); }catch(_){}
+      try{ window.AJ_Replay && window.AJ_Replay.exit && window.AJ_Replay.exit(); }catch(_){}
+      // Reiniciar tablero y dejarlo habilitado (sin overlays)
+      try{ if(typeof restartGame==='function') restartGame(); }catch(_){}
+      try{
+        var so = document.getElementById('startOverlay');
+        if(so) so.style.display='none';
+        window.GAME_STARTED = true; // habilitar interacción
+      }catch(_){}
+      try{ window.dispatchEvent(new Event('aj:replay:exit')); }catch(_){}
+    }
+  }, true);
+
+  // Estado inicial
+  hidePane(); hideStartButtons(false);
+})();
+</script>
+
+
+
+
+<script id="aj-replay-default-speed">
+(function(){
+  try{
+    var sel = document.getElementById('rp-speed');
+    if(sel){
+      sel.value = '0.25';
+      // Disparar oninput / change para sincronizar con RP.speed
+      try{
+        var ev = new Event('input', {bubbles:true});
+        sel.dispatchEvent(ev);
+      }catch(_){}
+      try{
+        var ev2 = new Event('change', {bubbles:true});
+        sel.dispatchEvent(ev2);
+      }catch(_){}
+    }
+  }catch(_){}
+})();
+</script>
+</html><!-- Session guard and HUD cancel on mode/restart --><script>
 (function(){
   window.__GAME_SESSION__ = window.__GAME_SESSION__ || 0;
 
