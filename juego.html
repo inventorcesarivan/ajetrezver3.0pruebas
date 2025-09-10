@@ -429,7 +429,7 @@ body[data-theme="madera"] .board-wrap{
 </style><style id="rpFloatStyles">
 #rpBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:999998;display:none;}
 #replayPanel.rp-float{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:min(760px,94vw);max-height:78vh;overflow:auto;background:#fff;
+  width:min(calc(760px + (2 * var(--square))),94vw);max-height:78vh;overflow:auto;background:#fff;
   z-index:999999;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.35);padding:14px;}
 /* compact list spacing */
 #replayPanel .row{gap:10px;}
@@ -437,8 +437,8 @@ body[data-theme="madera"] .board-wrap{
 </style><style id="rpEnforcerStyles">
 /* Enforce top-most modal */
 #rpBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.40)!important;z-index:2147483000!important;display:none;}
-#replayPanel.rp-float{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;
-  width:min(820px,96vw)!important;max-height:80vh!important;overflow:auto!important;background:#fff!important;
+#replayPanel.rp-float{position:fixed!important;top:50%!important;left:50%!important;transform: translate(calc(-50% + var(--square, 56px)), -50%) !important;
+  width:min(calc(820px + (2 * var(--square))),96vw)!important;max-height:80vh!important;overflow:auto!important;background:#fff!important;
   z-index:2147483001!important;border-radius:14px!important;box-shadow:0 18px 60px rgba(0,0,0,.45)!important;
   padding:16px!important; display:none;}
 #replayPanel.rp-force-show{display:block!important; visibility:visible!important; opacity:1!important;}
@@ -1112,6 +1112,113 @@ body, html{overflow:visible!important;}
 
     margin-top: calc(var(--casillero, 64px) * 0.5556) !important;
 }
+  }
+</style>
+
+
+
+<style id="aj-replay-red-btn">
+  /* Botón Reproducir en tablero: rojo cuando habilitado, negro cuando deshabilitado */
+  #reg-replay-start{
+    background: #C8102E !important; /* rojo */
+    color: #fff !important;
+    border-color: #ffffff !important;
+  }
+  #reg-replay-start:hover{ filter: brightness(0.95); }
+  #reg-replay-start:disabled{
+    background: #000 !important;   /* negro */
+    color: #fff !important;
+    border-color: #ffffff !important;
+    opacity: 1 !important;         /* sin opacar */
+    filter: none !important;
+    cursor: not-allowed;
+  }
+  #reg-replay-start:disabled:hover{ filter: none !important; }
+</style>
+
+
+
+
+
+<style id="aj-reg-hint-style">
+  #regHintSelect, .reg-hint-select{
+    /* Layout */
+    display: block;
+    width: fit-content;
+    max-width: 90%;
+    margin: 8px auto 10px auto;      /* centrado */
+    text-align: center;
+
+    /* Look & feel (más angosto) */
+    padding: 6px 10px;                /* era 8px 12px */
+    font-weight: 800;
+    color: #fff !important;
+    background: #C8102E !important;   /* rojo */
+    border: 2px solid #ffffff !important;
+    border-radius: 12px;
+    line-height: 1.15;
+    user-select: none;
+    cursor: default;
+
+    /* Latido */
+    animation: regPulse 1.6s ease-in-out infinite;
+    transform-origin: 50% 50%;
+  }
+  @keyframes regPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+</style>
+
+
+
+<style id="aj-replay-ui-scale">
+  /* Escala de controles del REPRODUCTOR (~-15%) */
+  #replayPanel button,
+  #replayPanel .btn,
+  #replayPanel select,
+  #replayPanel input[type="text"],
+  #replayPanel input[type="number"],
+  #replayPanel input[type="search"],
+  #replayPanel input[type="checkbox"],
+  #replayPanel input[type="radio"],
+  #replayPanel label {
+    font-size: 0.85em !important;
+  }
+  /* Botones pequeños: mantienen proporción y reducen padding */
+  #replayPanel .btn.small,
+  #replayPanel button.small {
+    font-size: 0.84em !important;
+    padding: 4px 8px !important;
+  }
+  /* Botones regulares: reducir padding un poco */
+  #replayPanel .btn:not(.small),
+  #replayPanel button:not(.small) {
+    padding: 6px 10px !important;
+  }
+  /* Inputs/selects: altura/padding más compactos */
+  #replayPanel select,
+  #replayPanel input[type="text"],
+  #replayPanel input[type="number"],
+  #replayPanel input[type="search"] {
+    padding: 5px 8px !important;
+    min-height: 28px !important;
+  }
+  /* Sliders (range): altura de pista/handler un poco menor (best-effort cross-browser) */
+  #replayPanel input[type="range"] {
+    height: 18px;
+  }
+  #replayPanel input[type="range"]::-webkit-slider-thumb {
+    width: 12px; height: 12px;
+  }
+  #replayPanel input[type="range"]::-moz-range-thumb {
+    width: 12px; height: 12px;
+  }
+  /* Iconos SVG dentro de los botones: */
+  #replayPanel button svg,
+  #replayPanel .btn svg {
+    width: 0.95em; height: 0.95em;
   }
 </style>
 
@@ -4968,7 +5075,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   window.__AJ_syncPanelUnderRow__ = syncPanel;
 })();
 </script><!-- === REGISTROS: Panel flotante independiente === --><div id="rgBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;z-index:2147483600;"></div><div aria-labelledby="rgTitle" aria-modal="true" class="rg-top" id="regPanel" role="dialog" style="display:none;"><div class="rg-header"><div id="rgTitle">Registros de partidas</div><div class="rg-right"><button class="btn" id="reg-replay-start" type="button" title="Reproducir esta partida en el tablero">Reproducir en tablero</button>
-<button class="btn small" id="rgExportAll">Exportar JSON</button><button class="btn small" id="rgImport">Importar JSON</button><button class="btn" id="rgClose">Cerrar</button></div></div><div class="rg-content"><div class="registros-grid"><aside class="reg-left"><div class="card"><div class="card-title">Buscar y filtrar</div><div class="row gap"><input class="input" id="reg-q" placeholder="Buscar por etiqueta, modo, resultado..."/></div><div class="row gap"><select class="input" id="reg-mode"><option value="">Todos los modos</option><option value="pvp">Player vs Player</option><option value="pvb">Player Vs Bot</option><option value="bvb">Bot vs Bot</option></select><select class="input" id="reg-result"><option value="">Todos los resultados</option><option value="1-0">1-0</option><option value="0-1">0-1</option><option value="1/2-1/2">Tablas</option></select></div><div class="row gap"><button class="btn small" id="reg-refresh">Actualizar</button><button class="btn small" id="reg-save-current">Guardar partida actual</button></div></div><div class="card" style="margin-top:10px"><div class="card-title">Partidas guardadas</div><div aria-label="Lista de partidas" class="game-list" id="reg-list" role="listbox"></div></div></aside><section class="reg-right"><div class="card" id="reg-empty"><div class="card-title">Selecciona una partida</div><p class="muted">Elige una de la lista para ver sus detalles. También puedes guardar la partida actual.</p><div class="row gap"><button class="btn small" id="reg-add-note">Añadir nota</button></div></div><div class="card" id="reg-detail" style="display:none"><div class="card-title"><span id="reg-title">Título</span><div class="right"><button class="btn small" id="reg-export-pgn">Exportar PGN</button><button class="btn small" id="reg-delete">Eliminar</button></div></div><div class="grid-2 gap"><div><div class="meta-line"><b>Fecha:</b><span id="reg-date">—</span></div><div class="meta-line"><b>Modo:</b><span id="reg-mode-val">—</span></div><div class="meta-line"><b>Resultado:</b><span id="reg-result-val">—</span></div><div class="meta-line"><b>Duración:</b><span id="reg-duration">—</span></div><div class="meta-line"><b>Etiquetas:</b><span id="reg-tags">—</span></div></div><div><div class="meta-chip">👁 Apertura: <span id="reg-opening">—</span></div><div class="meta-chip">⚡ Tiempos por jugada: <span id="reg-times">—</span></div><div class="meta-chip">⚠️ Errores: <span id="reg-errors">—</span></div></div></div><div class="grid-2 gap" style="margin-top:8px"><div class="card soft"><div class="card-title sm">Movimientos</div><div class="moves-table" id="reg-moves"></div></div><div class="card soft"><div class="card-title sm">Estadísticas</div><ul class="stats-list" id="reg-stats"></ul></div></div><div class="card soft" style="margin-top:8px"><div class="card-title sm">Notas</div><div class="notes" id="reg-notes"></div></div></div></section></div></div></div><!-- === REGISTROS — lógica y almacenamiento === --><script>
+<button class="btn small" id="rgExportAll">Exportar JSON</button><button class="btn small" id="rgImport">Importar JSON</button><button class="btn" id="rgClose">Cerrar</button></div></div><div class="rg-content"><div class="registros-grid"><aside class="reg-left"><div class="card"><div class="card-title">Buscar y filtrar</div><div class="row gap"><input class="input" id="reg-q" placeholder="Buscar por etiqueta, modo, resultado..."/></div><div class="row gap"><select class="input" id="reg-mode"><option value="">Todos los modos</option><option value="pvp">Player vs Player</option><option value="pvb">Player Vs Bot</option><option value="bvb">Bot vs Bot</option></select><select class="input" id="reg-result"><option value="">Todos los resultados</option><option value="1-0">1-0</option><option value="0-1">0-1</option><option value="1/2-1/2">Tablas</option></select></div><div class="row gap"><button class="btn small" id="reg-refresh">Actualizar</button><button class="btn small" id="reg-save-current">Guardar partida actual</button></div></div><div class="card" style="margin-top:10px"><div class="card-title">Partidas guardadas</div><div id="regHintSelect" style="margin:6px 0 8px 0;font-weight:700; color:#C8102E; text-align:left;">Selecciona una partida</div><div aria-label="Lista de partidas" class="game-list" id="reg-list" role="listbox"></div></div></aside><section class="reg-right"><div class="card" id="reg-empty"><div class="card-title">Selecciona una partida</div><p class="muted">Elige una de la lista para ver sus detalles. También puedes guardar la partida actual.</p><div class="row gap"></div></div><div class="card" id="reg-detail" style="display:none"><div class="card-title"><span id="reg-title">Título</span><div class="right"><button class="btn small" id="reg-export-pgn">Exportar PGN</button><button class="btn small" id="reg-delete">Eliminar</button></div></div><div class="grid-2 gap"><div><div class="meta-line"><b>Fecha:</b><span id="reg-date">—</span></div><div class="meta-line"><b>Modo:</b><span id="reg-mode-val">—</span></div><div class="meta-line"><b>Resultado:</b><span id="reg-result-val">—</span></div><div class="meta-line"><b>Duración:</b><span id="reg-duration">—</span></div><div class="meta-line"><b>Etiquetas:</b><span id="reg-tags">—</span></div></div><div><div class="meta-chip">👁 Apertura: <span id="reg-opening">—</span></div><div class="meta-chip">⚡ Tiempos por jugada: <span id="reg-times">—</span></div><div class="meta-chip">⚠️ Errores: <span id="reg-errors">—</span></div></div></div><div class="grid-2 gap" style="margin-top:8px"><div class="card soft"><div class="card-title sm">Movimientos</div><div class="moves-table" id="reg-moves"></div></div><div class="card soft"><div class="card-title sm">Estadísticas</div><ul class="stats-list" id="reg-stats"></ul></div></div><div class="card soft" style="margin-top:8px"><div class="card-title sm">Notas</div>\1</div></div></div></section></div></div></div><!-- === REGISTROS — lógica y almacenamiento === --><script>
 (function(){
   if(window.AJ_Recorder) return;
   const LS_KEY = 'ajetrez.registros.v1';
@@ -5098,10 +5205,7 @@ const g = window.__AJ_CURRENT_GAME__; if(!g) return;
     $('#reg-delete').onclick = ()=>{
       const n = loadAll().filter(x=>x.id!==g.id); saveAll(n); refreshList(); $('#reg-detail').style.display='none'; $('#reg-empty').style.display='block';
     };
-    $('#reg-add-note').onclick = ()=>{
-      const note = prompt('Añadir nota a la partida:');
-      if(note){ g.notes = (g.notes||'') + (g.notes? '\\n':'') + note; const all=loadAll(); const idx=all.findIndex(x=>x.id===g.id); all[idx]=g; saveAll(all); showDetail(g.id); }
-    };
+    /* add-note removed */
   }
 
   function exportPGN(g){
@@ -6511,10 +6615,22 @@ div[style="height:var(--toolbar-gap)"]{
 
   if(!btn) return;
 
+  function updateHint(hasSelection){
+    try{
+      var h = document.getElementById('regHintSelect');
+      if(!h) return;
+      h.style.display = hasSelection ? 'none' : 'block';
+    }catch(_){ }
+  }
+
+
   function getAll(){ try{ return JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]'); }catch(_){ return []; } }
-  function setEnabled(v){ btn.disabled = !v; btn.style.opacity = v ? '1' : '.6'; }
+  function setEnabled(v){ btn.disabled = !v;
+}
 
   function setCurrent(id){
+    try{ updateHint(!!id); }catch(_){}
+
     try{ window.__REG_CURRENT_ID__ = id; }catch(_){}
     setEnabled(!!id);
   }
@@ -6573,11 +6689,31 @@ div[style="height:var(--toolbar-gap)"]{
     const g = all.find(x=>x && x.id===id);
     if(g && window.AJ_Replay && typeof window.AJ_Replay.start==='function'){
       window.AJ_Replay.start(g);
+      try{
+        // Cerrar panel de Registros
+        const bp = document.getElementById('rgBackdrop');
+        const rp = document.getElementById('regPanel');
+        if(bp) bp.style.display = 'none';
+        if(rp) rp.style.display = 'none';
+      }catch(_){}
+      try{
+        // Cerrar menú principal (Mega Panel)
+        const pnl = document.getElementById('megaPanel');
+        const bd  = document.getElementById('panelBackdrop');
+        const btnClose = document.getElementById('btnClosePanel');
+        const btnOpen  = document.getElementById('btnMegaMenu');
+        if(btnClose) btnClose.click(); // dispara la lógica nativa de cierre
+        if(pnl) pnl.style.display = 'none';
+        if(bd)  bd.style.display  = 'none';
+        if(btnOpen) btnOpen.setAttribute('aria-expanded','false');
+      }catch(_){}
     }
   });
 
   // 5) Inicialmente deshabilitado hasta que haya selección
   setEnabled(!!window.__REG_CURRENT_ID__);
+  try{ updateHint(!!window.__REG_CURRENT_ID__); }catch(_){}
+
 })();
 </script>
 
