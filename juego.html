@@ -437,7 +437,7 @@ body[data-theme="madera"] .board-wrap{
 </style><style id="rpEnforcerStyles">
 /* Enforce top-most modal */
 #rpBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.40)!important;z-index:2147483000!important;display:none;}
-#replayPanel.rp-float{position:fixed!important;top:50%!important;left:50%!important;transform: translate(calc(-50% + var(--square, 56px)), -50%) !important;
+#replayPanel.rp-float{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;
   width:min(calc(820px + (2 * var(--square))),96vw)!important;max-height:80vh!important;overflow:auto!important;background:#fff!important;
   z-index:2147483001!important;border-radius:14px!important;box-shadow:0 18px 60px rgba(0,0,0,.45)!important;
   padding:16px!important; display:none;}
@@ -1171,56 +1171,6 @@ body, html{overflow:visible!important;}
   }
 </style>
 
-
-
-<style id="aj-replay-ui-scale">
-  /* Escala de controles del REPRODUCTOR (~-15%) */
-  #replayPanel button,
-  #replayPanel .btn,
-  #replayPanel select,
-  #replayPanel input[type="text"],
-  #replayPanel input[type="number"],
-  #replayPanel input[type="search"],
-  #replayPanel input[type="checkbox"],
-  #replayPanel input[type="radio"],
-  #replayPanel label {
-    font-size: 0.85em !important;
-  }
-  /* Botones pequeños: mantienen proporción y reducen padding */
-  #replayPanel .btn.small,
-  #replayPanel button.small {
-    font-size: 0.84em !important;
-    padding: 4px 8px !important;
-  }
-  /* Botones regulares: reducir padding un poco */
-  #replayPanel .btn:not(.small),
-  #replayPanel button:not(.small) {
-    padding: 6px 10px !important;
-  }
-  /* Inputs/selects: altura/padding más compactos */
-  #replayPanel select,
-  #replayPanel input[type="text"],
-  #replayPanel input[type="number"],
-  #replayPanel input[type="search"] {
-    padding: 5px 8px !important;
-    min-height: 28px !important;
-  }
-  /* Sliders (range): altura de pista/handler un poco menor (best-effort cross-browser) */
-  #replayPanel input[type="range"] {
-    height: 18px;
-  }
-  #replayPanel input[type="range"]::-webkit-slider-thumb {
-    width: 12px; height: 12px;
-  }
-  #replayPanel input[type="range"]::-moz-range-thumb {
-    width: 12px; height: 12px;
-  }
-  /* Iconos SVG dentro de los botones: */
-  #replayPanel button svg,
-  #replayPanel .btn svg {
-    width: 0.95em; height: 0.95em;
-  }
-</style>
 
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
