@@ -1172,6 +1172,221 @@ body, html{overflow:visible!important;}
 </style>
 
 
+
+<style id="aj-topbar-order-replayer-reg-clock">
+  /* Orden deseado dentro del reloj (timeIndicator):
+     1) Reproductor, 2) Botón "Registro de partidas", 3) Reloj, 4) Pausa */
+  #timeIndicator{ display: inline-flex !important; align-items: center !important; }
+  #timeIndicator #regv2-replayer{ order: 1 !important; margin-left: 0 !important; }
+  #timeIndicator #regv2-clock-btn{ order: 2 !important; margin-left: 8px !important; }
+  #timeIndicator .dot, #timeIndicator .label, #timeIndicator #timeTxt{ order: 3 !important; }
+  #timeIndicator #pauseBtn{ order: 4 !important; margin-left: 8px !important; }
+  #timeIndicator .dot{ margin-left: 8px !important; }
+</style>
+
+<style id="aj-replayer-compact-85">
+  /* Achicar el tamaño del reproductor */
+  #regv2-replayer{ gap: 6px !important; padding: 4px 8px !important; }
+  #regv2-replayer button{ padding: 3px 5px !important; }
+  #regv2-replayer #rp2-slider{ width: 120px !important; }
+  #regv2-replayer #rp2-status{ font-size: 11px !important; }
+  #regv2-replayer #rp2-speed{ padding: 2px 5px !important; }
+</style>
+
+<style id="aj-pause-right-and-timeindicator-transparent">
+  /* Fondo del bloque del reloj transparente */
+  #timeIndicator{ background: transparent !important; box-shadow: none !important; }
+</style>
+
+<style id="aj-shift-buttons-left-2c">
+  /* Tamaño base de un casillero */
+  :root{ --aj-casillero: 40px; }
+  /* Desplazar SOLO los botones a la izquierda (reproductor y registro) */
+  #timeIndicator #regv2-replayer,
+  #timeIndicator #regv2-clock-btn{ position: relative; left: calc(-2 * var(--aj-casillero)); }
+  /* Compensar el desplazamiento agregando padding al contenedor */
+  #timeIndicator{ padding-left: calc(2 * var(--aj-casillero)); }
+</style>
+
+<style id="aj-black-bg-replayer-clock">
+  /* Reproductor con fondo negro */
+  #regv2-replayer{ background: #000 !important; color: #fff !important; border-radius: 10px !important; padding: 4px 8px !important; }
+  #regv2-replayer button{ background: #000 !important; color: #fff !important; border-radius: 8px !important; }
+  /* Mantener contenedor transparente */
+  #timeIndicator{ background: transparent !important; box-shadow: none !important; }
+  /* Reloj (valor) en negro */
+  #timeIndicator #timeTxt{ background: #000 !important; color: #fff !important; border-radius: 8px !important; padding: 2px 8px !important; }
+  /* Botón Pausa en negro */
+  #timeIndicator #pauseBtn{ background: #000 !important; color: #fff !important; border-radius: 8px !important; }
+  #timeIndicator #pauseBtn:hover{ filter: brightness(1.15); }
+</style>
+
+<style id="aj-replayer-solid-black-override">
+  /* Anula gradientes globales y sombras para asegurar negro sólido */
+  #regv2-replayer,
+  #timeIndicator > #regv2-replayer,
+  #timeIndicator > div#regv2-replayer{
+    background-color: #000 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: 1px solid #fff !important;
+    border-radius: 12px !important;
+  }
+</style>
+
+<style id="aj-shift-reg-btn-plus-0_5c">
+  /* Mueve el botón "Registro de partidas" medio casillero a la derecha (de -2c a -1.5c) */
+  :root{ --aj-casillero: 40px; }
+  #timeIndicator #regv2-clock-btn{ left: calc(-1.5 * var(--aj-casillero)) !important; }
+</style>
+
+<style id="aj-shift-reg-btn-plus-1_0c-and-replayer-black">
+  /* Registro +0.5c adicional a la derecha (ahora total -1.0c) */
+  :root{ --aj-casillero: 40px; }
+  #timeIndicator #regv2-clock-btn{
+    left: calc(-1 * var(--aj-casillero)) !important;
+  }
+
+  /* Reproductor negro absoluto (incluye pseudo-elementos) */
+  #regv2-replayer,
+  #regv2-replayer::before,
+  #regv2-replayer::after{
+    background: #000 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+  #regv2-replayer{
+    border: 1px solid #fff !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+  }
+</style>
+
+<style id="aj-replayer-hidden-by-default">
+  #regv2-replayer{ display: none !important; }
+</style>
+
+<script id="aj-replayer-visibility-logic">
+(function(){
+  function $(s,root=document){ return root.querySelector(s); }
+  function ensureBar(){
+    // If the original script has a creator, let it build the bar once.
+    if(document.getElementById('regv2-replayer')) return true;
+    var creator = document.getElementById('regv2-replayer-script');
+    if(creator){
+      // invoke its ensureBar() if exposed, otherwise rely on its MutationObserver
+      try{ if(window.ensureRegv2Bar) window.ensureRegv2Bar(); }catch(_){}
+    }
+    // Fallback: wait for it
+    return !!document.getElementById('regv2-replayer');
+  }
+
+  // Show on "Reproducir en tablero"
+  document.addEventListener('click', function(ev){
+    var id = (ev.target && ev.target.id) || '';
+    if(id === 'regv2-play'){
+      // make sure the bar exists, then show
+      setTimeout(function(){
+        ensureBar();
+        var bar = $('#regv2-replayer');
+        if(bar){ bar.style.display = 'inline-flex'; }
+      }, 0);
+    }
+    // Hide when closing the registros panel
+    if(id === 'rgClose'){
+      var bar = $('#regv2-replayer');
+      if(bar){ bar.style.display = 'none'; }
+    }
+  }, true);
+
+  // Hide when the bot stops (hook stop method if available)
+  function hookStop(){
+    var B = window.__RegV2Bot;
+    if(!B || !B.stop || B.__stopHooked) return false;
+    var orig = B.stop;
+    B.stop = function(opts){
+      var r = orig.apply(B, arguments);
+      var bar = document.getElementById('regv2-replayer');
+      if(bar){ bar.style.display = 'none'; }
+      return r;
+    };
+    B.__stopHooked = true;
+    return true;
+  }
+
+  // Try hooking repeatedly until available
+  var tries = 0, t = setInterval(function(){
+    tries++;
+    if(hookStop() || tries > 40){ clearInterval(t); }
+  }, 250);
+})();
+</script>
+
+<style id="aj-clockwrap-style">
+  /* Base contenedora negra para reloj + pausa */
+  #aj-clockwrap{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #000 !important;
+    color: #fff !important;
+    border-radius: 10px;
+    padding: 2px 10px;
+    order: 3 !important;       /* aparece donde estaba el reloj */
+    margin-left: 8px;
+  }
+  /* Dentro del contenedor, los hijos no llevan fondo propio */
+  #aj-clockwrap #timeTxt,
+  #aj-clockwrap #pauseBtn{
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  #aj-clockwrap #pauseBtn{
+    margin-left: 6px !important;
+  }
+</style>
+
+<script id="aj-clockwrap-script">
+(function(){
+  function $(s,root=document){ return root.querySelector(s); }
+  function ensureWrap(){
+    var host = $('#timeIndicator');
+    var time = $('#timeTxt');
+    var pause = $('#pauseBtn');
+    if(!host || !time || !pause) return false;
+
+    var wrap = $('#aj-clockwrap');
+    if(!wrap){
+      wrap = document.createElement('div');
+      wrap.id = 'aj-clockwrap';
+      host.appendChild(wrap);
+    }
+    if(time.parentElement !== wrap) wrap.appendChild(time);
+    if(pause.parentElement !== wrap) wrap.appendChild(pause);
+    return true;
+  }
+
+  // Try immediately and keep trying as DOM updates
+  ensureWrap();
+  var tries = 0;
+  var obs = new MutationObserver(function(){
+    if(ensureWrap()){
+      // keep observing in case scripts relocate nodes later,
+      // but avoid running too often
+    }
+  });
+  obs.observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+
+<style id="aj-inline-css">
+#reg-list .reg-toggle{ display:inline-block; margin-top:6px; font-size:12px; opacity:.86; background:#f1f1f1; border:1px solid #e5e5e5; border-radius:999px; padding:2px 8px; cursor:pointer; }
+#reg-list .reg-toggle:hover{ opacity:1; }
+#reg-list .reg-inline{ margin-top:6px; border:1px dashed #ddd; border-radius:10px; padding:8px; background:#fff; max-height:180px; overflow:auto; white-space:pre-wrap; font-family: ui-monospace, Menlo, Consolas, 'Courier New', monospace; }
+#reg-moves .ply{ display:grid; grid-template-columns: 40px 1fr 1fr; gap:6px; padding:2px 0; border-bottom:1px dotted #eee; }
+#reg-moves .num{ font-weight:700; opacity:.8; }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -6742,6 +6957,1059 @@ div[style="height:var(--toolbar-gap)"]{
 </script>
 
 
+
+
+<!-- === AJETREZ: Registro de partidas + SystemBot inline === -->
+<style id="regv2-style-min">
+  #regv2-open{position:fixed;top:10px;right:10px;z-index:99999;background:#111;color:#fff;border:2px solid #fff;border-radius:12px;padding:8px 12px;font-weight:800;box-shadow:inset 0 0 0 2px #111;opacity:.9}
+  #regv2-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:99998}
+  #regv2-panel{width:min(92vw,980px);height:min(86vh,640px);background:#f7f7f7;border:2px solid #111;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
+  #regv2-panel header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #ddd;background:#fafafa}
+  #regv2-title{font-weight:900;font-size:18px}
+  #regv2-close{background:#111;color:#fff;border:2px solid #fff;border-radius:12px;padding:6px 10px;font-weight:800;cursor:pointer}
+  #regv2-body{display:grid;grid-template-columns:1fr;gap:10px;padding:12px}
+  #regv2-input{width:100%;height:220px;border:1px solid #ccc;border-radius:10px;padding:8px;font-family:ui-monospace,Consolas,monospace}
+  .regv2-btn{background:#111;color:#fff;border:2px solid #fff;border-radius:10px;padding:8px 10px;font-weight:800;cursor:pointer}
+  .regv2-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+</style>
+
+<button id="regv2-open" type="button">Registro de partidas</button>
+<div id="regv2-overlay" aria-hidden="true">
+  <div id="regv2-panel" role="dialog" aria-modal="true" aria-labelledby="regv2-title">
+    <header><div id="regv2-title">Registro de partidas</div><button id="regv2-close" type="button">✕</button></header>
+    <div id="regv2-body">
+      <div class="regv2-row">
+        <button class="regv2-btn" id="regv2-demo" type="button">Cargar demo</button>
+        <label>Velocidad <select id="regv2-speed"><option>0.25</option><option>0.5</option><option selected>1</option><option>1.5</option><option>2</option><option>3</option></select></label>
+      </div>
+      <textarea id="regv2-input" placeholder="Pega UCI: e2e4 e7e5 g1f3 ..."></textarea>
+      <div class="regv2-row">
+        <button class="regv2-btn" id="regv2-play" type="button">Reproducir en tablero</button>
+        <button class="regv2-btn" id="regv2-pause" type="button">Pausar</button>
+        <button class="regv2-btn" id="regv2-resume" type="button">Continuar</button>
+        <button class="regv2-btn" id="regv2-stop" type="button">Detener</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="regv2-inlinebot">
+(function(){
+  const $ = s => document.querySelector(s);
+  const overlay = $('#regv2-overlay'), openBtn = $('#regv2-open'), closeBtn = $('#regv2-close');
+  openBtn.onclick = ()=> overlay.style.display='flex';
+  closeBtn.onclick = ()=> overlay.style.display='none';
+  window.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='r' && e.shiftKey){ e.preventDefault(); overlay.style.display='flex'; } });
+
+  // Minimal SystemBot (engine mode only)
+  const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+  const Bot = {
+    script:[], index:0, playing:false, speed:700, abort:false,
+    load(arr){ this.script = Array.isArray(arr)? arr.slice():[]; this.index=0; },
+    setSpeed(ms){ this.speed = clamp(ms|0,0,60000); },
+    stop({resetToStart=true}={}){ this.abort=true; this.playing=false; if(resetToStart){ try{ if(typeof restartGame==='function') restartGame(); }catch(_){}} },
+    pause(){ this.playing=false; },
+    resume(){ if(!this.playing){ this.playing=true; this.play(); } },
+    async play(){
+      if(this.playing) return; this.playing=true; this.abort=false;
+      while(!this.abort && this.index<this.script.length){
+        const m=this.script[this.index++];
+        try{
+          const toRC = s=>({ r: 8-parseInt(s.slice(1),10), c: s.charCodeAt(0)-97 });
+          if(m.action==='shift'){
+            const sgn=(m.dir==='left'?-1:1)*(m.steps|0), mod=24, r=m.row|0;
+            offsets[r]=((offsets[r]+sgn)%mod+mod)%mod;
+            if(typeof render==='function') render();
+            if(typeof turn!=='undefined') turn=(turn==='w'?'b':'w');
+          }else{
+            const f=toRC(m.from), t=toRC(m.to);
+            const special={}; if(m.promotion) special.promotion=m.promotion; if(m.castle) special.castle=m.castle; if(m.enPassant) special.enPassant=true;
+            const res = applyMove(board, offsets, f, t, Object.keys(special).length?special:null);
+            if(res && res.board) board=res.board;
+            if(typeof render==='function') render();
+            if(typeof turn!=='undefined') turn=(turn==='w'?'b':'w');
+          }
+        }catch(e){ console.error('[RegV2 Bot]', e); }
+        await sleep(this.speed);
+      }
+      this.playing=false;
+    }
+  };
+  window.__RegV2Bot = Bot;
+
+  // Parser UCI simple
+  function parseUCI(txt){
+    const tokens = String(txt||'').trim().replace(/\s+/g,' ').split(' ');
+    const out=[]; let color='w';
+    for(const tk of tokens){
+      if(!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(tk)) continue;
+      const from=tk.slice(0,2), to=tk.slice(2,4); const promotion=tk.length===5 ? tk[4].toUpperCase() : undefined;
+      out.push({ action:'move', color, from, to, promotion }); color=(color==='w'?'b':'w');
+    }
+    return out;
+  }
+
+  // UI wiring
+  $('#regv2-demo').onclick = ()=> { $('#regv2-input').value='e2e4 e7e5 g1f3 b8c6 f1c4 g8f6'; };
+  $('#regv2-play').onclick = ()=>{
+    try{
+      const arr = parseUCI($('#regv2-input').value);
+      Bot.stop({resetToStart:true});
+      Bot.load(arr);
+      const mul = parseFloat($('#regv2-speed').value||'1'); Bot.setSpeed(700/(mul||1));
+      overlay.style.display='none';
+      if(typeof setBotEnabled==='function'){ try{ setBotEnabled(false); }catch(_){ } }
+      Bot.play();
+    }catch(e){ console.error(e); }
+  };
+  $('#regv2-pause').onclick = ()=> Bot.pause();
+  $('#regv2-resume').onclick = ()=> Bot.resume();
+  $('#regv2-stop').onclick = ()=> Bot.stop({resetToStart:false});
+})();
+</script>
+<!-- === /AJETREZ: Registro de partidas + SystemBot inline === -->
+
+
+
+<script id="regv2-menu-integration">
+(function(){
+  // Create the tab/button element
+  function makeBtn(){
+    var b = document.createElement('button');
+    b.id = 'btn-open-regv2-tab';
+    b.className = 'tab';
+    b.type = 'button';
+    b.textContent = 'Registro de partidas';
+    b.style.fontWeight = '800';
+    b.onclick = function(){
+      var ov = document.getElementById('regv2-overlay');
+      if(ov) ov.style.display = 'flex';
+    };
+    return b;
+  }
+
+  // Try multiple locations inside the menu
+  function tryInject(){
+    var mp = document.getElementById('megaPanel');
+    if(!mp) return false;
+
+    // 1) Prefer tabs bar
+    var tabs = mp.querySelector('.mp-tabs');
+    if(tabs && !document.getElementById('btn-open-regv2-tab')){
+      tabs.appendChild(makeBtn());
+      hideFloating();
+      return true;
+    }
+
+    // 2) Header right area
+    var headerRight = mp.querySelector('.mp-header .right');
+    if(headerRight && !document.getElementById('btn-open-regv2-tab')){
+      var b = makeBtn();
+      b.className = 'btn'; // fits header buttons
+      headerRight.appendChild(b);
+      hideFloating();
+      return true;
+    }
+
+    // 3) TabsView container (last resort)
+    var tv = mp.querySelector('#tabsView');
+    if(tv && !document.getElementById('btn-open-regv2-tab')){
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;gap:8px;align-items:center;margin:8px 10px;';
+      wrap.appendChild(makeBtn());
+      tv.parentNode.insertBefore(wrap, tv);
+      hideFloating();
+      return true;
+    }
+
+    return false;
+  }
+
+  // Hide the floating open button if we managed to inject inside the menu
+  function hideFloating(){
+    var f = document.getElementById('regv2-open');
+    if(f) f.style.display = 'none';
+  }
+
+  // Attempt immediately
+  var ok = tryInject();
+
+  // Re-try whenever DOM changes (menu may mount later)
+  var obs = new MutationObserver(function(){
+    if(tryInject()){ obs.disconnect(); }
+  });
+  obs.observe(document.documentElement, {childList:true, subtree:true});
+
+  // Also try when user opens the menu from the game button (if exists)
+  var menuBtn = document.getElementById('btnMegaMenu');
+  if(menuBtn){
+    menuBtn.addEventListener('click', function(){
+      setTimeout(tryInject, 50);
+      setTimeout(tryInject, 250);
+      setTimeout(tryInject, 1000);
+    });
+  }
+})();
+</script>
+
+
+
+<!-- AJETREZ: Botón Registro de partidas junto al reloj -->
+<style id="regv2-clock-btn-style">
+  #regv2-clock-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#111; color:#fff; border:2px solid #fff;
+    border-radius:999px; padding:6px 10px; font-weight:800; font-size:14px;
+    cursor:pointer; box-shadow:inset 0 0 0 2px #111;
+  }
+  #regv2-clock-btn.small{ font-size:12px; padding:5px 9px; }
+  #regv2-clock-btn .dot{ width:6px; height:6px; border-radius:50%; background:#4ade80; display:inline-block }
+</style>
+<script id="regv2-clock-btn-script">
+(function(){
+  function addBtn(){
+    var box = document.getElementById('timeIndicator');
+    if(!box) return false;
+    if(document.getElementById('regv2-clock-btn')) return true;
+    var spacer = document.createElement('span');
+    spacer.style.width='8px'; spacer.style.display='inline-block';
+    var btn = document.createElement('button');
+    btn.id='regv2-clock-btn'; btn.className='small'; btn.type='button';
+    btn.innerHTML = '<span class="dot"></span> Registro de partidas';
+    btn.onclick = function(){
+      var ov = document.getElementById('regv2-overlay');
+      if(ov) ov.style.display='flex';
+    };
+    // insert to the right of existing pause/time UI
+    box.appendChild(spacer);
+    box.appendChild(btn);
+    // hide floating button if present
+    var floatBtn = document.getElementById('regv2-open');
+    if(floatBtn) floatBtn.style.display='none';
+    return true;
+  }
+  if(!addBtn()){
+    var obs = new MutationObserver(function(){
+      if(addBtn()) obs.disconnect();
+    });
+    obs.observe(document.documentElement, {childList:true, subtree:true});
+  }
+})();
+</script>
+
+
+<style id="regv2-boardmask-style">
+  #regv2-board-mask{
+    position:absolute; inset:0;
+    background: rgba(0,0,0,0.08);
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.18);
+    display:none;
+    z-index: 2147482000; /* above pieces and board UI, below floating topbar */
+    pointer-events: auto; /* block clicks */
+  }
+  /* Make sure the board container can host an absolute child */
+  #board{ position: relative; }
+</style>
+
+
+<script id="regv2-boardmask-script">
+(function(){
+  function ensureMask(){
+    var board = document.getElementById('board');
+    if(!board) return null;
+    var m = document.getElementById('regv2-board-mask');
+    if(!m){
+      m = document.createElement('div');
+      m.id = 'regv2-board-mask';
+      board.appendChild(m);
+    }
+    return m;
+  }
+  function showMask(){ var m = ensureMask(); if(m) m.style.display='block'; }
+  function hideMask(){ var m = document.getElementById('regv2-board-mask'); if(m) m.style.display='none'; }
+
+  // Hook Bot methods to manage mask + hide Start button
+  if(window.__RegV2Bot){
+    const Bot = window.__RegV2Bot;
+    const playOrig = Bot.play.bind(Bot);
+    const stopOrig = Bot.stop.bind(Bot);
+    const pauseOrig = Bot.pause.bind(Bot);
+    const resumeOrig = Bot.resume.bind(Bot);
+
+    Bot.play = async function(){
+      try{
+        showMask();
+        var startBtn = document.getElementById('btnStartGame');
+        if(startBtn) startBtn.style.display = 'none';
+      }catch(_){}
+      await playOrig();
+      // When loop ends naturally, remove mask
+      hideMask();
+    };
+    Bot.stop = function(opts){ hideMask(); return stopOrig(opts); };
+    Bot.pause = function(){ /* keep mask during pause to bloquear tab */ return pauseOrig(); };
+    Bot.resume = function(){ showMask(); return resumeOrig(); };
+  }
+
+  // Also show mask when clicking our "Reproducir en tablero" button (in case Bot instance isn't ready yet)
+  document.addEventListener('click', function(e){
+    const id = (e.target && e.target.id) || '';
+    if(id === 'regv2-play'){
+      var startBtn = document.getElementById('btnStartGame');
+      if(startBtn) startBtn.style.display='none';
+      showMask();
+    }
+  });
+})();
+</script>
+
+
+
+<script id="regv2-clean-overlay">
+// Reutiliza el mismo "glass pane" del reproductor clásico para bloquear el tablero
+(function(){
+  if(window.__REGV2_OVERLAY_READY__) return; window.__REGV2_OVERLAY_READY__ = true;
+  const $ = (s)=>document.querySelector(s);
+  function findBoardWrap(){
+    return $('#boardWrap') || $('#board') || $('#aj-megaPanel-centered-to-board') || $('#aj-container-symmetric-3mm');
+  }
+  function ensurePane(){
+    var host = findBoardWrap();
+    if(!host) return null;
+    try{
+      var cs = window.getComputedStyle(host);
+      if(cs && cs.position === 'static'){ host.style.position='relative'; }
+    }catch(_){}
+    var pane = document.getElementById('aj-replay-glass-pane');
+    if(!pane){
+      pane = document.createElement('div');
+      pane.id = 'aj-replay-glass-pane';
+      var lbl = document.createElement('div');
+      lbl.className = 'aj-replay-label';
+      lbl.id = 'aj-replay-label';
+      lbl.textContent = 'Reproduciendo…';
+      var close = document.createElement('button');
+      close.id = 'aj-replay-close';
+      close.setAttribute('type','button');
+      close.setAttribute('aria-label','Salir de reproducción');
+      close.textContent = '✕';
+      close.style.cssText = 'position:absolute;top:10px;right:10px;font-weight:800;border-radius:999px;border:2px solid #fff;background:#b31212;color:#fff;padding:8px 12px;font-size:16px;cursor:pointer;box-shadow:inset 0 0 0 2px #111;z-index:2';
+      close.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault(); exit(); }, false);
+      pane.appendChild(lbl);
+      pane.appendChild(close);
+      // bloquear interacciones del tablero/secciones, permitiendo el botón cerrar
+      ['click','mousedown','mouseup','touchstart','touchend','touchmove','pointerdown','pointerup','pointermove','dragstart','contextmenu']
+        .forEach(function(ev){
+          pane.addEventListener(ev, function(e){
+            if(e.target && (e.target.id==='aj-replay-close' || e.target.id==='aj-replay-label' || e.target.closest && e.target.closest('#aj-replay-close'))) return;
+            e.stopPropagation(); e.preventDefault(); return false;
+          }, true);
+        });
+      host.appendChild(pane);
+    } else if (pane.parentElement !== host){
+      try{ pane.parentElement && pane.parentElement.removeChild(pane); }catch(_){}
+      host.appendChild(pane);
+    }
+    return pane;
+  }
+  function showPane(msg){
+    var p = ensurePane(); if(!p) return;
+    p.style.display='block';
+    var lbl = document.getElementById('aj-replay-label');
+    if(lbl && typeof msg==='string' && msg) lbl.textContent = msg;
+  }
+  function hidePane(){ var p = document.getElementById('aj-replay-glass-pane'); if(p) p.style.display='none'; }
+  function hideStartButtons(hide){
+    ['btnStartGame','btnStartGameBR'].forEach(function(id){
+      var b = document.getElementById(id);
+      if(!b) return;
+      if(hide){
+        b.dataset.__aj_prev_opacity = b.style.opacity || '';
+        b.dataset.__aj_prev_pe      = b.style.pointerEvents || '';
+        b.dataset.__aj_prev_display = b.style.display || '';
+        b.style.opacity='0';
+        b.style.pointerEvents='none';
+        b.style.display='none';
+        b.setAttribute('aria-hidden','true');
+        b.setAttribute('tabindex','-1');
+      }else{
+        b.style.opacity      = b.dataset.__aj_prev_opacity || '';
+        b.style.pointerEvents= b.dataset.__aj_prev_pe || '';
+        b.style.display      = b.dataset.__aj_prev_display || '';
+        b.removeAttribute('aria-hidden');
+        b.removeAttribute('tabindex');
+      }
+    });
+  }
+  
+  function exit(){
+    try{
+      if(window.__RegV2Bot){ window.__RegV2Bot.stop({resetToStart:true}); }
+      else if(typeof restartGame==='function'){ restartGame(); }
+    }catch(_){}
+    try{ hidePane(); hideStartButtons(false); }catch(_){}
+    try{
+      if(typeof setBotEnabled==='function') setBotEnabled(true);
+      window.__CLOCK_PAUSED__ = false;
+    }catch(_){}
+    try{ document.body.classList.remove('replaying','replaying-finished','replaying-stopped'); }catch(_){}
+  }
+catch(_){}
+    try{
+      if(typeof setBotEnabled==='function') setBotEnabled(true);
+      window.__CLOCK_PAUSED__ = false;
+    }catch(_){}
+  }
+  // Exponer utilidades mínimas
+  window.__REGV2_overlay__ = { showPane, hidePane, hideStartButtons, exit };
+  // Exponer salida global compatible con anterior
+  window.AJ_Replay = window.AJ_Replay || {};
+  window.AJ_Replay.exit = function(){ exit(); };
+})();
+</script>
+
+
+
+
+<script id="regv2-bot-enhancer">
+(function(){
+  function hook(){
+    if(!window.__RegV2Bot || !window.__REGV2_overlay__) return false;
+    var Bot = window.__RegV2Bot;
+    if(Bot.__v3hooked) return true;
+    var ol = window.__REGV2_overlay__;
+    var _play   = Bot.play.bind(Bot);
+    var _stop   = Bot.stop.bind(Bot);
+    var _resume = Bot.resume.bind(Bot);
+    var _pause  = Bot.pause.bind(Bot);
+    Bot.play = async function(){
+      try{
+        if(typeof setBotEnabled==='function') setBotEnabled(false);
+        window.__CLOCK_PAUSED__ = true;
+      }catch(_){}
+      try{ ol.showPane('Reproduciendo…');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#ffffff'; L.style.fontSize='20px'; L.style.webkitTextStroke='0px transparent'; L.style.textShadow='none'; }})(); ol.hideStartButtons(true); }catch(_){}
+      try{ document.body.classList.add('replaying'); }catch(_){}
+      await _play();
+      // Al finalizar, mantener bloqueado y mostrar mensaje final
+      try{ ol.showPane('Reproducción finalizada');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#dc2626'; L.style.fontSize='28px'; L.style.fontWeight='900'; L.style.webkitTextStroke='1.5px #ffffff'; L.style.textShadow='-1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff'; }})(); }catch(_){}
+      try{ document.body.classList.add('replaying-finished'); }catch(_){}
+      // Nota: no reactivamos controles aquí; salida es manual via ol.exit()
+    };
+    Bot.stop = function(opts){
+      // Detener pero mantener bloqueado hasta salida manual
+      try{ ol.showPane('Reproducción detenida');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#dc2626'; L.style.fontSize='26px'; L.style.fontWeight='900'; L.style.webkitTextStroke='1.5px #ffffff'; L.style.textShadow='-1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff'; }})(); ol.hideStartButtons(true); }catch(_){}
+      try{ document.body.classList.add('replaying-stopped'); }catch(_){}
+      return _stop(opts);
+    };
+    Bot.pause = function(){
+      // mantener pane durante pausa
+      return _pause();
+    };
+    Bot.resume = function(){
+      try{ ol.showPane('Reproduciendo…');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#ffffff'; L.style.fontSize='20px'; L.style.webkitTextStroke='0px transparent'; L.style.textShadow='none'; }})(); }catch(_){}
+      try{
+        if(typeof setBotEnabled==='function') setBotEnabled(false);
+        window.__CLOCK_PAUSED__ = true;
+      }catch(_){}
+      return _resume();
+    };
+    Bot.__v3hooked = true;
+    return true;
+  }
+  if(!hook()){
+    var obs = new MutationObserver(function(){ if(hook()) obs.disconnect(); });
+    obs.observe(document.documentElement, {childList:true, subtree:true});
+    setTimeout(hook, 0); setTimeout(hook, 300); setTimeout(hook, 1000);
+  }
+})();
+</script>
+
+
+
+<script id="regv2-inline-overlay-hook">
+(function(){
+  // Local overlay helpers (no dependency on other scripts)
+  const $ = (s)=>document.querySelector(s);
+  function findBoardWrap(){
+    return $('#boardWrap') || $('#board') || $('#aj-megaPanel-centered-to-board') || $('#aj-container-symmetric-3mm');
+  }
+  function ensurePane(){
+    var host = findBoardWrap();
+    if(!host) return null;
+    try{
+      var cs = window.getComputedStyle(host);
+      if(cs && cs.position === 'static'){ host.style.position='relative'; }
+    }catch(_){}
+    var pane = document.getElementById('aj-replay-glass-pane');
+    if(!pane){
+      pane = document.createElement('div');
+      pane.id = 'aj-replay-glass-pane';
+      var lbl = document.createElement('div');
+      lbl.className = 'aj-replay-label';
+      lbl.id = 'aj-replay-label';
+      lbl.textContent = 'Reproduciendo…';
+      pane.appendChild(lbl);
+      ['click','mousedown','mouseup','touchstart','touchend','touchmove','pointerdown','pointerup','pointermove','dragstart','contextmenu']
+        .forEach(function(ev){
+          pane.addEventListener(ev, function(e){
+  if(e.target && (e.target.id==='aj-replay-close' || (e.target.closest && e.target.closest('#aj-replay-close')))){
+    return; // allow close button to receive the event
+  }
+  e.stopPropagation(); e.preventDefault(); return false;
+}, true);
+        });
+      host.appendChild(pane);
+    } else if (pane.parentElement !== host){
+      try{ pane.parentElement && pane.parentElement.removeChild(pane); }catch(_){}
+      host.appendChild(pane);
+    }
+    return pane;
+  }
+  function showPane(msg){
+    var p = ensurePane(); if(!p) return;
+    p.style.display='block';
+    var lbl = document.getElementById('aj-replay-label');
+    if(lbl && typeof msg==='string' && msg) lbl.textContent = msg;
+  }
+  function hidePane(){
+    var p = document.getElementById('aj-replay-glass-pane');
+    if(p) p.style.display='none';
+  }
+  function hideStartButtons(hide){
+    ['btnStartGame','btnStartGameBR'].forEach(function(id){
+      var b = document.getElementById(id);
+      if(!b) return;
+      if(hide){
+        b.dataset.__aj_prev_opacity = b.style.opacity || '';
+        b.dataset.__aj_prev_pe      = b.style.pointerEvents || '';
+        b.dataset.__aj_prev_display = b.style.display || '';
+        b.style.opacity='0';
+        b.style.pointerEvents='none';
+        b.style.display='none';
+        b.setAttribute('aria-hidden','true');
+        b.setAttribute('tabindex','-1');
+      }else{
+        b.style.opacity      = b.dataset.__aj_prev_opacity || '';
+        b.style.pointerEvents= b.dataset.__aj_prev_pe || '';
+        b.style.display      = b.dataset.__aj_prev_display || '';
+        b.removeAttribute('aria-hidden');
+        b.removeAttribute('tabindex');
+      }
+    });
+  }
+  function exit(){
+    try{
+      if(window.__RegV2Bot){ window.__RegV2Bot.stop({resetToStart:true}); }
+      else if(typeof restartGame==='function'){ restartGame(); }
+    }catch(_){}
+    try{ hidePane(); hideStartButtons(false); }catch(_){}
+    try{
+      if(typeof setBotEnabled==='function') setBotEnabled(true);
+      window.__CLOCK_PAUSED__ = false;
+    }catch(_){}
+    try{ document.body.classList.remove('replaying','replaying-finished','replaying-stopped'); }catch(_){}
+  }
+
+  // Add a close button to the pane (if not present)
+  function ensureClose(){
+    var pane = ensurePane(); if(!pane) return;
+    if(!document.getElementById('aj-replay-close')){
+      var close = document.createElement('button');
+      close.id = 'aj-replay-close';
+      close.setAttribute('type','button');
+      close.setAttribute('aria-label','Salir de reproducción');
+      close.textContent = '✕';
+      close.style.cssText = 'position:absolute;top:10px;right:10px;font-weight:800;border-radius:999px;border:2px solid #fff;background:#b31212;color:#fff;padding:8px 12px;font-size:16px;cursor:pointer;box-shadow:inset 0 0 0 2px #111;z-index:2';
+      close.addEventListener('click', function(ev){ ev.stopPropagation(); ev.preventDefault(); exit(); }, false);
+      pane.appendChild(close);
+    }
+  }
+
+  function hook(){
+    if(!window.__RegV2Bot) return false;
+    var Bot = window.__RegV2Bot;
+    if(Bot.__overlayHooked) return true;
+    var _play   = Bot.play.bind(Bot);
+    var _stop   = Bot.stop.bind(Bot);
+    var _resume = Bot.resume.bind(Bot);
+    var _pause  = Bot.pause.bind(Bot);
+    Bot.play = async function(){
+      try{
+        if(typeof setBotEnabled==='function') setBotEnabled(false);
+        window.__CLOCK_PAUSED__ = true;
+      }catch(_){}
+      ensureClose();
+      showPane('Reproduciendo…');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#ffffff'; L.style.fontSize='20px'; L.style.webkitTextStroke='0px transparent'; L.style.textShadow='none'; }})(); hideStartButtons(true);
+      await _play();
+      // Keep blocked; message guides to close
+      showPane('Reproducción finalizada');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#dc2626'; L.style.fontSize='28px'; L.style.fontWeight='900'; L.style.webkitTextStroke='1.5px #ffffff'; L.style.textShadow='-1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff'; }})();
+      Bot.__lastEnded = true;
+    };
+    Bot.stop = function(opts){
+      ensureClose();
+      showPane('Reproducción detenida');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#dc2626'; L.style.fontSize='26px'; L.style.fontWeight='900'; L.style.webkitTextStroke='1.5px #ffffff'; L.style.textShadow='-1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff'; }})();
+      return _stop(opts);
+    };
+    Bot.pause = function(){ return _pause(); };
+    Bot.resume = function(){
+      ensureClose();
+      showPane('Reproduciendo…');
+      (function(){var L=document.getElementById('aj-replay-label'); if(L){ L.style.color='#ffffff'; L.style.fontSize='20px'; L.style.webkitTextStroke='0px transparent'; L.style.textShadow='none'; }})();
+      try{
+        if(typeof setBotEnabled==='function') setBotEnabled(false);
+        window.__CLOCK_PAUSED__ = true;
+      }catch(_){}
+      return _resume();
+    };
+    Bot.__overlayHooked = true;
+    return true;
+  }
+
+  if(!hook()){
+    var obs = new MutationObserver(function(){
+      if(hook()) obs.disconnect();
+    });
+    obs.observe(document.documentElement, {childList:true, subtree:true});
+    setTimeout(hook, 0); setTimeout(hook, 300); setTimeout(hook, 1000);
+  }
+
+  // Expose exit for menu-old compat and close button
+  window.AJ_Replay = window.AJ_Replay || {};
+  window.AJ_Replay.exit = exit;
+})();
+</script>
+
+
+<style id="regv2-finish-style">
+  #aj-replay-close{
+    background:#b31212 !important;
+    color:#fff !important;
+    padding:8px 12px !important;
+    font-size:16px !important;
+    border-radius:999px !important;
+    border:2px solid #fff !important;
+    box-shadow:inset 0 0 0 2px #fff, 0 2px 12px rgba(0,0,0,.3) !important;
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease !important;
+  }
+  #aj-replay-close:hover{
+    transform: scale(1.08);
+    box-shadow:inset 0 0 0 2px #fff, 0 4px 16px rgba(0,0,0,.45);
+  }
+</style>
+
+
+<script id="regv2-esc-exit">
+(function(){
+  function isPaneVisible(){
+    var p = document.getElementById('aj-replay-glass-pane');
+    return p && p.style && p.style.display==='block';
+  }
+  function exit(){ if(window.AJ_Replay && typeof window.AJ_Replay.exit==='function') window.AJ_Replay.exit(); }
+  window.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' || e.key === 'Esc'){
+      if(isPaneVisible()){
+        e.preventDefault(); e.stopPropagation();
+        exit();
+      }
+    }
+  }, true);
+})();
+</script>
+
+
+<script id="regv2-panel-rewire">
+(function(){
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  ready(function(){
+    var actions = document.getElementById('regv2-actions');
+    if(actions){
+      actions.style.display = 'none';
+      // Add a "Cargar al reproductor" button near the speed select (or below textarea)
+      if(!document.getElementById('regv2-sendto')){
+        var btn = document.createElement('button');
+        btn.id = 'regv2-sendto';
+        btn.className = 'regv2-btn';
+        btn.type = 'button';
+        btn.textContent = 'Cargar al reproductor';
+        btn.style.marginTop = '6px';
+        var body = document.getElementById('regv2-body') || actions.parentElement || document.getElementById('regv2-right');
+        body.appendChild(btn);
+        btn.addEventListener('click', function(){
+          try{
+            if(!window.__RegV2Bot){ console.warn('Bot no disponible'); return; }
+            var txt = document.getElementById('regv2-input').value;
+            var fmt = (document.getElementById('regv2-format')||{}).value || 'auto';
+            // parse functions exist in regv2-inlinebot script
+            var parsed = (window.parsePayload ? window.parsePayload(txt, fmt) : (function(t){ 
+              // fallback UCI-only parser
+              t = String(t||'').trim().replace(/\s+/g,' ');
+              return t.split(' ').filter(Boolean).map(function(tk){
+                if(!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(tk)) return null;
+                return {action:'move', from:tk.slice(0,2), to:tk.slice(2,4), promotion: (tk.length===5? tk[4].toUpperCase(): undefined)};
+              }).filter(Boolean);
+            })(txt));
+            var script = (window.buildScript ? window.buildScript(parsed) : parsed);
+            window.__RegV2Bot.stop({resetToStart:true});
+            window.__RegV2Bot.load(script);
+            var mul = parseFloat((document.getElementById('regv2-speed')||{}).value || '1');
+            if(mul && window.__RegV2Bot.setSpeed) window.__RegV2Bot.setSpeed(700/(mul||1));
+            // Do NOT auto-play; let the top bar control it
+            // Close the panel after load:
+            var ov = document.getElementById('regv2-overlay'); if(ov) ov.style.display='none';
+            // show a mild toast via console
+            console.log('Guion cargado en reproductor', {total: script.length});
+            // Trigger UI refresh for top bar if available:
+            document.dispatchEvent(new CustomEvent('regv2:scriptLoaded', {detail:{total: script.length}}));
+          }catch(e){ console.error(e); }
+        });
+      }
+    }
+  });
+})();
+</script>
+
+
+<style id="regv2-replayer-style">
+  #regv2-replayer{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#111; color:#fff; border:2px solid #fff; border-radius:999px; padding:6px 10px;
+    box-shadow:inset 0 0 0 2px #111; margin-left:10px; position:relative; z-index:2147483000;
+  }
+  #regv2-replayer button{
+    background:transparent; color:#fff; border:0; font-weight:900; cursor:pointer; padding:4px 6px; border-radius:8px;
+  }
+  #regv2-replayer button:hover{ background:rgba(255,255,255,.12); }
+  #regv2-replayer .sep{ width:1px; height:18px; background:rgba(255,255,255,.35); margin:0 2px; }
+  #rp2-slider{ width:160px; }
+  #rp2-status{ font-size:12px; opacity:.85; }
+  #rp2-speed{ background:#222; color:#fff; border:1px solid #555; border-radius:8px; padding:3px 6px; }
+  #regv2-replayer.disabled{ opacity:.5; pointer-events:none; }
+</style>
+
+
+<script id="regv2-replayer-script">
+(function(){
+  function $(s,root=document){ return root.querySelector(s); }
+  function addBar(){
+    var host = document.getElementById('timeIndicator');
+    if(!host) return false;
+    if(document.getElementById('regv2-replayer')) return true;
+    var bar = document.createElement('div');
+    bar.id = 'regv2-replayer';
+    bar.innerHTML = ''
+      + '<button id="rp2-start" title="Inicio">|◀</button>'
+      + '<button id="rp2-prev"  title="Anterior">⏮</button>'
+      + '<button id="rp2-play"  title="Reproducir">▶</button>'
+      + '<button id="rp2-pause" title="Pausar" style="display:none">⏸</button>'
+      + '<button id="rp2-next"  title="Siguiente">⏭</button>'
+      + '<button id="rp2-end"   title="Fin">▶|</button>'
+      + '<span class="sep"></span>'
+      + '<input id="rp2-slider" type="range" min="0" max="0" step="1" value="0" />'
+      + '<span id="rp2-status">0/0</span>'
+      + '<span class="sep"></span>'
+      + '<select id="rp2-speed"><option>0.25</option><option>0.5</option><option selected>1</option><option>1.5</option><option>2</option><option>3</option></select>';
+    host.appendChild(bar);
+    return true;
+  }
+
+  function ensureBar(){
+    if(addBar()) return;
+    var obs = new MutationObserver(function(){
+      if(addBar()) obs.disconnect();
+    });
+    obs.observe(document.documentElement, {childList:true, subtree:true});
+  }
+
+  function bot(){ return window.__RegV2Bot; }
+
+  // Extend bot with goto/rebuild and helpers if missing
+  function extendBot(){
+    var B = bot(); if(!B) return false;
+    if(B.__replayerExtended) return true;
+    B.goto = function(i){
+      var idx = Math.max(0, Math.min((i|0), (B.script?B.script.length:0)));
+      // Reset to start
+      try{ if(typeof restartGame==='function') restartGame(); }catch(_){}
+      // Apply up to idx
+      var arr = B.script || [];
+      function toRC(s){ return { r: 8-parseInt(s.slice(1),10), c: s.charCodeAt(0)-97 }; }
+      for(var k=0;k<idx;k++){
+        var m = arr[k];
+        if(!m) continue;
+        if(m.action==='shift'){
+          var sgn=(m.dir==='left'?-1:1)*(m.steps|0), mod=24, r=m.row|0;
+          offsets[r] = ((offsets[r] + sgn) % mod + mod) % mod;
+          if(typeof render==='function') render();
+          if(typeof turn!=='undefined') turn = (turn==='w'?'b':'w');
+        }else{
+          var f=toRC(m.from), t=toRC(m.to);
+          var special={}; if(m.promotion) special.promotion=m.promotion; if(m.castle) special.castle=m.castle; if(m.enPassant) special.enPassant=true;
+          var res = applyMove(board, offsets, f, t, (Object.keys(special).length? special:null));
+          if(res && res.board){ board = res.board; }
+          if(typeof render==='function') render();
+          if(typeof turn!=='undefined') turn = (turn==='w'?'b':'w');
+        }
+      }
+      B.index = idx;
+      B.playing = false;
+      updateUI();
+    };
+    B.stepPrev = function(){ this.goto((this.index||0)-1); };
+    B.stepNext = function(){ this.goto((this.index||0)+1); };
+    B.total = function(){ return (this.script?this.script.length:0); };
+    B.__replayerExtended = true;
+    return true;
+  }
+
+  // UI handlers
+  function updateUI(){
+    var bar = document.getElementById('regv2-replayer'); if(!bar) return;
+    var B = bot();
+    var total = B && B.script ? B.script.length : 0;
+    var idx = B ? (B.index|0) : 0;
+    var playing = !!(B && B.playing);
+    $('#rp2-slider').max = total;
+    $('#rp2-slider').value = idx;
+    $('#rp2-status').textContent = idx + '/' + total;
+    $('#rp2-play').style.display = playing ? 'none' : 'inline-block';
+    $('#rp2-pause').style.display = playing ? 'inline-block' : 'none';
+    bar.classList.toggle('disabled', total===0);
+  }
+
+  function hookPlay(){
+    var B = bot(); if(!B) return false;
+    if(B.__replayerHooked) return true;
+    var _play=B.play.bind(B), _pause=B.pause.bind(B), _resume=B.resume.bind(B), _stop=B.stop.bind(B), _load=B.load.bind(B);
+    B.play = async function(){ var r=_play(); updateUI(); return r; };
+    B.pause  = function(){ var r=_pause(); updateUI(); return r; };
+    B.resume = function(){ var r=_resume(); updateUI(); return r; };
+    B.stop   = function(o){ var r=_stop(o); updateUI(); return r; };
+    B.load   = function(a){ var r=_load(a); updateUI(); return r; };
+    B.__replayerHooked = true;
+    return true;
+  }
+
+  function wireControls(){
+    var B = bot(); if(!B) return;
+    $('#rp2-start').onclick = function(){ B.goto(0); };
+    $('#rp2-prev').onclick  = function(){ B.stepPrev(); };
+    $('#rp2-play').onclick  = function(){ B.play(); };
+    $('#rp2-pause').onclick = function(){ B.pause(); };
+    $('#rp2-next').onclick  = function(){ B.stepNext(); };
+    $('#rp2-end').onclick   = function(){ B.goto(B.total()); };
+    $('#rp2-slider').oninput = function(e){ B.goto(parseInt(e.target.value||'0',10)); };
+    $('#rp2-speed').oninput = function(e){ var mul=parseFloat(e.target.value||'1'); if(B.setSpeed) B.setSpeed(700/(mul||1)); };
+  }
+
+  // Initialize
+  ensureBar();
+  var initObs = new MutationObserver(function(){
+    if(document.getElementById('regv2-replayer') && window.__RegV2Bot){
+      if(extendBot() && hookPlay()){
+        wireControls();
+        updateUI();
+        initObs.disconnect();
+      }
+    }
+  });
+  initObs.observe(document.documentElement, {childList:true, subtree:true});
+  // Also listen when script is loaded from panel
+  document.addEventListener('regv2:scriptLoaded', function(){ extendBot(); hookPlay(); updateUI(); });
+
+  // Periodic UI refresh (in case of external index changes)
+  setInterval(updateUI, 400);
+})();
+</script>
+
+
+<!-- === Overlay Movimientos === -->
+<div id="rgMovesOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#fff; width:min(920px,94vw); max-height:82vh; border-radius:16px; padding:16px; box-shadow:0 18px 60px rgba(0,0,0,.2); display:flex; flex-direction:column; gap:10px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+      <h3 style="margin:0">Movimientos de la partida</h3>
+      <div style="display:flex; gap:8px;">
+        <button class="btn small" id="rgMovCopy">Copiar</button>
+        <button class="btn small" id="rgMovClose">Cerrar</button>
+      </div>
+    </div>
+    <textarea id="rgMovText" style="width:100%; height:60vh; font-family: ui-monospace, Menlo, Consolas, 'Courier New', monospace; border:1px solid #eee; border-radius:12px; padding:10px; background:#fafafa; resize:vertical"></textarea>
+  </div>
+</div>
+
+
+<script id="aj-reg-solid">
+(function(){
+  function $(s){ return document.querySelector(s); }
+  function $all(s){ return Array.from(document.querySelectorAll(s)); }
+  function moveText(m){
+    if(!m) return '';
+    if(typeof m === 'string') return m;
+    if(m.san) return m.san;
+    if(m.uci) return m.uci;
+    if(m.from && m.to) return m.from + '-' + m.to + (m.promotion? '='+m.promotion:'');
+    if(m.f && m.t){ try{ var f='abcdefgh'; return f[m.f.c]+(8-m.f.r)+'-'+f[m.t.c]+(8-m.t.r); }catch(_){}
+    return '';
+  }
+  function numbered(ms){
+    var out=[], n=1;
+    for(var i=0;i<(ms||[]).length;i+=2){
+      var w = ms[i], b = ms[i+1];
+      out.push(n+'. '+moveText(w)+ (b? (' '+moveText(b)) : ''));
+      n++;
+    }
+    return out.join('\n');
+  }
+  function humanBotLabel(bl){
+    try{
+      if(!bl) return '';
+      if(typeof bl === 'string') return bl;
+      if(typeof bl === 'object' && bl.white!=null && bl.black!=null){
+        return 'W:'+bl.white+' B:'+bl.black;
+      }
+    }catch(_){}
+    return '';
+  }
+
+  // --- Robust showDetail: fill right panel including moves and stats ---
+  window.showDetail = function(id){
+    try{
+      var all = (typeof loadAll==='function') ? loadAll() : JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]');
+      var g = (all||[]).find(function(x){ return x.id===id; });
+      if(!g){ $('#reg-detail').style.display='none'; $('#reg-empty').style.display='block'; return; }
+      // set an attribute for quick access
+      $('#reg-detail')?.setAttribute('data-id', id);
+      $('#reg-empty') && ($('#reg-empty').style.display='none');
+      $('#reg-detail') && ($('#reg-detail').style.display='block');
+
+      // header/title
+      var dt = new Date(g.createdAt||Date.now());
+      $('#reg-title').textContent = (g.meta?.title) || ('Partida '+dt.toLocaleString());
+      $('#reg-date').textContent  = dt.toLocaleString();
+      $('#reg-mode').textContent  = (typeof humanMode==='function') ? humanMode(g.mode) : (g.mode||'');
+      $('#reg-result-val').textContent = g.result || '—';
+      $('#reg-duration').textContent = g.duration || '—';
+      $('#reg-tags').textContent = (g.tags||[]).join(', ') || '—';
+      var bl = humanBotLabel(g.meta && g.meta.botLevel);
+      if($('#rgd-bot')) $('#rgd-bot').textContent = bl ? ('Bot: '+bl) : '';
+
+      // moves table
+      var mv = $('#reg-moves'); if(mv){ mv.innerHTML=''; }
+      var ms = g.moves || [];
+      for(var i=0;i<ms.length;i+=2){
+        var row = document.createElement('div'); row.className='ply';
+        row.innerHTML = '<div class="num">'+((i/2)+1)+'.</div>'+
+                        '<div class="mv">'+moveText(ms[i])+'</div>'+
+                        '<div class="mv">'+moveText(ms[i+1])+'</div>';
+        mv.appendChild(row);
+      }
+
+      // statistics (fallback simple if not provided)
+      var sl = $('#reg-stats'); if(sl){ sl.innerHTML=''; }
+      var captures = ms.filter(m=>m && m.capture).length;
+      var checks   = ms.filter(m=>m && (m.check || (typeof m.san==='string' && m.san.indexOf('+')!==-1))).length;
+      var mates    = ms.filter(m=>m && (typeof m.san==='string' && m.san.indexOf('#')!==-1)).length;
+      var total    = ms.length;
+      function add(label, val){ var li=document.createElement('li'); li.innerHTML='<b>'+label+':</b> '+(val||'—'); sl.appendChild(li); }
+      add('Movimientos', total); add('Capturas', captures); add('Checks', checks); add('Mates', mates);
+
+      // actions (PGN / Delete wired if existen botones)
+      if($('#reg-export-pgn')) $('#reg-export-pgn').onclick = function(){ try{ exportPGN(g); }catch(_){ /* optional */ } };
+      if($('#reg-delete')) $('#reg-delete').onclick = function(){
+        var ok = confirm('¿Eliminar esta partida?'); if(!ok) return;
+        try{
+          var rest = (all||[]).filter(function(x){ return x.id!==g.id; });
+          localStorage.setItem('ajetrez.registros.v1', JSON.stringify(rest));
+          if(typeof refreshList==='function') refreshList();
+          $('#reg-detail').style.display='none'; $('#reg-empty').style.display='block';
+        }catch(err){ console.error(err); }
+      };
+    }catch(err){ console.error(err); }
+  };
+
+  // --- Rebuild refreshList to include inline expansion button ---
+  window.refreshList = function(){
+    var list = $('#reg-list'); if(!list) return;
+    list.innerHTML='';
+    var q  = ($('#reg-q')?.value||'').toLowerCase();
+    var md = $('#reg-mode')?.value||'';
+    var rs = $('#reg-result')?.value||'';
+    var all = (typeof loadAll==='function') ? loadAll() : JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]');
+    var filtered = (all||[]).filter(function(g){
+      if(md && (g.mode||'')!==md) return false;
+      if(rs && (g.result||'')!==rs) return false;
+      var txt = [g.meta?.title, g.result, g.mode, (g.tags||[]).join(' '), humanBotLabel(g.meta && g.meta.botLevel), g.meta?.opponent].join(' ').toLowerCase();
+      if(q && txt.indexOf(q)===-1) return false;
+      return true;
+    }).sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); });
+
+    filtered.forEach(function(g){
+      var item = document.createElement('div');
+      item.className='row';
+      item.setAttribute('data-id', g.id);
+      var dt = new Date(g.createdAt||Date.now());
+      var bot = humanBotLabel(g.meta && g.meta.botLevel);
+      item.innerHTML = '<div class="title">Partida '+dt.toLocaleString()+'</div>'+
+                       '<div class="sub">'+dt.toLocaleString()+'  '+( (g.mode||'') ? ( (typeof humanMode==='function')? humanMode(g.mode): g.mode ) : '' )+'</div>'+
+                       '<div class="meta">'+ (bot? 'Bot: '+bot : '') +'  Movs: '+((g.moves||[]).length)+'</div>';
+      // click -> select detail
+      item.addEventListener('click', function(){ showDetail(g.id); }, true);
+      // inline toggle
+      var t = document.createElement('div'); t.className='reg-toggle'; t.textContent='Ver movimientos';
+      t.addEventListener('click', function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        var panel = item.querySelector('.reg-inline');
+        if(panel){ var hide = panel.style.display!=='none' ; panel.style.display = hide? 'none':'block'; t.textContent = hide? 'Ver movimientos':'Ocultar movimientos'; return; }
+        var pre = document.createElement('pre'); pre.className='reg-inline'; pre.textContent = numbered(g.moves||[]);
+        item.appendChild(pre); t.textContent='Ocultar movimientos';
+      }, true);
+      item.appendChild(t);
+      list.appendChild(item);
+    });
+
+    // Show empty state if none
+    if(!filtered.length){ list.innerHTML = '<div class="empty">No hay resultados</div>'; }
+  };
+
+  // --- Overlay controls ---
+  function openOverlayWith(ms){
+    var ov = $('#rgMovesOverlay'), ta = $('#rgMovText');
+    if(!ov || !ta) return;
+    ta.value = numbered(ms||[]);
+    ov.style.display = 'flex';
+  }
+  document.addEventListener('click', function(ev){
+    if(ev.target && ev.target.id==='rgMovClose'){ $('#rgMovesOverlay').style.display='none'; }
+    if(ev.target && ev.target.id==='rgMovCopy'){ try{ $('#rgMovText').select(); document.execCommand('copy'); }catch(_){ } }
+    if(ev.target === $('#rgMovesOverlay')){ $('#rgMovesOverlay').style.display='none'; }
+  }, true);
+  // Button in detail header if exists
+  (function(){
+    var hdr = document.querySelector('#reg-detail .card-title');
+    if(!hdr || hdr.querySelector('#btnViewMoves')) return;
+    var b = document.createElement('button'); b.className='btn small'; b.id='btnViewMoves'; b.textContent='Ver movimientos';
+    b.style.marginLeft='8px';
+    b.addEventListener('click', function(){
+      try{
+        var id = document.querySelector('#reg-detail').getAttribute('data-id') || '';
+        var all = (typeof loadAll==='function') ? loadAll() : JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]');
+        var g = (all||[]).find(function(x){ return x.id===id; }); if(g) openOverlayWith(g.moves||[]);
+      }catch(_){}
+    }, true);
+    hdr.appendChild(b);
+  })();
+
+  // Initial render once
+  try{ refreshList(); }catch(_){}
+})();
+</script>
 
 </body>
 <!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
