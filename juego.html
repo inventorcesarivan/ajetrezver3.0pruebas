@@ -4,7 +4,7 @@
   /* Desplazar los botones de pago 1 casillero a la derecha */
   #btnMercadoPago{ margin-left: calc(var(--casillero, 64px) * 0.5); }
 
-</style><meta charset="utf-8"/><meta content="width=1280, initial-scale=1" name="viewport"/><title>Ajetrez — Panel con Login, Pestañas + Info Partidas (v3-fix2)</title><style>
+</style><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Ajetrez — Panel con Login, Pestañas + Info Partidas (v3-fix2)</title><style>
   :root{
     --square: 56px;
     --border: 2px;
@@ -917,7 +917,7 @@ body, html{overflow:visible!important;}
 </style><style id="aj-mobile-bottombar-inside">
   /* En móvil, extiende el contorno/fondo hasta el borde inferior
      para que la barra inferior quede claramente "dentro" del contenedor. */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     .frame::before{
       bottom: 0 !important; /* antes: 3mm */
     }
@@ -935,7 +935,7 @@ body, html{overflow:visible!important;}
   }
 </style><style id="aj-mobile-frame-trim-plus4mm">
   /* En móvil, mantener el mismo recorte que web (evita que la barra parezca fuera) */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     .frame::before{
       bottom: 5mm !important; /* override del fix anterior que ponía 0 */
       top: 7mm !important;
@@ -1016,7 +1016,7 @@ body, html{overflow:visible!important;}
   /* En móvil, algunas reglas previas mueven #bottomBar con 'top:-1*var(--square)'.
      Eso puede producir una separación aparente por redondeo/altura disponible.
      Neutralizamos 'top' y compensamos con un micro-offset adicional. */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     #bottomBar{
       position: relative !important;
       top: 0 !important;                                 /* anula desplazamiento vertical previo */
@@ -1025,7 +1025,7 @@ body, html{overflow:visible!important;}
     }
   }
 </style><!-- AJETREZ: Mobile — subir barra inferior ~1 casillero --><style id="aj-bottomBar-mobile-up-1square-0909">
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     #bottomBar{
       /* Mantener neutralización previa del 'top' */
       position: relative !important;
@@ -1092,7 +1092,7 @@ body, html{overflow:visible!important;}
     height: 28px;
   }
   /* En móvil, acomodar un poco el tamaño */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     #donateBox{ left: 6px; top: 50%; gap: 6px; }
     #donateBox .imgbtn img{ height: 26px; }
     #donateBox .label{
@@ -1799,10 +1799,17 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
 </style>
 
 
-<style id="ajetrez-layout-lock">
-  :root{ --c: var(--square); --casillero: var(--square); }
-  /* No hard resets here to avoid touching desktop geometry.
-     This block simply ensures any place using --casillero picks up --square. */
+<style id="verDevToast-styles">
+#verDevToast .btn{ 
+  display:inline-flex; align-items:center; justify-content:center; 
+  padding:10px 14px; border-radius:12px; font-weight:800; 
+  text-decoration:none; border:2px solid #fff; background:#fff; color:#111;
+  box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+#verDevToast .btn:hover{ transform:translateY(-1px); }
+#verDevToast .btn:active{ transform:translateY(0); }
+#verDevToast .btn.mp{ border-color:#009ee3; }
+#verDevToast .btn.pp{ border-color:#253b80; }
 </style>
 
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
@@ -1840,7 +1847,7 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
 </div></div></div><div aria-label="Ajetrez base limpia" id="board"></div><div aria-label="Decidir desplazamiento de fila" class="shift-ctrl" id="shiftCtrl" role="group"><span class="lbl" id="shiftLbl">Fila</span><span id="chooseWrap"><button aria-label="Mantener" id="btnKeep" type="button">Mantener</button><button aria-label="Desplazar sección" id="btnShift" type="button">Desplazar sección</button></span><span id="confirmWrap" style="display:none"><span id="choiceTxt" style="font-size:12px;font-weight:700;margin-right:6px;opacity:.85">Confirmar:</span><button aria-label="Confirmar" class="confirm" id="btnConfirm" type="button">Confirmar</button><button aria-label="Volver a elegir" id="btnBack" type="button">Cambiar elección</button></span></div><div id="overlay"><div id="banner">FIN</div></div><div id="panelBackdrop"></div><div aria-labelledby="mpTitle" aria-modal="true" id="megaPanel" role="dialog"><div class="apply-toast" id="applyToast">✔ Cambios guardados
 </div><div class="mp-header"><div id="mpTitle">Panel de Ajetrez
 </div><div class="right"><span class="hint-sm" id="loggedUser"></span><button class="btn secondary" id="btnLogout" type="button">Cerrar sesión</button><button class="btn" id="btnClosePanel" type="button">Cerrar</button></div></div><div id="loginView"><h2>Iniciar sesión</h2><div class="field"><label for="inpUser">Usuario</label><input id="inpUser" placeholder="Tu nombre de usuario" type="text"/></div><div class="field"><label for="inpPass">Contraseña</label><input id="inpPass" placeholder="••••••••" type="password"/></div><button class="btn" id="btnLogin" type="button">Entrar</button><div class="hint-sm">*Login local (almacenado en este navegador). Próximamente: cuentas online.
-</div></div><div id="tabsView"><div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-registros" id="btnRegistrosTab">Registros</button></div><div class="mp-content"><div class="tab" id="tab-personalizacion" style="display:none"><h3>Personalización del juego</h3><div class="row"><div class="field"><label>Estilo de piezas</label><select id="selSprites"><option value="auto">Auto (usar sprites si están disponibles)</option><option value="sprites">Sprites (imágenes)</option><option value="unicode">Unicode (símbolos)</option></select></div><div class="field"><label>Estilo visual</label><div aria-label="Elegir estilo visual" class="row" id="themePicker" role="group"><button class="btn theme" data-theme="dia" title="Tonos claros, suaves" type="button">Día</button><button class="btn theme" data-theme="noche" title="Tonos oscuros, suaves" type="button">Noche</button><button class="btn theme" data-theme="madera" title="Tonos madera, suaves" type="button">Madera</button><button class="btn theme" data-theme="arena" title="Arena suave" type="button">Arena</button><button class="btn theme" data-theme="pizarra" title="Pizarra / gris" type="button">Pizarra</button><button class="btn theme" data-theme="oliva" title="Verde oliva suave" type="button">Oliva</button></div><span class="hint-sm">Los estilos son suaves para no distraer durante la partida.</span></div></div></div><div class="tab" id="tab-version" style="display:block"><h3>Versión de Ajetrez</h3><p>Versión actual del juego: <strong id="verActual">2.5 (Estable)</strong></p><div class="field"><label>Seleccionar versión</label><select id="selVersion"><option selected="" value="2_5">2.5 (Estable)</option><option value="3_0">3.0 (En desarrollo)</option></select></div><div class="hint-sm">La selección futura podrá cargar configuraciones específicas por versión.
+</div></div><div id="tabsView"><div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-registros" id="btnRegistrosTab">Registros</button></div><div class="mp-content"><div class="tab" id="tab-personalizacion" style="display:none"><h3>Personalización del juego</h3><div class="row"><div class="field"><label>Estilo de piezas</label><select id="selSprites"><option value="auto">Auto (usar sprites si están disponibles)</option><option value="sprites">Sprites (imágenes)</option><option value="unicode">Unicode (símbolos)</option></select></div><div class="field"><label>Estilo visual</label><div aria-label="Elegir estilo visual" class="row" id="themePicker" role="group"><button class="btn theme" data-theme="dia" title="Tonos claros, suaves" type="button">Día</button><button class="btn theme" data-theme="noche" title="Tonos oscuros, suaves" type="button">Noche</button><button class="btn theme" data-theme="madera" title="Tonos madera, suaves" type="button">Madera</button><button class="btn theme" data-theme="arena" title="Arena suave" type="button">Arena</button><button class="btn theme" data-theme="pizarra" title="Pizarra / gris" type="button">Pizarra</button><button class="btn theme" data-theme="oliva" title="Verde oliva suave" type="button">Oliva</button></div><span class="hint-sm">Los estilos son suaves para no distraer durante la partida.</span></div></div></div><div class="tab" id="tab-version" style="display:block"><h3>Versión de Ajetrez</h3><p>Versión actual del juego: <strong id="verActual">2.5 (Estable)</strong></p><div class="field"><label>Seleccionar versión</label><select id="selVersion"><option value="3_0_simple" selected>Versión 3.0 (modo simple)</option><option value="3_0_amenaza">Versión 3.0 (modo amenaza)</option><option value="3_0_guerra">Versión 3.0 (modo guerra)</option></select></div><div class="hint-sm">La selección futura podrá cargar configuraciones específicas por versión.
 </div></div><div class="tab" id="tab-modos" style="display:none"><h3>Modos de juego</h3><div class="row"><button class="btn mode" data-gmode="pvp-local">Player vs player (local)</button><button class="btn mode" data-gmode="bot">Player Vs Bot</button><button class="btn mode" data-gmode="bot-vs-bot">Bot vs Bot (demo)</button><button class="btn mode" data-gmode="online">Modo Online</button></div><div aria-live="polite" id="modeHelp" role="note"><span class="title">¿Cómo funciona este modo?</span><div class="body">Elegí un modo para ver una breve explicación.</div></div><p class="hint-sm">Al elegir un modo, la partida se reinicia automáticamente.</p></div><div class="tab" id="tab-guia" style="display:none"><h3>Guía rápida</h3><ol><li><strong>Objetivo:</strong> dar jaque mate al rey rival.</li><li><strong>Mover piezas:</strong> igual que en ajedrez clásico (incluye enroque y captura al paso).</li><li><strong>Tras capturar:</strong> decidís en la <em>misma fila</em> entre <strong>Mantener</strong> o <strong>Desplazar</strong> la sección completa (offset 0 ↔ 8).</li><li><strong>Restricciones:</strong> no hay desplazamientos si estás en jaque o si el 8×8 quedaría sin piezas de algún bando.</li><li><strong>Zonas:</strong> se juega sólo en el 8×8 central; los laterales funcionan como reserva al desplazar.</li><li><strong>Partida:</strong> pulsá <em>Comenzar</em>, elegí modo; cambiar de modo reinicia la partida.</li><li><strong>Final:</strong> jaque mate o tablas (ahogado, 3 repeticiones, 50 jugadas, material insuficiente, acuerdo).</li></ol></div><div class="tab aj-reglas-ver" id="tab-reglas" style="display:none"><h3>Reglas del juego</h3><div class="field"><label for="selRulesVersion">Ver reglas según versión</label><select id="selRulesVersion"><option selected="selected" value="2_5">2.5 (Estable)</option><option value="3_0">3.0 (En desarrollo)</option></select><div class="hint-sm">Este selector es independiente del de “Versión de Ajetrez”. Cambiarlo solo afecta el texto mostrado aquí.</div></div><div id="rulesContent" style="margin-top:8px;"><div class="rules-version" data-version="2_5" style=""><h4>Ajetrez 2.5 — Reglas oficiales (Estable)</h4><div><ol><li><strong>Tablero y zonas:</strong> se juega en el 8×8 central dentro de un tablero de 24×8. Las franjas laterales actúan como reserva al desplazar secciones.</li><li><strong>Movimiento de piezas:</strong> igual que ajedrez clásico, incluyendo <em>enroque</em> y <em>captura al paso</em>.</li><li><strong>Tras capturar:</strong> en la <em>misma fila</em> elegís entre <strong>Mantener</strong> o <strong>Desplazar</strong> la sección completa (offset 0 ↔ 8). Esta elección forma parte de la resolución del turno.</li><li><strong>Restricciones de desplazamiento:</strong> no podés desplazar si:
       <ul><li>estás en jaque,</li><li>o el 8×8 quedaría sin piezas de algún bando,</li><li>o viola reglas de legalidad equivalentes (p. ej., dejaría tu rey en jaque).</li></ul></li><li><strong>Final de partida:</strong> jaque mate, tablas por ahogado, 50 jugadas, triple repetición, material insuficiente o acuerdo.</li><li><strong>Cambio de modo:</strong> elegir un modo reinicia la partida.</li></ol></div></div><div class="rules-version" data-version="3_0" style="display:none;"><h4>Ajetrez 3.0 / Modo Dante — Reglas previstas (En desarrollo)</h4><div><p><em>Estado:</em> experimental. Actualmente mantiene la base de 2.5 con un <strong>diseño de secciones 16×</strong> (8 secciones horizontales de 16 casilleros); las 4 superiores desplazadas (offset 8) y las 4 inferiores en offset 0. Por ahora el ajuste es principalmente <strong>visual</strong>.</p><ol><li><strong>Base de movimiento:</strong> igual que 2.5 (ajedrez clásico + decisión Mantener/Desplazar tras capturas en la misma fila).</li><li><strong>Excepciones previstas Dante:</strong> se estudian restricciones adicionales para evitar desplazamientos que produzcan mates inmediatos no forzados o vaciados anómalos del 8×8. Se publicará la versión final junto con la lógica completa.</li><li><strong>Compatibilidad:</strong> mientras se activa la lógica Dante, las partidas siguen las reglas de 2.5.</li></ol></div></div></div></div><div class="tab" id="tab-info" style="display:none"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3mm;"><h3 style="margin:0;"></h3><button class="btn small danger" id="btnClearLogs" style="margin-left:12px;">Borrar historial</button></div><div class="hint-sm">Se guarda <strong>localmente</strong> en este navegador.
 </div><div class="row"><div class="field"><label>Total jugadas</label><div class="pill" id="statTotal">0
@@ -3192,7 +3199,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   const selVersion = document.getElementById('selVersion');
   const verActual  = document.getElementById('verActual');
   selVersion.addEventListener('change', ()=>{
-    const map = { '2_5': '2.5 (Estable)', '3_0': '3.0 (En desarrollo)' };
+    const map = { '3_0': '3.0 (En desarrollo)' };
     verActual.textContent = map[selVersion.value] || selVersion.value;
   });
 
@@ -6713,7 +6720,7 @@ div[style="height:var(--toolbar-gap)"]{
 </style>
 <style id="aj-bottomBar-mobile-up-1more-square-0909b">
   /* Subir TODOS los botones inferiores +1 casillero en versión móvil */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     #bottomBar{
       position: relative !important;
       top: 0 !important; /* neutraliza desplazamientos previos */
@@ -6726,7 +6733,7 @@ div[style="height:var(--toolbar-gap)"]{
 
 <style id="aj-frame-mobile-taller-bottom-2sq-0909">
   /* Versión móvil: aumentar la altura de la base hacia abajo en +2 casilleros */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     .frame{
       /* sumamos 2×casillero a la base inferior */
       padding-bottom: calc(14px + (var(--square) * 2)) !important;
@@ -6741,7 +6748,7 @@ div[style="height:var(--toolbar-gap)"]{
 
 <style id="aj-bottomBar-mobile-down-half-square-0909c">
   /* Versión móvil: bajar los botones inferiores medio casillero */
-  @media (max-width: 900px){
+  @media (max-width: 900px), (pointer: coarse){
     #bottomBar{
       position: relative !important;
       top: 0 !important; /* neutraliza otros 'top' previos */
@@ -8789,6 +8796,78 @@ catch(_){}
     window.addEventListener('resize', onResize);
     document.addEventListener('ajetrez:version-applied', groupTopRightButtons);
   });
+})();
+</script>
+
+
+<div id="verDevToast" style="position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:16px 18px;border-radius:14px;z-index:2147483647;box-shadow:0 10px 30px rgba(0,0,0,.28);max-width:min(92vw,780px);font-weight:600;line-height:1.35;display:none;text-align:center">Versión en desarrollo. Muy pronto estará disponible.<br>Por favor apoya el proyecto, para que esta mejora y otras más estén disponibles cuanto antes y que podamos seguir mejorando todos los aspectos del juego. Muchas gracias.<div class="toast-donate" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px"><a class="btn mp" href="https://link.mercadopago.com.ar/ajetrez" target="_blank" rel="noopener">Mercado Pago</a><a class="btn pp" href="https://www.paypal.com/ncp/payment/PTRWET3UWGEY8" target="_blank" rel="noopener">PayPal</a></div></div>
+
+
+<script>
+(function(){
+  function showToast(){
+    var el = document.getElementById('verDevToast');
+    if(!el) return;
+    el.style.display = 'block';
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .2s ease, transform .2s ease';
+    requestAnimationFrame(function(){
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) translateY(0)';
+    });
+    setTimeout(function(){ el.style.opacity='0'; setTimeout(function(){ el.style.display='none'; }, 250); }, 8200);
+  }
+  var sel = document.getElementById('selVersion');
+  if(sel){
+    sel.addEventListener('change', function(ev){
+      var v = sel.value;
+      if(v === '3_0_amenaza' || v === '3_0_guerra'){
+        // revert to previous (keep the currently shown version)
+        var prev = sel.getAttribute('data-prev') || '3_0_simple';
+        sel.value = prev;
+        showToast();
+        return;
+      }else{
+        sel.setAttribute('data-prev', v);
+      }
+      // actualizar etiqueta visible, si corresponde
+      try{
+        var verActual = document.getElementById('verActual');
+        if(verActual){
+          var map = {
+            '3_0_simple':'3.0 (modo simple)',
+            '3_0_amenaza':'3.0 (modo amenaza)',
+            '3_0_guerra':'3.0 (modo guerra)'
+          };
+          verActual.textContent = map[v] || v;
+        }
+      }catch(_){}
+    });
+    // inicializar prev según opción inicial
+    sel.setAttribute('data-prev', sel.value || '3_0_simple');
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  function initVersionIndicator(){
+    try{
+      var sel = document.getElementById('selVersion');
+      var verActual = document.getElementById('verActual');
+      if(!sel || !verActual) return;
+      var textMap = {
+        '3_0_simple':'3.0 (modo simple)',
+        '3_0_amenaza':'3.0 (modo amenaza)',
+        '3_0_guerra':'3.0 (modo guerra)'
+      };
+      verActual.textContent = textMap[sel.value] || '3.0 (modo simple)';
+      sel.setAttribute('data-prev', sel.value || '3_0_simple');
+    }catch(_){}
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initVersionIndicator);
+  else initVersionIndicator();
 })();
 </script>
 
