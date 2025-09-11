@@ -4,7 +4,7 @@
   /* Desplazar los botones de pago 1 casillero a la derecha */
   #btnMercadoPago{ margin-left: calc(var(--casillero, 64px) * 0.5); }
 
-</style><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Ajetrez — Panel con Login, Pestañas + Info Partidas (v3-fix2)</title><style>
+</style><meta charset="utf-8"/><meta content="width=1280, initial-scale=1" name="viewport"/><title>Ajetrez — Panel con Login, Pestañas + Info Partidas (v3-fix2)</title><style>
   :root{
     --square: 56px;
     --border: 2px;
@@ -1796,6 +1796,14 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
     flex: 0 0 auto;
   }
 }
+</style>
+
+
+/* === A J E T R E Z — LAYOUT LOCK (desktop geometry across devices) === */
+<style id="ajetrez-layout-lock">
+  :root{ --c: var(--square); --casillero: var(--square); }
+  /* No hard resets here to avoid touching desktop geometry.
+     This block simply ensures any place using --casillero picks up --square. */
 </style>
 
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
