@@ -1379,12 +1379,150 @@ body, html{overflow:visible!important;}
 })();
 </script>
 
-<style id="aj-inline-css">
-#reg-list .reg-toggle{ display:inline-block; margin-top:6px; font-size:12px; opacity:.86; background:#f1f1f1; border:1px solid #e5e5e5; border-radius:999px; padding:2px 8px; cursor:pointer; }
-#reg-list .reg-toggle:hover{ opacity:1; }
-#reg-list .reg-inline{ margin-top:6px; border:1px dashed #ddd; border-radius:10px; padding:8px; background:#fff; max-height:180px; overflow:auto; white-space:pre-wrap; font-family: ui-monospace, Menlo, Consolas, 'Courier New', monospace; }
-#reg-moves .ply{ display:grid; grid-template-columns: 40px 1fr 1fr; gap:6px; padding:2px 0; border-bottom:1px dotted #eee; }
-#reg-moves .num{ font-weight:700; opacity:.8; }
+<style id="rv2-sticky-css">
+#rv2 .wrapper{ width:min(1040px,92vw); margin:12px auto; box-sizing:border-box; }
+#rv2 .grid{ display:grid; grid-template-columns:38% 62%; gap:16px; align-items:stretch; }
+#rv2 .card{ background:#f7f7f7; border:1px solid #e9e9e9; border-radius:14px; padding:12px; display:flex; flex-direction:column;
+            min-height:360px; height:56vh; max-height:62vh; overflow:hidden; }
+#rv2-list{ overflow:auto; flex:1; min-height:0; }
+#rv2-list .item{ border:1px solid #e6e6e6; background:#fff; border-radius:12px; padding:8px; margin:6px 0; cursor:pointer; }
+#rv2-list .item.selected{ border-color:#7aa2ff; box-shadow:0 0 0 2px rgba(122,162,255,.25) inset; }
+#rv2-list .item:hover{ box-shadow:0 1px 0 rgba(0,0,0,.06); }
+#rv2-list .ttl{ font-weight:800; }
+#rv2-list .sub{ opacity:.8; font-size:12px; }
+#rv2-list .meta{ font-size:12px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#rv2-detail .head{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+#rv2-detail h4{ margin:0; }
+#rv2-actions{ display:flex; flex-wrap:wrap; gap:10px; max-width:100%; }
+#rv2-meta{ font-size:13px; opacity:.9; margin:6px 0; }
+#rv2-moves{ flex:1; min-height:0; overflow:auto; border:1px dashed #ddd; border-radius:10px; padding:8px; background:#fff; font-variant-numeric: tabular-nums; }
+#rv2-moves .ply{ display:grid; grid-template-columns:38px 1fr 1fr; gap:8px; padding:2px 0; border-bottom:1px dotted #eee; }
+#rv2-moves .num{ font-weight:700; opacity:.8; text-align:right; padding-right:4px; }
+.btn.danger{ background:#d9534f; border-color:#c9302c; }
+@media (max-width: 960px){ #rv2 .grid{ grid-template-columns:1fr; gap:12px; } #rv2 .card{ height:48vh; max-height:56vh; } }
+</style>
+
+
+
+
+
+
+
+
+<style id="rv2-textarea-shrink">
+/* Reduce tester textarea height to ~half */
+#regv2-input{ height: 160px !important; min-height: 140px !important; }
+textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !important; min-height: 140px !important; }
+</style>
+
+
+<style id="rv2-grid-5050">
+/* Make bottom info panels split 50/50 */
+#rv2 .grid{ grid-template-columns: 1fr 1fr !important; }
+</style>
+
+
+<style id="rv2-leftheader-stack">
+/* En el panel izquierdo ("Partidas guardadas"), pone el título arriba y los botones debajo */
+#rv2 .grid > section.card:first-of-type > div{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+}
+#rv2 .grid > section.card:first-of-type > div > div{ /* contenedor de controles */
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+</style>
+
+
+<style id="rv2-play-heartbeat-css">
+/* Topbar with three zones: left (demo+velocidad), center (play), right (spacer/extra) */
+#rv2-topbar{ display:flex; align-items:center; gap:12px; margin:8px 0 6px; }
+#rv2-topbar .left{ flex:1 1 0; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+#rv2-topbar .center{ flex:0 0 auto; display:flex; justify-content:center; align-items:center; min-width:180px; }
+#rv2-topbar .right{ flex:1 1 0; display:flex; justify-content:flex-end; gap:12px; }
+
+/* Red button + heartbeat */
+#rv2-topbar #regv2-play{
+  background:#d9534f !important;
+  border-color:#c9302c !important;
+  color:#fff !important;
+  position:relative;
+  animation: rv2-heartbeat 1.4s ease-in-out infinite;
+  transform-origin:center center;
+}
+@keyframes rv2-heartbeat{
+  0%{ transform:scale(1); }
+  14%{ transform:scale(1.08); }
+  28%{ transform:scale(1); }
+  42%{ transform:scale(1.08); }
+  70%{ transform:scale(1); }
+  100%{ transform:scale(1); }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  #rv2-topbar #regv2-play{ animation: none; }
+}
+</style>
+
+
+<style id="rv2-pulse-css">
+#rv2-topbar .center button.rv2-pulse{
+  animation: rv2-heartbeat-x 1.25s ease-in-out infinite !important;
+  transform-origin: center center !important;
+  will-change: transform;
+}
+@keyframes rv2-heartbeat-x{
+  0%{ transform:scale(1); }
+  14%{ transform:scale(1.08); }
+  28%{ transform:scale(1); }
+  42%{ transform:scale(1.08); }
+  70%{ transform:scale(1); }
+  100%{ transform:scale(1); }
+}
+@media (prefers-reduced-motion: reduce){
+  #rv2-topbar .center button.rv2-pulse{ animation: none !important; }
+}
+</style>
+
+
+<style id="rv2-topbar-tweak-css">
+/* Mover "Cargar demo" + "Velocidad" unos 3mm a la derecha */
+#rv2-topbar .left{ padding-left: 3mm; }
+/* Botón Reproducir en tablero en negro, por encima de cualquier tema */
+#rv2-topbar .center #regv2-play.rv2-black{
+  background:#000 !important;
+  border-color:#000 !important;
+  color:#fff !important;
+}
+</style>
+
+
+<style id="rv2-panel-8-casilleros-css">
+/* Variables: altura total del panel y altura de las tarjetas inferiores */
+#rv2{ --rv2-panel-h: 480px; --rv2-cards-h: 280px; }
+#rv2 .card{ height: var(--rv2-cards-h) !important; max-height: var(--rv2-cards-h) !important; }
+</style>
+
+
+<style id="rv2-rounded-modal-css">
+/* Redondear las esquinas del contenedor que desplaza (aunque tenga scroll) */
+.rv2-modal{
+  border-radius: 16px !important;
+  /* clip-path recorta el contenido para que respete el radio aun con overflow:auto */
+  clip-path: inset(0 round 16px);
+  /* ayuda en WebKit */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  background-clip: padding-box;
+}
+/* Opcional: suaviza la esquina del área de la barra */
+.rv2-modal::-webkit-scrollbar-corner{ background: transparent; }
 </style>
 
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
@@ -7830,184 +7968,460 @@ catch(_){}
 </script>
 
 
-<!-- === Overlay Movimientos === -->
-<div id="rgMovesOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:#fff; width:min(920px,94vw); max-height:82vh; border-radius:16px; padding:16px; box-shadow:0 18px 60px rgba(0,0,0,.2); display:flex; flex-direction:column; gap:10px;">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-      <h3 style="margin:0">Movimientos de la partida</h3>
-      <div style="display:flex; gap:8px;">
-        <button class="btn small" id="rgMovCopy">Copiar</button>
-        <button class="btn small" id="rgMovClose">Cerrar</button>
-      </div>
-    </div>
-    <textarea id="rgMovText" style="width:100%; height:60vh; font-family: ui-monospace, Menlo, Consolas, 'Courier New', monospace; border:1px solid #eee; border-radius:12px; padding:10px; background:#fafafa; resize:vertical"></textarea>
-  </div>
-</div>
-
-
-<script id="aj-reg-solid">
+<script id="rv2-sticky-js">
 (function(){
-  function $(s){ return document.querySelector(s); }
-  function $all(s){ return Array.from(document.querySelectorAll(s)); }
-  function moveText(m){
-    if(!m) return '';
-    if(typeof m === 'string') return m;
-    if(m.san) return m.san;
-    if(m.uci) return m.uci;
-    if(m.from && m.to) return m.from + '-' + m.to + (m.promotion? '='+m.promotion:'');
-    if(m.f && m.t){ try{ var f='abcdefgh'; return f[m.f.c]+(8-m.f.r)+'-'+f[m.t.c]+(8-m.t.r); }catch(_){}
-    return '';
-  }
-  function numbered(ms){
-    var out=[], n=1;
-    for(var i=0;i<(ms||[]).length;i+=2){
-      var w = ms[i], b = ms[i+1];
-      out.push(n+'. '+moveText(w)+ (b? (' '+moveText(b)) : ''));
-      n++;
-    }
-    return out.join('\n');
-  }
-  function humanBotLabel(bl){
+  const LS_KEY='ajetrez.registros.v1', AUTO_KEY='rv2.autoload', AUTOSAVE_KEY='rv2.autosave';
+  function $(s,r){return (r||document).querySelector(s);} 
+  function all(s,r){return Array.from((r||document).querySelectorAll(s));}
+  function loadAll(){ try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(_){return [];} }
+  function saveAll(a){ try{localStorage.setItem(LS_KEY, JSON.stringify(a));}catch(_){ } }
+  function humanMode(m){ if(!m) return ''; const map={'pvp-local':'Player vs Player','bot-vs-bot':'Bot vs Bot','pve':'Player vs Bot'}; return map[m]||m; }
+  function botLabel(meta){ try{ if(!meta||!meta.botLevel) return ''; const bl=meta.botLevel; return (typeof bl==='string')? bl : ('W:'+bl.white+' B:'+bl.black);}catch(_){ return ''; } }
+  function moveText(m){ if(!m) return ''; if(typeof m==='string') return m; if(m.san) return m.san; if(m.uci) return m.uci;
+    if(m.from&&m.to) return m.from+'-'+m.to+(m.promotion? '='+m.promotion:''); if(m.f&&m.t){ try{const f='abcdefgh'; return f[m.f.c]+(8-m.f.r)+'-'+f[m.t.c]+(8-m.t.r);}catch(_){}} return ''; }
+  function m2uci(m){ if(!m) return ''; if(typeof m==='string') return m; if(m.uci) return m.uci;
+    if(m.from&&m.to) return m.from+m.to+(m.promotion||''); if(m.f&&m.t){ try{const f='abcdefgh'; return f[m.f.c]+(8-m.f.r)+f[m.t.c]+(8-m.t.r)+(m.promotion||'');}catch(_){}} return ''; }
+  function isUci(s){ return typeof s==='string' && /^[a-h][1-8][a-h][1-8][qrbn]?$/.test(s); }
+  function sanitizeUciTokens(tokens){ var out=[], prev=''; for(var i=0;i<(tokens||[]).length;i++){ var t=(tokens[i]||'').trim().toLowerCase(); if(!isUci(t)) continue; if(t===prev) continue; out.push(t); prev=t; } return out; }
+  function normalizeGameToUCI(g){ if(!g) return g; const ms=Array.isArray(g.moves)?g.moves:[]; g.moves=sanitizeUciTokens(ms.map(m2uci)); g.format='uci'; return g; }
+  function normalizeAllToUCI(){ try{ let all = loadAll(); if(!all.length) return; let ch=false; for(let i=0;i<all.length;i++){ const before=all[i].moves; normalizeGameToUCI(all[i]); if(before!==all[i].moves) ch=true; } if(ch) saveAll(all); }catch(_){} }
+
+  function setUciTextareaFrom(g,root){
     try{
-      if(!bl) return '';
-      if(typeof bl === 'string') return bl;
-      if(typeof bl === 'object' && bl.white!=null && bl.black!=null){
-        return 'W:'+bl.white+' B:'+bl.black;
-      }
+      const ta = (root||document).querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+      if(!ta) return;
+      const uci = sanitizeUciTokens((g.moves||[]).map(m2uci)).join(' ');
+      ta.value = uci;
     }catch(_){}
-    return '';
   }
 
-  // --- Robust showDetail: fill right panel including moves and stats ---
-  window.showDetail = function(id){
+  function findModalRoot(){
+    // Prioriza contenedor cercano al textarea
+    const ta = document.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+    if(!ta) return null;
+    let p = ta.closest('[role="dialog"], .modal, .overlay, .aj-modal, .dialog, .panel, .modal-content');
+    if(!p) p = ta.parentElement;
+    return p || null;
+  }
+
+  function renderMoves(ct, ms){
+    ct.innerHTML='';
+    for(let i=0;i<(ms||[]).length;i+=2){
+      const n=(i/2)+1, w=ms[i]||{}, b=ms[i+1]||{};
+      const row=document.createElement('div'); row.className='ply';
+      row.innerHTML='<div class="num">'+n+'.</div><div class="mv">'+moveText(w)+'</div><div class="mv">'+moveText(b)+'</div>';
+      ct.appendChild(row);
+    }
+  }
+  function selectItem(el){ try{ all('#rv2-list .item.selected').forEach(x=>x.classList.remove('selected')); if(el) el.classList.add('selected'); }catch(_){ } }
+  function currentOrLatestId(){ const sel=document.querySelector('#rv2-list .item.selected'); if(sel) return sel.getAttribute('data-id'); const first=document.querySelector('#rv2-list .item'); return first? first.getAttribute('data-id'): null; }
+
+  function refreshList(){
+    const list = document.getElementById('rv2-list'); if(!list) return;
+    const all = (loadAll()||[]).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    list.innerHTML='';
+    if(!all.length){ list.innerHTML='<div id="rv2-empty">Aún no hay partidas registradas.</div>'; return; }
+    all.forEach(g=>{
+      const it=document.createElement('div'); it.className='item'; it.setAttribute('data-id', g.id);
+      const dt=new Date(g.createdAt||Date.now()).toLocaleString();
+      const metaTxt=(botLabel(g.meta)?('Bot: '+botLabel(g.meta)+'  '):'')+'Movs: '+((g.moves||[]).length);
+      it.innerHTML='<div class="ttl">Partida '+dt+'</div><div class="sub">'+dt+' '+(humanMode(g.mode)||'')+'</div><div class="meta">'+metaTxt+'</div>';
+      it.addEventListener('click', ()=>{ selectItem(it); showDetail(g.id); }, true);
+      list.appendChild(it);
+    });
+  }
+
+  function showDetail(id){
+    const allGames=loadAll(); const g=(allGames||[]).find(x=>x.id===id); if(!g) return;
+    const dt=new Date(g.createdAt||Date.now()).toLocaleString();
+    document.getElementById('rv2-detail')?.setAttribute('data-id', id);
+    document.getElementById('rv2-title').textContent=(g.meta?.title)||('Partida '+dt);
+    document.getElementById('rv2-meta').textContent='Fecha: '+dt+'   '+(humanMode(g.mode)||'')+(botLabel(g.meta)?('   Bot: '+botLabel(g.meta)):''); 
+    renderMoves(document.getElementById('rv2-moves'), g.moves||[]);
+    // autoload if enabled
+    try{ const cb=document.getElementById('rv2-autoload'); if(!cb || cb.checked){ const root=findModalRoot(); setUciTextareaFrom(g, root); } }catch(_){}
+  }
+
+  function buildUI(){
+    const root = findModalRoot(); if(!root) return;
+    if(document.getElementById('rv2')) return;
+
+    normalizeAllToUCI();
+    const ta = root.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+    let host = ta ? (ta.parentElement || ta) : root;
+
+    const wrap = document.createElement('div'); wrap.id='rv2'; wrap.className='wrapper';
+    wrap.innerHTML = `
+      <div class="grid">
+        <section class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <strong>Partidas guardadas</strong>
+            <div>
+              <button class="btn small" id="rv2-refresh">Actualizar</button>
+              <button class="btn small" id="rv2-save">Guardar partida actual</button>
+              <label class="btn small" style="display:inline-flex;gap:6px;align-items:center;margin-left:6px">
+                <input type="checkbox" id="rv2-autosave"> Auto‑guardar
+              </label>
+              <button class="btn small danger" id="rv2-clear-all">Borrar todo el registro</button>
+            </div>
+          </div>
+          <div id="rv2-list"><div id="rv2-empty">Aún no hay partidas registradas.</div></div>
+        </section>
+        <section class="card" id="rv2-detail">
+          <div class="head">
+            <h4 id="rv2-title">Detalle</h4>
+            <div id="rv2-actions">
+              <button class="btn small" id="rv2-load">Cargar en probador</button>
+              <label class="btn small" style="display:inline-flex;gap:6px;align-items:center">
+                <input type="checkbox" id="rv2-autoload"> Auto‑cargar UCI
+              </label>
+              <button class="btn small" id="rv2-play">Reproducir</button>
+              <button class="btn small" id="rv2-export">Exportar PGN</button>
+              <button class="btn small danger" id="rv2-delete">Eliminar partida</button>
+            </div>
+          </div>
+          <div id="rv2-meta"></div>
+          <div id="rv2-moves"></div>
+        </section>
+      </div>`;
+    host.insertAdjacentElement('afterend', wrap);
+
+    // init toggles
+    try{ const as=document.getElementById('rv2-autosave'); const vv=localStorage.getItem(AUTOSAVE_KEY); as.checked=(vv===null?true:(vv==='1')); }catch(_){}
+    try{ const cb=document.getElementById('rv2-autoload'); const v=localStorage.getItem(AUTO_KEY); cb.checked=(v===null?true:(v==='1')); }catch(_){}
+
+    refreshList();
+
+    // auto select MOST RECENT and autoload
     try{
-      var all = (typeof loadAll==='function') ? loadAll() : JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]');
-      var g = (all||[]).find(function(x){ return x.id===id; });
-      if(!g){ $('#reg-detail').style.display='none'; $('#reg-empty').style.display='block'; return; }
-      // set an attribute for quick access
-      $('#reg-detail')?.setAttribute('data-id', id);
-      $('#reg-empty') && ($('#reg-empty').style.display='none');
-      $('#reg-detail') && ($('#reg-detail').style.display='block');
+      const first = document.querySelector('#rv2-list .item'); if(first){ first.click(); }
+    }catch(_){}
+  }
 
-      // header/title
-      var dt = new Date(g.createdAt||Date.now());
-      $('#reg-title').textContent = (g.meta?.title) || ('Partida '+dt.toLocaleString());
-      $('#reg-date').textContent  = dt.toLocaleString();
-      $('#reg-mode').textContent  = (typeof humanMode==='function') ? humanMode(g.mode) : (g.mode||'');
-      $('#reg-result-val').textContent = g.result || '—';
-      $('#reg-duration').textContent = g.duration || '—';
-      $('#reg-tags').textContent = (g.tags||[]).join(', ') || '—';
-      var bl = humanBotLabel(g.meta && g.meta.botLevel);
-      if($('#rgd-bot')) $('#rgd-bot').textContent = bl ? ('Bot: '+bl) : '';
+  // Click handlers
+  document.addEventListener('click', function(ev){
+    const id=ev.target && ev.target.id;
+    if(id==='rv2-refresh'){ refreshList(); }
+    if(id==='rv2-clear-all'){
+      if(!confirm('¿Borrar TODAS las partidas guardadas? Esta acción no se puede deshacer.')) return;
+      try{ localStorage.removeItem(LS_KEY); localStorage.removeItem('ajetrez.registro.draft'); }catch(_){}
+      try{ refreshList(); }catch(_){}
+      try{ document.getElementById('rv2-title').textContent='Detalle'; document.getElementById('rv2-meta').textContent=''; document.getElementById('rv2-moves').innerHTML=''; }catch(_){}
+      try{ var ta=document.getElementById('regv2-input') || document.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]'); if(ta) ta.value=''; }catch(_){}
+    }
+    if(id==='rv2-save'){
+      try{
+        if(window.AJ_Recorder && typeof AJ_Recorder.saveCurrent==='function'){
+          const ok = AJ_Recorder.saveCurrent({result:'*'});
+          if(ok){ normalizeAllToUCI(); refreshList(); }
+          else { alert('No hay partida activa para guardar.'); }
+        }
+      }catch(err){ console.error(err); }
+    }
+    if(id==='rv2-export'){
+      try{
+        const gid=document.getElementById('rv2-detail')?.getAttribute('data-id'); const g=(loadAll()||[]).find(x=>x.id===gid); if(!g) return;
+        const d=new Date(g.createdAt||Date.now()); const date=d.toISOString().slice(0,10).replace(/-/g,'.');
+        const tags=[]; const t=(k,v)=>tags.push('['+k+' "'+(v||'-')+'"]');
+        t('Event', g.meta?.title||'Ajetrez Game'); t('Site','Ajetrez'); t('Date',date); t('Result', g.result||'*');
+        if(g.meta?.mode) t('Mode', g.meta.mode); if(g.meta?.opening) t('Opening', g.meta.opening); const bl=botLabel(g.meta); if(bl) t('Bot', bl);
+        let body=''; const ms=g.moves||[]; for(let i=0;i<ms.length;i++){ if(i%2===0) body+=((i/2)+1)+'. '; body+=moveText(ms[i])+' '; }
+        const pgn=tags.join('\\n')+'\\n\\n'+body.trim(); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([pgn],{type:'text/plain'})); a.download=(g.meta?.title||'partida')+'.pgn'; a.click();
+      }catch(_){}
+    }
+    if(id==='rv2-delete'){
+      const gid=document.getElementById('rv2-detail')?.getAttribute('data-id'); if(!gid) return; if(!confirm('¿Eliminar esta partida?')) return;
+      const rest=(loadAll()||[]).filter(x=>x.id!==gid); saveAll(rest); refreshList(); document.getElementById('rv2-title').textContent='Detalle'; document.getElementById('rv2-meta').textContent=''; document.getElementById('rv2-moves').innerHTML='';
+    }
+    if(id==='rv2-load'){
+      const gid=document.getElementById('rv2-detail')?.getAttribute('data-id') || currentOrLatestId(); if(!gid){ alert('Seleccioná una partida de la lista.'); return; }
+      const g=(loadAll()||[]).find(x=>x.id===gid); if(!g) return; const root=findModalRoot(); setUciTextareaFrom(g, root);
+    }
+    if(id==='rv2-play'){
+      const gid=document.getElementById('rv2-detail')?.getAttribute('data-id') || currentOrLatestId(); if(!gid){ alert('Seleccioná una partida de la lista.'); return; }
+      const g=(loadAll()||[]).find(x=>x.id===gid); if(!g) return; const root=findModalRoot(); setUciTextareaFrom(g, root); const btn=document.getElementById('regv2-play'); if(btn) btn.click();
+    }
+  }, true);
 
-      // moves table
-      var mv = $('#reg-moves'); if(mv){ mv.innerHTML=''; }
-      var ms = g.moves || [];
-      for(var i=0;i<ms.length;i+=2){
-        var row = document.createElement('div'); row.className='ply';
-        row.innerHTML = '<div class="num">'+((i/2)+1)+'.</div>'+
-                        '<div class="mv">'+moveText(ms[i])+'</div>'+
-                        '<div class="mv">'+moveText(ms[i+1])+'</div>';
-        mv.appendChild(row);
+  // Persist toggles
+  document.addEventListener('change', function(ev){
+    if(ev.target && ev.target.id==='rv2-autoload'){ try{ localStorage.setItem(AUTO_KEY, ev.target.checked?'1':'0'); }catch(_){ } }
+    if(ev.target && ev.target.id==='rv2-autosave'){ try{ localStorage.setItem(AUTOSAVE_KEY, ev.target.checked?'1':'0'); }catch(_){ } }
+  }, true);
+
+  // --- Auto-guardar ---
+  let __rv2Current = null; let __rv2SaveTimer = null;
+  function draftSaveSoon(){ try{ if(__rv2SaveTimer) clearTimeout(__rv2SaveTimer); __rv2SaveTimer = setTimeout(draftPersist, 400); }catch(_){ } }
+  function draftPersist(){
+    try{
+      if(!__rv2Current) return;
+      if(localStorage.getItem(AUTOSAVE_KEY)==='0') return;
+      if(!(__rv2Current.moves && __rv2Current.moves.length)) return;
+      localStorage.setItem('ajetrez.registro.draft', JSON.stringify(__rv2Current));
+    }catch(_){}
+  }
+  function finalizeAutosaveGame(payload){
+    try{
+      if(localStorage.getItem(AUTOSAVE_KEY)==='0') return;
+      if(!__rv2Current) return;
+      if(payload && payload.result) __rv2Current.result = payload.result;
+      __rv2Current.moves = sanitizeUciTokens(__rv2Current.moves||[]);
+      const all = loadAll(); all.push(__rv2Current); saveAll(all);
+      localStorage.removeItem('ajetrez.registro.draft');
+      try{ refreshList(); }catch(_){}
+      try{
+        const lastId = __rv2Current.id;
+        setTimeout(()=>{
+          const item = document.querySelector('#rv2-list .item[data-id=\"'+lastId+'\"]');
+          if(item){ item.click(); }
+        }, 50);
+      }catch(_){}
+    }catch(err){ console.error(err); }
+    finally{ __rv2Current=null; }
+  }
+
+  window.addEventListener('aj:game:start', function(e){
+    try{
+      if(localStorage.getItem(AUTOSAVE_KEY)==='0') return;
+      __rv2Current = { id:'g'+Date.now(), createdAt:Date.now(), mode:e&&e.detail&&e.detail.mode||'', meta:e&&e.detail&&e.detail.meta||{}, result:'*', moves:[] };
+      draftPersist();
+    }catch(_){}
+  }, true);
+
+  window.addEventListener('aj:move', function(e){
+    try{
+      if(localStorage.getItem(AUTOSAVE_KEY)==='0') return;
+      if(!__rv2Current) return;
+      const d=(e&&e.detail)||e||{}; const u=m2uci(d)||d.uci||''; if(!u) return;
+      const last=__rv2Current.moves.length? __rv2Current.moves[__rv2Current.moves.length-1] : '';
+      if(String(u).toLowerCase()===String(last).toLowerCase()) return;
+      __rv2Current.moves.push(String(u).toLowerCase());
+      draftSaveSoon();
+    }catch(_){}
+  }, true);
+
+  window.addEventListener('aj:game:end', function(e){
+    try{ finalizeAutosaveGame((e&&e.detail)||{}); }catch(_){}
+  }, true);
+
+  // Rebuild when panel opens — detect textarea appearance
+  const mo = new MutationObserver((muts)=>{
+    for(const m of muts){
+      m.addedNodes && m.addedNodes.forEach(n=>{
+        if(n.nodeType===1){
+          const ta = n.querySelector && n.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+          if(ta){ setTimeout(buildUI, 10); }
+        }
+      });
+    }
+  });
+  mo.observe(document.body || document.documentElement, {childList:true, subtree:true});
+
+  // First attempt (in case modal ya está)
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(buildUI, 0); });
+})();
+</script>
+
+
+
+
+
+
+
+
+<script id="rv2-topbar-align-js">
+(function(){
+  function $(s,r){ return (r||document).querySelector(s); }
+  function all(s,r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  function findTesterRoot(){
+    var ta = document.getElementById('regv2-input') || document.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+    if(!ta) return null;
+    return ta.closest('div') || ta.parentElement || null;
+  }
+  function findPlayButton(){
+    var byId = document.getElementById('regv2-play');
+    if(byId) return byId;
+    var btn = all('button').find(function(b){
+      var t=(b.textContent||'').trim().toLowerCase();
+      return t.indexOf('reproducir en tablero')!==-1 || t==='reproducir';
+    });
+    return btn || null;
+  }
+  function findDemoButton(root){
+    return all('button', root).find(function(b){
+      return ((b.textContent||'').trim().toLowerCase().indexOf('cargar demo')!==-1);
+    }) || null;
+  }
+  function findSpeedGroup(root){
+    var label = all('*', root).find(function(el){
+      return el && (el.tagName==='LABEL' || el.tagName==='SPAN' || el.tagName==='DIV') &&
+             ((el.textContent||'').trim().toLowerCase().indexOf('velocidad')!==-1) &&
+             (el.querySelector('select') || el.nextElementSibling && el.nextElementSibling.tagName==='SELECT');
+    });
+    if(label){
+      var group = document.createElement('div');
+      group.style.display='inline-flex'; group.style.alignItems='center'; group.style.gap='8px';
+      var sel = label.querySelector('select') || (label.nextElementSibling && label.nextElementSibling.tagName==='SELECT' ? label.nextElementSibling : null);
+      group.appendChild(label);
+      if(sel && sel.parentElement!==group) group.appendChild(sel);
+      return group;
+    }else{
+      var selTop = root.querySelector('select');
+      if(selTop){
+        var g = document.createElement('div');
+        g.style.display='inline-flex'; g.style.alignItems='center'; g.style.gap='8px';
+        var span = document.createElement('span'); span.textContent='Velocidad'; g.appendChild(span); g.appendChild(selTop);
+        return g;
+      }
+    }
+    return null;
+  }
+  function hideByTextWithin(root, texts){
+    if(!root) root = document;
+    texts = texts.map(function(x){ return x.toLowerCase(); });
+    all('button, .btn', root).forEach(function(b){
+      var t=(b.textContent||'').trim().toLowerCase();
+      if(texts.some(function(s){ return t.indexOf(s)!==-1; })){
+        b.style.display='none';
+        var row = b.closest('div'); if(row) row.classList.add('rv2-collapsed-row');
+      }
+    });
+  }
+  function ensureTopbar(root){
+    var topbar = document.getElementById('rv2-topbar');
+    if(!topbar){
+      topbar = document.createElement('div'); topbar.id='rv2-topbar';
+      topbar.innerHTML = '<div class="left"></div><div class="center"></div><div class="right"></div>';
+      var ta = document.getElementById('regv2-input') || root.querySelector('textarea');
+      if(ta && ta.parentElement){
+        ta.parentElement.insertAdjacentElement('beforebegin', topbar);
+      }else if(ta){
+        ta.insertAdjacentElement('beforebegin', topbar);
+      }else{
+        root.insertAdjacentElement('afterbegin', topbar);
+      }
+    }
+    return topbar;
+  }
+
+  function alignTopbar(){
+    try{
+      var root = findTesterRoot(); if(!root) return;
+      var topbar = ensureTopbar(root);
+      var left = topbar.querySelector('.left'), center = topbar.querySelector('.center'), right = topbar.querySelector('.right');
+
+      // Move play button to center and apply "danger" look
+      var play = findPlayButton();
+      if(play){
+        if(play.parentElement !== center){ center.appendChild(play); }
+        // Forzar estilo negro y pulso
+        try{ play.className = (play.className||'').replace(/\bdanger\b/g,'').trim(); }catch(_){}
+        if(!/\brv2-black\b/.test(play.className||'')){ play.className = (play.className||'') + ' rv2-black'; }
+        if(!/\brv2-pulse\b/.test(play.className||'')){ play.className = (play.className||'') + ' rv2-pulse'; }
+        try{ play.style.animation = 'rv2-heartbeat-x 1.25s ease-in-out infinite'; play.style.transformOrigin='center center'; }catch(_){ }
       }
 
-      // statistics (fallback simple if not provided)
-      var sl = $('#reg-stats'); if(sl){ sl.innerHTML=''; }
-      var captures = ms.filter(m=>m && m.capture).length;
-      var checks   = ms.filter(m=>m && (m.check || (typeof m.san==='string' && m.san.indexOf('+')!==-1))).length;
-      var mates    = ms.filter(m=>m && (typeof m.san==='string' && m.san.indexOf('#')!==-1)).length;
-      var total    = ms.length;
-      function add(label, val){ var li=document.createElement('li'); li.innerHTML='<b>'+label+':</b> '+(val||'—'); sl.appendChild(li); }
-      add('Movimientos', total); add('Capturas', captures); add('Checks', checks); add('Mates', mates);
+      // Move demo + speed to left
+      var demo = findDemoButton(root);
+      if(demo && demo.parentElement !== left){ left.appendChild(demo); }
+      var speed = findSpeedGroup(root);
+      if(speed){
+        if(!left.querySelector('select')) left.appendChild(speed);
+      }
 
-      // actions (PGN / Delete wired if existen botones)
-      if($('#reg-export-pgn')) $('#reg-export-pgn').onclick = function(){ try{ exportPGN(g); }catch(_){ /* optional */ } };
-      if($('#reg-delete')) $('#reg-delete').onclick = function(){
-        var ok = confirm('¿Eliminar esta partida?'); if(!ok) return;
-        try{
-          var rest = (all||[]).filter(function(x){ return x.id!==g.id; });
-          localStorage.setItem('ajetrez.registros.v1', JSON.stringify(rest));
-          if(typeof refreshList==='function') refreshList();
-          $('#reg-detail').style.display='none'; $('#reg-empty').style.display='block';
-        }catch(err){ console.error(err); }
-      };
-    }catch(err){ console.error(err); }
-  };
-
-  // --- Rebuild refreshList to include inline expansion button ---
-  window.refreshList = function(){
-    var list = $('#reg-list'); if(!list) return;
-    list.innerHTML='';
-    var q  = ($('#reg-q')?.value||'').toLowerCase();
-    var md = $('#reg-mode')?.value||'';
-    var rs = $('#reg-result')?.value||'';
-    var all = (typeof loadAll==='function') ? loadAll() : JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]');
-    var filtered = (all||[]).filter(function(g){
-      if(md && (g.mode||'')!==md) return false;
-      if(rs && (g.result||'')!==rs) return false;
-      var txt = [g.meta?.title, g.result, g.mode, (g.tags||[]).join(' '), humanBotLabel(g.meta && g.meta.botLevel), g.meta?.opponent].join(' ').toLowerCase();
-      if(q && txt.indexOf(q)===-1) return false;
-      return true;
-    }).sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); });
-
-    filtered.forEach(function(g){
-      var item = document.createElement('div');
-      item.className='row';
-      item.setAttribute('data-id', g.id);
-      var dt = new Date(g.createdAt||Date.now());
-      var bot = humanBotLabel(g.meta && g.meta.botLevel);
-      item.innerHTML = '<div class="title">Partida '+dt.toLocaleString()+'</div>'+
-                       '<div class="sub">'+dt.toLocaleString()+'  '+( (g.mode||'') ? ( (typeof humanMode==='function')? humanMode(g.mode): g.mode ) : '' )+'</div>'+
-                       '<div class="meta">'+ (bot? 'Bot: '+bot : '') +'  Movs: '+((g.moves||[]).length)+'</div>';
-      // click -> select detail
-      item.addEventListener('click', function(){ showDetail(g.id); }, true);
-      // inline toggle
-      var t = document.createElement('div'); t.className='reg-toggle'; t.textContent='Ver movimientos';
-      t.addEventListener('click', function(ev){
-        ev.preventDefault(); ev.stopPropagation();
-        var panel = item.querySelector('.reg-inline');
-        if(panel){ var hide = panel.style.display!=='none' ; panel.style.display = hide? 'none':'block'; t.textContent = hide? 'Ver movimientos':'Ocultar movimientos'; return; }
-        var pre = document.createElement('pre'); pre.className='reg-inline'; pre.textContent = numbered(g.moves||[]);
-        item.appendChild(pre); t.textContent='Ocultar movimientos';
-      }, true);
-      item.appendChild(t);
-      list.appendChild(item);
-    });
-
-    // Show empty state if none
-    if(!filtered.length){ list.innerHTML = '<div class="empty">No hay resultados</div>'; }
-  };
-
-  // --- Overlay controls ---
-  function openOverlayWith(ms){
-    var ov = $('#rgMovesOverlay'), ta = $('#rgMovText');
-    if(!ov || !ta) return;
-    ta.value = numbered(ms||[]);
-    ov.style.display = 'flex';
+      // Hide legacy controls and collapse their row
+      hideByTextWithin(root, ['pausar','continuar','detener']);
+    }catch(err){ console.error('alignTopbar error', err); }
   }
-  document.addEventListener('click', function(ev){
-    if(ev.target && ev.target.id==='rgMovClose'){ $('#rgMovesOverlay').style.display='none'; }
-    if(ev.target && ev.target.id==='rgMovCopy'){ try{ $('#rgMovText').select(); document.execCommand('copy'); }catch(_){ } }
-    if(ev.target === $('#rgMovesOverlay')){ $('#rgMovesOverlay').style.display='none'; }
-  }, true);
-  // Button in detail header if exists
-  (function(){
-    var hdr = document.querySelector('#reg-detail .card-title');
-    if(!hdr || hdr.querySelector('#btnViewMoves')) return;
-    var b = document.createElement('button'); b.className='btn small'; b.id='btnViewMoves'; b.textContent='Ver movimientos';
-    b.style.marginLeft='8px';
-    b.addEventListener('click', function(){
-      try{
-        var id = document.querySelector('#reg-detail').getAttribute('data-id') || '';
-        var all = (typeof loadAll==='function') ? loadAll() : JSON.parse(localStorage.getItem('ajetrez.registros.v1')||'[]');
-        var g = (all||[]).find(function(x){ return x.id===id; }); if(g) openOverlayWith(g.moves||[]);
-      }catch(_){}
-    }, true);
-    hdr.appendChild(b);
-  })();
 
-  // Initial render once
-  try{ refreshList(); }catch(_){}
+  var mo = new MutationObserver(function(){ alignTopbar(); });
+  if(document.body){ mo.observe(document.body, {childList:true, subtree:true}); }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(alignTopbar, 0); });
+  setTimeout(alignTopbar, 60);
+  setTimeout(alignTopbar, 250);
+})();
+</script>
+
+
+<script id="rv2-height-fit-js">
+(function(){
+  function $(s,r){ return (r||document).querySelector(s); }
+  function all(s,r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  function findBoard(){
+    // heurísticas comunes
+    var cand = document.getElementById('board') ||
+               document.querySelector('.board, .chessboard, #chessboard, [data-board], .tablero, .aj-board, canvas.board');
+    if(cand) return cand;
+    // fallback: busca un cuadrado grande (w≈h) cercano al tablero
+    var divs = all('div');
+    for(var i=0;i<divs.length;i++){
+      try{
+        var cs = getComputedStyle(divs[i]);
+        var w = divs[i].offsetWidth, h = divs[i].offsetHeight;
+        if(w>200 && Math.abs(w-h) < 6 && (divs[i].className||'').toLowerCase().indexOf('board')!==-1){ return divs[i]; }
+      }catch(_){}
+    }
+    return null;
+  }
+
+  function findModalRoot(){
+    var ta = document.getElementById('regv2-input') || document.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+    if(!ta) return null;
+    var p = ta.closest('[role="dialog"], .modal, .overlay, .aj-modal, .dialog, .panel, .modal-content');
+    return p || ta.parentElement || null;
+  }
+
+  function recalc(){
+    try{
+      var board = findBoard();
+      var panelH;
+      if(board){
+        var h = board.offsetHeight || board.clientHeight || 384;
+        // 8 casilleros = altura del tablero completo
+        panelH = h;
+      }else{
+        // fallback: 8*48px
+        panelH = 8*48;
+      }
+      var topbar = document.getElementById('rv2-topbar');
+      var ta = document.getElementById('regv2-input') || document.querySelector('textarea[placeholder*="UCI"], textarea[placeholder*="uci"]');
+      var topH = topbar ? topbar.offsetHeight : 0;
+      var taH = ta ? ta.offsetHeight : 0;
+      // margen de respiración
+      var fudge = 20;
+      var cardsH = Math.max(140, panelH - topH - taH - fudge);
+
+      // Set CSS vars
+      var rv2 = document.getElementById('rv2');
+      if(rv2){
+        rv2.style.setProperty('--rv2-panel-h', panelH + 'px');
+        rv2.style.setProperty('--rv2-cards-h', cardsH + 'px');
+      }
+
+      // Limitar el contenedor del modal a la altura objetivo
+      var modal = findModalRoot();
+      if(modal){
+        try{ modal.classList.add('rv2-modal'); }catch(_){}
+        modal.style.maxHeight = panelH + 'px';
+        modal.style.overflowY = 'auto';
+      }
+    }catch(err){ console.error('rv2 recalc error', err); }
+  }
+
+  var ro;
+  try{
+    // Observa cambios de tamaño
+    ro = new ResizeObserver(function(){ recalc(); });
+    var bd = findBoard(); if(bd) ro.observe(bd);
+  }catch(_){}
+
+  window.addEventListener('resize', recalc);
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(recalc, 0); setTimeout(recalc, 300); });
+  // También al mutar el DOM (por si el tablero se reconstruye o el modal abre)
+  var mo = new MutationObserver(function(){ recalc(); });
+  if(document.body){ mo.observe(document.body, {childList:true, subtree:true}); }
 })();
 </script>
 
