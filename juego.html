@@ -917,7 +917,7 @@ body, html{overflow:visible!important;}
 </style><style id="aj-mobile-bottombar-inside">
   /* En móvil, extiende el contorno/fondo hasta el borde inferior
      para que la barra inferior quede claramente "dentro" del contenedor. */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     .frame::before{
       bottom: 0 !important; /* antes: 3mm */
     }
@@ -935,7 +935,7 @@ body, html{overflow:visible!important;}
   }
 </style><style id="aj-mobile-frame-trim-plus4mm">
   /* En móvil, mantener el mismo recorte que web (evita que la barra parezca fuera) */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     .frame::before{
       bottom: 5mm !important; /* override del fix anterior que ponía 0 */
       top: 7mm !important;
@@ -1016,7 +1016,7 @@ body, html{overflow:visible!important;}
   /* En móvil, algunas reglas previas mueven #bottomBar con 'top:-1*var(--square)'.
      Eso puede producir una separación aparente por redondeo/altura disponible.
      Neutralizamos 'top' y compensamos con un micro-offset adicional. */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     #bottomBar{
       position: relative !important;
       top: 0 !important;                                 /* anula desplazamiento vertical previo */
@@ -1025,7 +1025,7 @@ body, html{overflow:visible!important;}
     }
   }
 </style><!-- AJETREZ: Mobile — subir barra inferior ~1 casillero --><style id="aj-bottomBar-mobile-up-1square-0909">
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     #bottomBar{
       /* Mantener neutralización previa del 'top' */
       position: relative !important;
@@ -1092,7 +1092,7 @@ body, html{overflow:visible!important;}
     height: 28px;
   }
   /* En móvil, acomodar un poco el tamaño */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     #donateBox{ left: 6px; top: 50%; gap: 6px; }
     #donateBox .imgbtn img{ height: 26px; }
     #donateBox .label{
@@ -1799,7 +1799,6 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
 </style>
 
 
-/* === A J E T R E Z — LAYOUT LOCK (desktop geometry across devices) === */
 <style id="ajetrez-layout-lock">
   :root{ --c: var(--square); --casillero: var(--square); }
   /* No hard resets here to avoid touching desktop geometry.
@@ -6714,7 +6713,7 @@ div[style="height:var(--toolbar-gap)"]{
 </style>
 <style id="aj-bottomBar-mobile-up-1more-square-0909b">
   /* Subir TODOS los botones inferiores +1 casillero en versión móvil */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     #bottomBar{
       position: relative !important;
       top: 0 !important; /* neutraliza desplazamientos previos */
@@ -6727,7 +6726,7 @@ div[style="height:var(--toolbar-gap)"]{
 
 <style id="aj-frame-mobile-taller-bottom-2sq-0909">
   /* Versión móvil: aumentar la altura de la base hacia abajo en +2 casilleros */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     .frame{
       /* sumamos 2×casillero a la base inferior */
       padding-bottom: calc(14px + (var(--square) * 2)) !important;
@@ -6742,7 +6741,7 @@ div[style="height:var(--toolbar-gap)"]{
 
 <style id="aj-bottomBar-mobile-down-half-square-0909c">
   /* Versión móvil: bajar los botones inferiores medio casillero */
-  @media (max-width: 900px), (pointer: coarse){
+  @media (max-width: 900px){
     #bottomBar{
       position: relative !important;
       top: 0 !important; /* neutraliza otros 'top' previos */
