@@ -1776,6 +1776,28 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
     }
   }
 </style>
+
+<style id="ajetrez-mobile-topright-8cols">
+/* === Ajetrez Mobile: Top-Right group width = 8 casilleros === */
+@media (max-width: 900px) {
+  #topright-mobile-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--mob-gap, 2mm);
+    /* La anchura fija a 8 casilleros: --tile es calculada por JS */
+    width: calc(var(--tile, 10px) * 8);
+    max-width: calc(var(--tile, 10px) * 8);
+    box-sizing: border-box;
+  }
+  /* Botones dentro del grupo: compactos en móvil */
+  #topright-mobile-wrap > * {
+    flex: 0 0 auto;
+  }
+}
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -8673,6 +8695,93 @@ catch(_){}
   // También al mutar el DOM (por si el tablero se reconstruye o el modal abre)
   var mo = new MutationObserver(function(){ recalc(); });
   if(document.body){ mo.observe(document.body, {childList:true, subtree:true}); }
+})();
+</script>
+
+
+<script id="ajetrez-mobile-topright-8cols-js">
+// === Ajetrez Mobile: Agrupar y fijar ancho a 8 casilleros (sólo móvil) ===
+(function(){
+  if (window.__AJ_TOPRIGHT_8COLS__) return; window.__AJ_TOPRIGHT_8COLS__=true;
+
+  function ready(fn){ if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  function findBoardEl(){
+    // Busca contenedor del tablero más fiable
+    var ids = ['mobile-board', 'board', 'game-board', 'aj-board'];
+    for (var i=0;i<ids.length;i++){
+      var el = document.getElementById(ids[i]);
+      if (el) return el;
+    }
+    // Fallback por clase común
+    var cands = document.querySelectorAll('.board, .game-board, [data-role="board"]');
+    if (cands.length) return cands[0];
+    return null;
+  }
+
+  function computeTile(){
+    var board = findBoardEl();
+    if (!board) return null;
+    // Heurística: 8 casilleros visibles horizontales (zona central)
+    var w = board.clientWidth || board.getBoundingClientRect().width;
+    if (!w) return null;
+    return Math.max(8, Math.round(w / 8)); // píxeles aproximados por casillero
+  }
+
+  function groupTopRightButtons(){
+    if (window.innerWidth > 900) return; // sólo móvil
+    // Candidatos típicos de botones de la zona superior derecha
+    var selectors = [
+      '#btn-fullscreen', '#fullscreenBtn', '[data-role="fullscreen"]', '.btn-fullscreen',
+      '#btn-reiniciar',  '#reiniciarBtn',  '[data-role="reiniciar"]',  '.btn-reiniciar'
+    ];
+    var nodes = [];
+    selectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){
+        if (el && !nodes.includes(el)) nodes.push(el);
+      });
+    });
+    if (nodes.length < 1) return;
+
+    // Usa el padre del primer botón como ancla
+    var anchorParent = nodes[0].parentElement;
+    if (!anchorParent) return;
+
+    // Evita duplicar wrapper
+    var wrap = document.getElementById('topright-mobile-wrap');
+    if (!wrap){
+      wrap = document.createElement('div');
+      wrap.id = 'topright-mobile-wrap';
+      // Inserta wrapper antes del primer botón y luego mueve los candidatos dentro
+      anchorParent.insertBefore(wrap, nodes[0]);
+    }
+
+    // Mover botones dentro del wrapper preservando orden actual en el DOM
+    nodes.forEach(function(n){
+      if (n.parentElement !== wrap) wrap.appendChild(n);
+    });
+
+    // Calcula el tamaño del casillero y setea la variable --tile
+    var tile = computeTile();
+    if (tile){
+      wrap.style.setProperty('--tile', tile + 'px');
+    }
+  }
+
+  // Debounce simple
+  var resizeTimer;
+  function onResize(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      groupTopRightButtons();
+    }, 120);
+  }
+
+  ready(function(){
+    groupTopRightButtons();
+    window.addEventListener('resize', onResize);
+    document.addEventListener('ajetrez:version-applied', groupTopRightButtons);
+  });
 })();
 </script>
 
