@@ -1812,6 +1812,152 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
 #verDevToast .btn.pp{ border-color:#253b80; }
 </style>
 
+<style>
+
+/* === Ajetrez: WakeLock toggle (flex item al lado de Reiniciar) === */
+.btn.aj-wakelock-toggle{ white-space: nowrap; }
+.btn.aj-wakelock-toggle[aria-pressed="true"]{ background:#0a0; color:#fff; border-color:#fff; }
+@media (max-width: 768px){
+  .btn.aj-wakelock-toggle{ font-size:0.95em; }
+}
+
+</style>
+<style>
+
+/* === Ajetrez: Centrar botón Menú en bottomBar SIN fijar posiciones === */
+#bottomBar{
+  display:flex !important;
+  justify-content:flex-start !important; /* evitamos space-between */
+}
+#btnMegaMenu{
+  margin-left:auto !important;
+  margin-right:auto !important; /* esto centra el Menú entre izquierda y derecha */
+}
+#rightControls{
+  margin-left:0 !important;
+}
+
+</style>
+<style>
+
+/* === Reset fuerte para Menú: eliminar offsets previos (sin fijarlo) === */
+#btnMegaMenu{
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+/* Asegurar contenedor: flex y permitir que Menú se centre con márgenes auto */
+#bottomBar{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+}
+/* Grupo derecho queda al final de la fila sin empujar el centro */
+#rightControls{ margin-left: 0 !important; }
+
+</style>
+<style>
+
+/* === Tema-safe: texto oscuro sobre fondos claros en "noche" y "pizarra" === */
+/* Panel principal de menú (#megaPanel) y secciones claras */
+body[data-theme="noche"]  #megaPanel,
+body[data-theme="pizarra"]#megaPanel,
+body[data-theme="noche"]  #megaPanel .mp-content,
+body[data-theme="pizarra"]#megaPanel .mp-content,
+body[data-theme="noche"]  #megaPanel .mp-footer,
+body[data-theme="pizarra"]#megaPanel .mp-footer,
+/* Panel de registros (v1 y v2) */
+body[data-theme="noche"]  #regPanel,
+body[data-theme="pizarra"]#regPanel,
+body[data-theme="noche"]  #regv2-panel,
+body[data-theme="pizarra"]#regv2-panel{
+  color:#111 !important; /* texto negro/oscuro para contraste en fondos blancos o muy claros */
+}
+
+/* Excepciones: encabezado oscuro del megaPanel mantiene texto claro */
+body[data-theme="noche"]  #megaPanel .mp-header,
+body[data-theme="pizarra"]#megaPanel .mp-header{
+  color:#fff !important;
+}
+
+/* Inputs y listas dentro de registros y menú con fondo claro: texto oscuro garantizado */
+body[data-theme="noche"]  #megaPanel input,
+body[data-theme="pizarra"]#megaPanel input,
+body[data-theme="noche"]  #megaPanel select,
+body[data-theme="pizarra"]#megaPanel select,
+body[data-theme="noche"]  #megaPanel textarea,
+body[data-theme="pizarra"]#megaPanel textarea,
+body[data-theme="noche"]  #regPanel *,
+body[data-theme="pizarra"]#regPanel *,
+body[data-theme="noche"]  #regv2-panel *,
+body[data-theme="pizarra"]#regv2-panel *{
+  color:#111 !important;
+}
+
+/* Si algún botón/etiqueta depende de texto blanco sobre fondo oscuro, sus reglas específicas ya lo definen.
+   Este bloque evita que el color heredado del tema (gris muy claro) haga ilegible el contenido sobre fondos blancos. */
+
+</style>
+<style>
+
+/* === Texto legible en temas "noche" y "pizarra" (sin !important) === */
+body[data-theme="noche"],
+body[data-theme="pizarra"]{
+  color:#111; /* texto oscuro por defecto; encabezados/btn con color propio seguirán mostrándose bien */
+}
+
+</style>
+<style>
+
+/* === Botones legibles en temas "noche" y "pizarra" === */
+body[data-theme="noche"]  .btn,
+body[data-theme="pizarra"] .btn,
+body[data-theme="noche"]  .tab-btn,
+body[data-theme="pizarra"] .tab-btn{
+  color:#fff; /* texto blanco en botones/ pestañas con fondo oscuro */
+}
+
+</style>
+<style>
+
+/* === Fix específico para "noche": texto blanco en botones sobre fondos oscuros === */
+body[data-theme="noche"] .btn,
+body[data-theme="noche"] .tab-btn,
+body[data-theme="noche"] #megaPanel .btn,
+body[data-theme="noche"] #regPanel .btn,
+body[data-theme="noche"] #regv2-panel .btn{
+  color:#fff !important;
+}
+
+</style>
+<style>
+
+/* === Noche: asegurar iconos/✕ de cerrar visibles en blanco === */
+body[data-theme="noche"] #rpFabClose,
+body[data-theme="noche"] #btnClosePanel,
+body[data-theme="noche"] #botChooserClose,
+body[data-theme="noche"] #rgClose,
+body[data-theme="noche"] #menu-robust-login-close-fix,
+body[data-theme="noche"] #regv2-close,
+body[data-theme="noche"] #verDevToastClose{
+  color:#fff !important;
+}
+
+</style>
+<style>
+
+/* === Noche: asegurar que "Cargar demo" (#regv2-demo) muestre texto blanco === */
+body[data-theme="noche"] #regv2-demo,
+body[data-theme="noche"] .regv2-btn{
+  color:#fff !important;
+}
+
+</style>
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -1865,7 +2011,12 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
     <img src="logo paypal.png" alt="PayPal"/>
   </a>
 </div>
-<button aria-controls="megaPanel" aria-expanded="false" class="btn" id="btnMegaMenu" type="button">Menú</button></span><div class="right-ctrls" id="rightControls"><button class="btn small" id="btnRestartBR" type="button">Reiniciar</button><button class="btn small" id="btnFSBR" type="button">Pantalla completa</button></div></div></div><script>
+<button aria-controls="megaPanel" aria-expanded="false" class="btn" id="btnMegaMenu" type="button">Menú</button></span><div class="right-ctrls" id="rightControls">
+  <!-- Toggle WakeLock: normal flex item, sin posición fija -->
+  <button id="wakeLockToggle" class="btn small aj-wakelock-toggle" type="button" aria-pressed="false" title="Evita que la pantalla se apague mientras el juego está activo">
+    Pantalla activa
+  </button>
+<button class="btn small" id="btnRestartBR" type="button">Reiniciar</button><button class="btn small" id="btnFSBR" type="button">Pantalla completa</button></div></div></div><script>
 // --- Audio FX setup ---
 (function(){
   function make(src){ try{ const a = new Audio(src); a.preload='auto'; a.volume = 0.85; return a; }catch(_){ return null; } }
@@ -8886,6 +9037,89 @@ function showToast(){
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
   else wire();
+})();
+</script>
+
+
+<script>
+/* === Mantener pantalla encendida (Screen Wake Lock) + Toggle === */
+(function(){
+  let wakeLock = null;
+  let userEnabled = false;
+
+  async function requestWakeLock(){
+    try{
+      if(!('wakeLock' in navigator)) return false;
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener?.('release', ()=>{
+        console.debug('[Ajetrez] WakeLock liberado');
+      });
+      console.debug('[Ajetrez] WakeLock activo');
+      return true;
+    }catch(e){
+      console.warn('[Ajetrez] WakeLock error:', e);
+      return false;
+    }
+  }
+  async function releaseWakeLock(){
+    try{ if(wakeLock){ await wakeLock.release(); } }catch(_){}
+    wakeLock = null;
+  }
+
+  document.addEventListener('visibilitychange', async () => {
+    if(document.visibilityState === 'visible' && userEnabled){
+      if(!wakeLock || wakeLock.released){ await requestWakeLock(); }
+    }
+  });
+
+  function updateToggleUI(btn){
+    if(!btn) return;
+    btn.setAttribute('aria-pressed', userEnabled ? 'true':'false');
+  }
+
+  async function setEnabled(nextEnabled, btn){
+    userEnabled = !!nextEnabled;
+    updateToggleUI(btn);
+    if(userEnabled){ await requestWakeLock(); }
+    else{ await releaseWakeLock(); }
+  }
+
+  function bindActiveTriggers(){
+    const startBtn  = document.getElementById('btnStartGame');
+    const replayBtn = document.getElementById('reg-replay-start');
+    const pauseBtn  = document.getElementById('pauseBtn');
+
+    const ask = (el)=> el && el.addEventListener('click', async ()=>{
+      if(userEnabled){ await requestWakeLock(); }
+    });
+    ask(startBtn);
+    ask(replayBtn);
+
+    if(pauseBtn){
+      pauseBtn.addEventListener('click', async ()=>{
+        if(!userEnabled){ await releaseWakeLock(); }
+      });
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.getElementById('wakeLockToggle');
+    if(btn){
+      btn.addEventListener('click', async ()=>{
+        await setEnabled(!userEnabled, btn);
+      });
+      updateToggleUI(btn);
+    }
+    bindActiveTriggers();
+    window.addEventListener('beforeunload', releaseWakeLock);
+  });
+
+  window.__AJetWake__ = {
+    enable: ()=>setEnabled(true, document.getElementById('wakeLockToggle')),
+    disable: ()=>setEnabled(false, document.getElementById('wakeLockToggle')),
+    request: requestWakeLock,
+    release: releaseWakeLock
+  };
 })();
 </script>
 
