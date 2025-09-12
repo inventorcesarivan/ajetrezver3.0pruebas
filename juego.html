@@ -9550,8 +9550,7 @@ function showToast(){
       tab.innerHTML = ''
         + '<h3>Registros de partidas</h3>'
         + '<p style="margin:8px 0 14px 0; line-height:1.4">'
-        + 'Desde esta sección podés abrir el panel de registros del juego.'
-        + '</p>'
+        + 'Desde esta sección podés abrir el panel de registros del juego y tener acceso a toda la información de las partidas.</p>'
         + '<button class="btn small" id="regv2-open-from-tab" type="button">Abrir panel de registros</button>';
       // Insert as the last tab content
       if(mpContent){ mpContent.appendChild(tab); } else { panel.appendChild(tab); }
@@ -9633,8 +9632,7 @@ function showToast(){
       v2tab.innerHTML = ''
         + '<h3>Registros de partidas</h3>'
         + '<p style="margin:8px 0 14px 0; line-height:1.4">'
-        + 'Desde esta sección podés abrir el panel de registros del juego y tener acceso a toda la información de las partidas y además podés reproducir las partidas y movimientos para analizarlos a gusto.'
-        + '</p>'
+        + 'Desde esta sección podés abrir el panel de registros del juego y tener acceso a toda la información de las partidas.</p>'
         + '<button class="btn small" id="regv2-open-from-tab" type="button">Abrir panel de registros</button>';
       contentHost.appendChild(v2tab);
     }
@@ -9875,7 +9873,7 @@ function showToast(){
   /* Sube el botón "Abrir panel de registros" ~4mm */
   #regv2-open-from-tab{
     position: relative !important;
-    top: -4mm !important;
+    top: -8mm !important;
   }
 </style>
 
