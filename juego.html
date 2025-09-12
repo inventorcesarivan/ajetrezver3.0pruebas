@@ -2150,6 +2150,24 @@ body[data-theme="noche"] .regv2-btn{
   }
 </style>
 
+
+<style id="aj-bottom-menu-center">
+  /* Centrar el botón Menú (horizontalmente) en la barra inferior */
+  #bottomBar { position: relative !important; }
+  #btnMegaMenu{
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: 6mm !important;        /* alineado con el resto de botones */
+    min-width: 0 !important;
+    z-index: 5 !important;
+  }
+  /* Espaciado limpio entre Pantalla activa y Reiniciar */
+  #rightControls #wakeLockToggle + #btnRestartBR{
+    margin-left: 8px !important;
+  }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -9752,6 +9770,28 @@ function showToast(){
     }catch(_){}
     // Pulso ocasional por si se nos escapa algún cambio de tamaño del canvas
     setInterval(fit, 1000);
+  });
+})();
+</script>
+
+
+<script id="aj-rightcontrols-order">
+(function(){
+  if(window.__AJ_RIGHTCONTROLS_ORDER__) return; window.__AJ_RIGHTCONTROLS_ORDER__=true;
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  ready(function(){
+    try{
+      var rc = document.getElementById('rightControls');
+      if(!rc) return;
+      var wake = rc.querySelector('#wakeLockToggle');
+      var restart = rc.querySelector('#btnRestartBR');
+      if(wake && restart){
+        // Colocar Reiniciar inmediatamente después de Pantalla activa
+        if(restart.previousElementSibling !== wake){
+          wake.insertAdjacentElement('afterend', restart);
+        }
+      }
+    }catch(e){ /* noop */ }
   });
 })();
 </script>
