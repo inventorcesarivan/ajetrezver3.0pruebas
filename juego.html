@@ -1958,6 +1958,198 @@ body[data-theme="noche"] .regv2-btn{
 }
 
 </style>
+
+<style id="aj-menu-restart-adjacency">
+  /* Place restart right next to Menu with a small gap */
+  #btnMegaMenu + #btnRestartBR {
+    margin-left: 8px !important;
+  }
+</style>
+
+
+<style id="aj-restart-left-4">
+  /* Desplaza el botón Reiniciar 4 casilleros a la izquierda */
+  #btnRestartBR {
+    position: relative !important;
+    left: calc(-4 * var(--square)) !important;
+  }
+</style>
+
+
+<style id="aj-menu-size-match-restart">
+  /* Hacer que el botón Menú tenga el mismo tamaño visual que Reiniciar (.btn.small) */
+  #btnMegaMenu {
+    min-width: 0 !important;
+    width: auto !important;
+  }
+  /* En algunos layouts se aplican paddings por id anteriores, reforzamos aquí */
+  #btnMegaMenu.btn.small {
+    padding: 5.4px 8.1px !important; /* igual que .btn.small (-10%) */
+    font-size: 90% !important;
+  }
+</style>
+
+
+<style id="aj-topright-separated-styles">
+  /* Alinear los 3 controles superiores (registro, pausa, reloj) como items individuales */
+  #regv2-clock-btn, #pauseBtn {
+    position: absolute !important;
+    top: calc(6px + 3mm) !important;      /* mismo Y que el reloj */
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: auto !important;
+    line-height: 1.1 !important;
+    border-radius: 14px !important;
+    padding: 6px 10px !important;
+    z-index: 12 !important;
+  }
+  /* Heredar estilo de botones pequeños */
+  #regv2-clock-btn.btn.small, #pauseBtn.btn.small {
+    font-size: 90% !important;
+  }
+  /* El reloj ya está a la derecha con right:10px */
+  #timeIndicator{
+    position: absolute !important;
+    right: 10px !important;
+    top: calc(6px + 3mm) !important;
+    z-index: 11 !important;
+  }
+  /* Quitar estilos que dependían del reloj como contenedor */
+  #timeIndicator #regv2-clock-btn,
+  #timeIndicator #pauseBtn{ all: unset; }
+</style>
+
+
+<style id="aj-menu-registro-tab-style">
+  /* Asegurar que el botón nuevo herede el look de las tabs */
+  #megaPanel .tabs .tab-btn#regv2-open-menu,
+  #menu-panel .tabs .tab-btn#regv2-open-menu{
+    display:inline-flex; align-items:center; gap:6px;
+    font-weight:800;
+  }
+  #regv2-open-menu .dot{
+    width:6px; height:6px; border-radius:50%; background:#4ade80;
+    box-shadow:0 0 6px rgba(74,222,128,.6);
+  }
+</style>
+
+
+<style id="regv2-head-actions-style">
+  #regv2-panel header{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  #regv2-title{ flex:1 1 auto; }
+  #regv2-panel .regv2-head-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  #regv2-panel .regv2-btn.small{ padding:6px 10px; border-radius:10px; font-weight:800; background:#111; color:#fff; border:2px solid #fff; }
+  #regv2-panel .regv2-btn.small:hover{ background:#000; }
+</style>
+
+
+<style id="aj-night-btn-contrast-fix">
+  /* Forzar contraste en temas oscuros: texto blanco en botones del panel de registros */
+  body[data-theme="noche"]  #regv2-panel .btn,
+  body[data-theme="noche"]  #regv2-panel .regv2-btn,
+  body[data-theme="noche"]  #regv2-panel button,
+  body[data-theme="noche"]  #regPanel   .btn,
+  body[data-theme="noche"]  #regPanel   button,
+  body[data-theme="noche"]  #regPanel   label.btn,
+  body[data-theme="pizarra"]#regv2-panel .btn,
+  body[data-theme="pizarra"]#regv2-panel .regv2-btn,
+  body[data-theme="pizarra"]#regv2-panel button,
+  body[data-theme="pizarra"]#regPanel   .btn,
+  body[data-theme="pizarra"]#regPanel   button,
+  body[data-theme="pizarra"]#regPanel   label.btn{
+    color: #fff !important;
+  }
+  /* Para selects dentro del header de acciones (si adoptan fondo oscuro) */
+  body[data-theme="noche"]  #regv2-panel .regv2-head-actions select,
+  body[data-theme="pizarra"]#regv2-panel .regv2-head-actions select{
+    color: #fff !important;
+  }
+</style>
+
+
+<style id="aj-registro-open-btn-style">
+  /* Estilo del botón dentro de la pestaña Registros (v2) */
+  #tab-registros-v2 #regv2-open-from-tab{
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    /* bajarlo un poco */
+    margin-top: calc(var(--square, 24px) * 0.8) !important;
+    /* look & feel rojo + texto blanco */
+    background: #111 !important;
+    color: #fff !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    padding: 10px 16px !important;
+    /* efecto de latido */
+    animation: regOpenPulse 1.5s ease-in-out infinite;
+    transform-origin: 50% 50%;
+  }
+  #tab-registros-v2 #regv2-open-from-tab:hover{
+    filter: brightness(1.05);
+  }
+  @keyframes regOpenPulse {
+    0%   { transform: scale(1);   box-shadow: 0 0 0 rgba(255,255,255,0.0); }
+    50%  { transform: scale(1.07); box-shadow: 0 0 14px rgba(255,255,255,0.45); }
+    100% { transform: scale(1);   box-shadow: 0 0 0 rgba(255,255,255,0.0); }
+  }
+</style>
+
+<style id="aj-regv2-play-pulse-slow">
+  /* Hacer más lento el latido del botón "Reproducir en tablero" en el panel de registros */
+  #regv2-play,
+  #rpPlay,
+  #rp2-play,
+  #replayPanel #rpPlay,
+  #regv2-panel #regv2-play{
+    animation-duration: 2.4s !important; /* antes ~1.5s, ahora más lento */
+    animation-timing-function: ease-in-out !important;
+  }
+</style>
+
+<style id="aj-fit-bars-css">
+  /* Ajusta ancho de barras para que coincidan con el ancho del tablero visible */
+  #topBar.bar, #bottomBar.bar{
+    width: var(--bars-width, auto) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  /* Asegura que los controles de la derecha no se salgan por overflow al reducir el ancho */
+  #rightControls{
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+  }
+  #rightControls .btn{ white-space: nowrap; }
+</style>
+
+
+<style id="aj-right-controls-shift-4mm">
+  /* Desplazar 4mm hacia la izquierda los controles derechos (abajo y arriba) */
+  #bottomBar #rightControls{
+    position: relative !important;
+    transform: translateX(-4mm);
+  }
+  /* Top-right: reloj, pausa y botón de registros */
+  #topBar #timeIndicator, #topBar #pauseBtn{ transform: translateX(-4mm); }
+</style>
+
+
+<style id="aj-top-shift-pause-clock-4mm">
+  /* Solo reloj y pausa: 4mm a la izquierda */
+  #topBar #timeIndicator,
+  #topBar #pauseBtn{
+    transform: translateX(-4mm) !important;
+  }
+  /* Asegurar que el botón "Registros" no se desplace */
+  #topBar #regv2-clock-btn{
+    transform: none !important;
+  }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -3231,13 +3423,13 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   if(btnFSBR){
     btnFSBR.addEventListener('click', async ()=>{
       try{
-        if(!document.fullscreenElement){ await fsRoot.requestFullscreen(); btnFSBR.textContent='Salir de pantalla completa'; }
+        if(!document.fullscreenElement){ await fsRoot.requestFullscreen(); btnFSBR.textContent='salir'; }
         else { await document.exitFullscreen(); btnFSBR.textContent='Pantalla completa'; }
       }catch(e){ console.error(e); }
     });
     document.addEventListener('fullscreenchange', ()=>{
       if(!btnFSBR) return;
-      btnFSBR.textContent = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla completa';
+      btnFSBR.textContent = document.fullscreenElement ? 'salir' : 'Pantalla completa';
     });
   }
 })();
@@ -7552,7 +7744,14 @@ div[style="height:var(--toolbar-gap)"]{
 <button id="regv2-open" type="button">Registro de partidas</button>
 <div id="regv2-overlay" aria-hidden="true">
   <div id="regv2-panel" role="dialog" aria-modal="true" aria-labelledby="regv2-title">
-    <header><div id="regv2-title">Registro de partidas</div><button id="regv2-close" type="button">✕</button></header>
+    <header><div id="regv2-title">Registro de partidas</div>
+    <div class="regv2-head-actions">
+      <button class="regv2-btn small" id="regv2-import" type="button">Importar JSON</button>
+      <button class="regv2-btn small" id="regv2-export" type="button">Exportar JSON</button>
+      <button class="regv2-btn small" id="regv2-exit" type="button">Cerrar</button>
+      <input type="file" id="regv2-file" accept=".json,application/json" style="display:none">
+    </div>
+    <button id="regv2-close" type="button">✕</button></header>
     <div id="regv2-body">
       <div class="regv2-row">
         <button class="regv2-btn" id="regv2-demo" type="button">Cargar demo</button>
@@ -9124,26 +9323,438 @@ function showToast(){
 </script>
 
 
-<style id="aj-menu-center-final">
-/* === Corrección definitiva: centrar Menú sin anclajes === */
-#bottomBar{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:flex-start !important; /* en vez de space-between */
-  gap:10px !important;
-}
-#btnMegaMenu{
-  position: static !important;
-  left: auto !important;
-  right: auto !important;
-  top: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  margin-left: auto !important;
-  margin-right: auto !important; /* centra entre izquierda y derecha */
-}
-#rightControls{ margin-left: 0 !important; }
-</style>
+<script id="aj-move-restart-next-to-menu">
+(function(){
+  function moveRestart() {
+    try {
+      var menu = document.getElementById('btnMegaMenu');
+      var restart = document.getElementById('btnRestartBR');
+      if (!menu || !restart) return;
+      if (restart.previousElementSibling === menu) return; // already placed
+      // Insert Restart immediately after Menu
+      menu.insertAdjacentElement('afterend', restart);
+    } catch(e){ console.warn('moveRestart error', e); }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', moveRestart);
+  } else {
+    moveRestart();
+  }
+})();
+</script>
+
+
+<script id="aj-apply-small-to-menu">
+(function(){
+  function applySmall(){
+    var btn = document.getElementById('btnMegaMenu');
+    if(!btn) return;
+    // Añadir la clase 'small' para heredar estilo de .btn.small
+    if(!btn.classList.contains('small')) btn.classList.add('small');
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', applySmall);
+  } else {
+    applySmall();
+  }
+})();
+</script>
+
+
+<script id="aj-topright-separated-js">
+(function(){
+  if(window.__AJ_TOPRIGHT_SEPARATED__) return; window.__AJ_TOPRIGHT_SEPARATED__=true;
+
+  function $(s,r){ return (r||document).querySelector(s); }
+
+  function moveIfNeeded(){
+    var topBar = $('#topBar');
+    var clock = $('#timeIndicator');
+    var reg = $('#regv2-clock-btn');
+    var pause = $('#pauseBtn');
+    if(!topBar || !clock) return false;
+
+    var moved = false;
+    if(reg && reg.parentElement !== topBar){
+      // Asegurar clase de botón pequeño
+      reg.classList.add('btn','small');
+      topBar.appendChild(reg);
+      moved = true;
+    }
+    if(pause && pause.parentElement !== topBar){
+      pause.classList.add('btn','small');
+      topBar.appendChild(pause);
+      moved = true;
+    }
+    if(moved) layout();
+    return !!(reg && pause);
+  }
+
+  function layout(){
+    try{
+      var clock = $('#timeIndicator');
+      var reg = $('#regv2-clock-btn');
+      var pause = $('#pauseBtn');
+      if(!clock) return;
+      // El reloj queda pegado a la derecha (CSS)
+      var rightBase = 10; // coincide con #timeIndicator right
+      var nextRight = rightBase + (clock.offsetWidth || 0) + 8;
+      if(pause){
+        pause.style.right = nextRight + 'px';
+        nextRight += (pause.offsetWidth || 0) + 8;
+      }
+      if(reg){
+        reg.style.right = nextRight + 'px';
+      }
+    }catch(e){ /* noop */ }
+  }
+
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  ready(function(){
+    // Intentar mover de entrada
+    moveIfNeeded();
+    // Reintentos, ya que reloj/pausa/registro se insertan dinámicamente
+    var tries = 0, t = setInterval(function(){
+      tries++;
+      if(moveIfNeeded() || tries > 40){ clearInterval(t); }
+    }, 250);
+    // Recalcular en resize y de vez en cuando por variaciones del texto del reloj
+    window.addEventListener('resize', layout);
+    setInterval(layout, 1000);
+  });
+})();
+</script>
+
+
+<script id="aj-menu-registro-tab-js">
+(function(){
+  if(window.__AJ_MENU_REG_TAB__) return; window.__AJ_MENU_REG_TAB__=true;
+
+  function $(s,r){ return (r||document).querySelector(s); }
+  function all(s,r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  function addBtn(){
+    var containers = all('#megaPanel .tabs, #menu-panel .tabs');
+    if(!containers.length) return false;
+    // Evitar duplicado
+    if(document.getElementById('regv2-open-menu')) return true;
+
+    // Crear botón estilo tab
+    var btn = document.createElement('button');
+    btn.id = 'regv2-open-menu';
+    btn.type = 'button';
+    btn.className = 'tab-btn'; // hereda estilo de tabs
+    btn.innerHTML = '<span class="dot" aria-hidden="true"></span> Registro de partidas';
+
+    btn.addEventListener('click', function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      try{
+        var overlay = document.getElementById('regv2-overlay');
+        if(overlay){ overlay.style.display = 'flex'; }
+        var mp = document.getElementById('megaPanel') || document.getElementById('menu-panel');
+        if(mp){ mp.style.display = 'none'; }
+        // Si el botón Menú usa aria-expanded, actualizarlo
+        var menuBtn = document.getElementById('btnMegaMenu');
+        if(menuBtn){ menuBtn.setAttribute('aria-expanded','false'); }
+      }catch(e){ console.warn('Open registro from menu failed', e); }
+    });
+
+    // Insertarlo al final de la fila de tabs (queda después de "Reglas del juego")
+    containers[0].appendChild(btn);
+    return true;
+  }
+
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  ready(function(){
+    if(addBtn()) return;
+    // Esperar a que el menú esté en el DOM
+    var tries = 0, t = setInterval(function(){
+      tries++;
+      if(addBtn() || tries > 40){ clearInterval(t); }
+    }, 250);
+  });
+})();
+</script>
+
+
+<script id="aj-menu-registros-tab-real">
+(function(){
+  if(window.__AJ_MENU_REG_TAB_REAL__) return; window.__AJ_MENU_REG_TAB_REAL__=true;
+  function $(s,r){ return (r||document).querySelector(s); }
+  function all(s,r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  function ensureTabContent(){
+    // Remove old CSS that hid the 'Registros' tab, if present
+    var hideStyle = document.getElementById('aj-hide-registros-in-menu-2025-09-11');
+    if(hideStyle && hideStyle.parentNode){ hideStyle.parentNode.removeChild(hideStyle); }
+
+    // Remove the temporary "Registro de partidas" button we added earlier (if still present)
+    var tempBtn = document.getElementById('regv2-open-menu');
+    if(tempBtn && tempBtn.parentNode){ tempBtn.parentNode.removeChild(tempBtn); }
+
+    var panel = $('#megaPanel') || $('#menu-panel');
+    if(!panel) return false;
+
+    var mpTabs = panel.querySelector('.mp-tabs');
+    var mpContent = panel.querySelector('.mp-content') || panel;
+    // Ensure the tab button exists; if not, create it next to "Reglas del juego"
+    var btn = panel.querySelector('.tab-btn#btnRegistrosTab, .tab-btn[data-tab="tab-registros"]');
+    if(!btn && mpTabs){
+      btn = document.createElement('button');
+      btn.className = 'tab-btn';
+      btn.id = 'btnRegistrosTab';
+      btn.setAttribute('data-tab','tab-registros');
+      btn.textContent = 'Registros';
+      mpTabs.appendChild(btn);
+    }
+
+    // Create the tab content if missing
+    var tab = panel.querySelector('#tab-registros');
+    if(!tab){
+      tab = document.createElement('div');
+      tab.className = 'tab';
+      tab.id = 'tab-registros';
+      tab.style.display = 'none';
+      tab.innerHTML = ''
+        + '<h3>Registros de partidas</h3>'
+        + '<p style="margin:8px 0 14px 0; line-height:1.4">'
+        + 'Desde esta sección podés abrir el panel de registros del juego y tener acceso a toda la información de las partidas y además podés reproducir las partidas y movimientos para analizarlos a gusto.'
+        + '</p>'
+        + '<button class="btn small" id="regv2-open-from-tab" type="button">Abrir panel de registros</button>';
+      // Insert as the last tab content
+      if(mpContent){ mpContent.appendChild(tab); } else { panel.appendChild(tab); }
+    }
+
+    // Wire the "Abrir panel de registros" button
+    var openBtn = tab.querySelector('#regv2-open-from-tab');
+    if(openBtn && !openBtn.__wired){
+      openBtn.__wired = true;
+      openBtn.addEventListener('click', function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        try{
+          var overlay = document.getElementById('regv2-overlay');
+          if(overlay){ overlay.style.display = 'flex'; }
+          // Close menu panel if open
+          var mp = $('#megaPanel') || $('#menu-panel');
+          if(mp){ mp.style.display = 'none'; }
+          var menuBtn = document.getElementById('btnMegaMenu');
+          if(menuBtn){ menuBtn.setAttribute('aria-expanded','false'); }
+        }catch(e){ console.warn('Error opening reg overlay:', e); }
+      });
+    }
+    return true;
+  }
+
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  ready(function(){
+    if(ensureTabContent()) return;
+    var tries = 0, t = setInterval(function(){
+      tries++;
+      if(ensureTabContent() || tries > 40){ clearInterval(t); }
+    }, 250);
+  });
+})();
+</script>
+
+
+<script id="aj-menu-registros-tab-v2-patch">
+(function(){
+  if(window.__AJ_MENU_REG_TAB_V2__) return; window.__AJ_MENU_REG_TAB_V2__=true;
+  function $(s,r){ return (r||document).querySelector(s); }
+  function all(s,r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  // 1) Ocultar/deshabilitar la pestaña antigua que dispara el overlay automáticamente
+  var oldBtn = document.getElementById('btnRegistrosTab');
+  if(oldBtn){ oldBtn.style.display = 'none'; oldBtn.id = 'btnRegistrosTab__disabled'; }
+  var oldTab = document.getElementById('tab-registros');
+  if(oldTab){ oldTab.style.display='none'; oldTab.id = 'tab-registros__disabled'; }
+
+  // 2) Crear/asegurar la pestaña nueva (v2) que NO dispara overlay al clickear la tab
+  function ensureV2(){
+    var panel = $('#megaPanel') || $('#menu-panel');
+    if(!panel) return false;
+    var tabsBar = panel.querySelector('.mp-tabs');
+    var contentHost = panel.querySelector('.mp-content') || panel;
+
+    // Botón de tab v2
+    var v2btn = panel.querySelector('.tab-btn#btnRegistrosTabV2, .tab-btn[data-tab="tab-registros-v2"]');
+    if(!v2btn && tabsBar){
+      v2btn = document.createElement('button');
+      v2btn.className = 'tab-btn';
+      v2btn.id = 'btnRegistrosTabV2';
+      v2btn.setAttribute('data-tab','tab-registros-v2');
+      v2btn.textContent = 'Registros';
+      tabsBar.appendChild(v2btn);
+    }
+
+    // Contenido de tab v2
+    var v2tab = panel.querySelector('#tab-registros-v2');
+    if(!v2tab){
+      v2tab = document.createElement('div');
+      v2tab.className = 'tab';
+      v2tab.id = 'tab-registros-v2';
+      v2tab.style.display = 'none';
+      v2tab.innerHTML = ''
+        + '<h3>Registros de partidas</h3>'
+        + '<p style="margin:8px 0 14px 0; line-height:1.4">'
+        + 'Desde esta sección podés abrir el panel de registros del juego y tener acceso a toda la información de las partidas y además podés reproducir las partidas y movimientos para analizarlos a gusto.'
+        + '</p>'
+        + '<button class="btn small" id="regv2-open-from-tab" type="button">Abrir panel de registros</button>';
+      contentHost.appendChild(v2tab);
+    }
+
+    // Botón interno que abre el overlay
+    var openBtn = v2tab.querySelector('#regv2-open-from-tab');
+    if(openBtn && !openBtn.__wired){
+      openBtn.__wired = true;
+      openBtn.addEventListener('click', function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        var overlay = $('#regv2-overlay');
+        if(overlay){ overlay.style.display = 'flex'; }
+        var mp = $('#megaPanel') || $('#menu-panel');
+        if(mp){ mp.style.display = 'none'; }
+        var menuBtn = $('#btnMegaMenu');
+        if(menuBtn){ menuBtn.setAttribute('aria-expanded','false'); }
+      });
+    }
+
+    return true;
+  }
+
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  ready(function(){
+    if(ensureV2()) return;
+    var tries=0, t=setInterval(function(){
+      tries++;
+      if(ensureV2() || tries>40){ clearInterval(t); }
+    },250);
+  });
+})();
+</script>
+
+
+<script id="regv2-head-actions-js">
+(function(){
+  if(window.__REGV2_HEAD_ACTIONS__) return; window.__REGV2_HEAD_ACTIONS__=true;
+  function $(s,r){ return (r||document).querySelector(s); }
+  function all(s,r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  function exportJSON(){
+    try{
+      if(typeof loadAll!=='function'){ alert('Exportación no disponible.'); return; }
+      var data = loadAll() || [];
+      var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ajetrez_registros.json';
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+    }catch(e){ console.error(e); alert('No se pudo exportar.'); }
+  }
+
+  function dedupById(arr){
+    var seen = new Set();
+    var out = [];
+    (arr||[]).forEach(function(g){
+      var id = (g && g.id) || ('G'+Math.random().toString(36).slice(2));
+      if(!seen.has(id)){ seen.add(id); out.push(Object.assign({id:id}, g)); }
+    });
+    return out;
+  }
+
+  function importJSONFile(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var txt = String(reader.result||'').trim();
+        var data = JSON.parse(txt);
+        var arr = Array.isArray(data) ? data : (Array.isArray(data.games) ? data.games : []);
+        if(!arr.length){ alert('El archivo no contiene partidas en formato válido.'); return; }
+        if(typeof loadAll!=='function' || typeof saveAll!=='function'){ alert('Importación no disponible.'); return; }
+        var existing = loadAll() || [];
+        var merged = dedupById(existing.concat(arr));
+        saveAll(merged);
+        try{ if(typeof refreshList==='function') refreshList(); }catch(_){}
+        alert('Importadas ' + (merged.length - existing.length) + ' partidas.');
+      }catch(e){ console.error(e); alert('No se pudo importar el JSON.'); }
+    };
+    reader.readAsText(file);
+  }
+
+  function wire(){
+    var imp = $('#regv2-import');
+    var exp = $('#regv2-export');
+    var exi = $('#regv2-exit');
+    var file = $('#regv2-file');
+    var closeX = $('#regv2-close');
+    if(exp && !exp.__wired){ exp.__wired=true; exp.addEventListener('click', exportJSON); }
+    if(imp && !imp.__wired){ 
+      imp.__wired=true; 
+      imp.addEventListener('click', function(){ file && file.click(); });
+    }
+    if(file && !file.__wired){
+      file.__wired = true;
+      file.addEventListener('change', function(){
+        if(file.files && file.files[0]) importJSONFile(file.files[0]);
+        file.value='';
+      });
+    }
+    if(exi && !exi.__wired){
+      exi.__wired=true;
+      exi.addEventListener('click', function(){
+        try{ if(closeX) closeX.click(); else { var ov=$('#regv2-overlay'); if(ov) ov.style.display='none'; } }catch(_){}
+      });
+    }
+  }
+
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  ready(function(){ wire(); });
+})();
+</script>
+
+
+<script id="aj-fit-bars-js">
+(function(){
+  if(window.__AJ_FIT_BARS__) return; window.__AJ_FIT_BARS__=true;
+  function $(s,r){ return (r||document).querySelector(s); }
+  function fit(){
+    try{
+      var wrap = $('#boardWrap');
+      if(!wrap) return;
+      var rect = wrap.getBoundingClientRect();
+      // px exacto del ancho del tablero visible
+      var w = Math.max(0, Math.round(rect.width));
+      document.documentElement.style.setProperty('--bars-width', w+'px');
+    }catch(e){}
+  }
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  ready(function(){
+    fit();
+    // Recalcular en eventos relevantes
+    window.addEventListener('resize', fit);
+    document.addEventListener('fullscreenchange', fit);
+    // Observa cambios que afecten el layout del tablero
+    try{
+      var mo = new MutationObserver(function(){ fit(); });
+      mo.observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
+    }catch(_){}
+    // Pulso ocasional por si se nos escapa algún cambio de tamaño del canvas
+    setInterval(fit, 1000);
+  });
+})();
+</script>
 
 </body>
 <!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
