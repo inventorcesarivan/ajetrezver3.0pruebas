@@ -2221,12 +2221,7 @@ body[data-theme="noche"] .regv2-btn{
     <img src="logo paypal.png" alt="PayPal"/>
   </a>
 </div>
-<button aria-controls="megaPanel" aria-expanded="false" class="btn" id="btnMegaMenu" type="button">Menú</button></span><div class="right-ctrls" id="rightControls">
-  <!-- Toggle WakeLock: normal flex item, sin posición fija -->
-  <button id="wakeLockToggle" class="btn small aj-wakelock-toggle" type="button" aria-pressed="false" title="Evita que la pantalla se apague mientras el juego está activo">
-    Pantalla activa
-  </button>
-<button class="btn small" id="btnRestartBR" type="button">Reiniciar</button><button class="btn small" id="btnFSBR" type="button">Pantalla completa</button></div></div></div><script>
+<button aria-controls="megaPanel" aria-expanded="false" class="btn" id="btnMegaMenu" type="button">Menú</button></span><div class="right-ctrls" id="rightControls"><button class="btn small" id="btnRestartBR" type="button">Reiniciar</button><button class="btn small" id="btnFSBR" type="button">Pantalla completa</button></div></div></div><script>
 // --- Audio FX setup ---
 (function(){
   function make(src){ try{ const a = new Audio(src); a.preload='auto'; a.volume = 0.85; return a; }catch(_){ return null; } }
@@ -9262,7 +9257,7 @@ function showToast(){
 /* === Mantener pantalla encendida (Screen Wake Lock) + Toggle === */
 (function(){
   let wakeLock = null;
-  let userEnabled = false;
+  let userEnabled = true;
 
   async function requestWakeLock(){
     try{
