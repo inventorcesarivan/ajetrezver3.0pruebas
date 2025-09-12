@@ -114,8 +114,7 @@
     position:absolute;
     left: calc(var(--square) * 6);
     top: calc(var(--square) * -1);
-    width: calc(var(--square) * 12);
-    height: calc(var(--square) * 10);
+    width: calc(var(--square) * 12)
     background:#fff; border-radius: 16px;
     box-shadow: 0 12px 32px rgba(0,0,0,.25);
     display:none; flex-direction:column; overflow:hidden;
@@ -944,33 +943,28 @@ body, html{overflow:visible!important;}
 </style><!-- LEGACY AUDIO CSS REMOVED --><style id="aj-megaPanel-scale-95">
   /* Achicar el panel de menú un 5% (general: web + móvil) */
   #megaPanel{
-    transform: scale(0.95) !important;
     transform-origin: top left !important;
   }
 </style><style id="aj-megaPanel-scale-90">
   /* Achicar el panel de menú un 5% adicional (total ~10%) */
   #megaPanel{
-    transform: scale(0.90) !important;
     transform-origin: top left !important;
   }
 </style><style id="aj-megaPanel-shift">
   /* Desplazar un poco a la derecha y hacia abajo, manteniendo scale(0.90) */
   #megaPanel{
-    transform: translate(6mm, 3mm) scale(0.90) !important;
     transform-origin: top left !important;
   }
 </style><style id="aj-megaPanel-shift-half-square">
   /* Desplazar medio casillero a la derecha (+ mantener 3mm abajo) */
   #megaPanel{
-    transform: translate(calc(var(--square) * 0.5), 3mm) scale(0.90) !important;
     transform-origin: top left !important;
   }
 </style><style id="aj-megaPanel-centered-to-board">
   /* Centrado perfecto entre derecha e izquierda respecto al tablero */
   #megaPanel{
     left: calc( (var(--square) * (var(--board-cols) - var(--panel-w)) ) / 2 ) !important;
-    right: auto !important;
-    transform: translateY(calc(var(--square) * 0.5)) scale(0.90) !important; /* mantenemos el descenso leve */
+    right: auto !important /* mantenemos el descenso leve */
     transform-origin: top center !important;          /* escala alrededor del centro horizontal */
   }
 </style><style id="aj-registro-minus-1_5-square">
@@ -2184,7 +2178,6 @@ body[data-theme="noche"] .regv2-btn{
 <style id="aj-megaPanel-height-plus4mm">
   /* Aumentar altura del panel completo de menú ~4mm (aprox) */
   #megaPanel{
-    height: calc((var(--square) * 10) + 4mm) !important;
   }
 </style>
 
@@ -4145,8 +4138,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
 </style><style id="panelMinus10">
 /* Reducir tamaño total del panel (ancho y alto) un 10% */
 #megaPanel{
-  width: calc(var(--square) * 10.8) !important;  /* 12 -> 10.8 */
-  height: calc(var(--square) * 9) !important;    /* 10 -> 9 */
+  width: calc(var(--square) * 10.8) !important;  /* 12 -> 10.8 */    /* 10 -> 9 */
 }
 </style><style id="loginTighten">
 /* Subir login 1 casillero y compactar espaciados */
@@ -4265,7 +4257,6 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
 /* Altura del panel +~5% y ajuste simétrico (sube y baja por igual) */
 :root{ --panel-h: 9.45; } /* antes 9 */
 #megaPanel{
-  height: calc(var(--square) * var(--panel-h)) !important;
   top: calc(var(--square) * -1.225) !important; /* -1 - (0.45/2) */
 }
 </style><style id="panelTopTighten">
@@ -9856,6 +9847,38 @@ function showToast(){
 })();
 </script>
 
+
+<!-- Canonical override: tamaño del panel del menú unificado (+4mm hacia ARRIBA) -->
+<style id="aj-megaPanel-canonical-2025-09-12">
+  #megaPanel {
+    height: calc(var(--square) * 8 + 4mm) !important;
+    transform: translateY(calc(var(--square) * 1 - 4mm)) scale(1) !important;
+    transform-origin: top center !important;
+  }
+</style>
+
+
+<style id="aj-megapanel-bg-white-fix-2025-09-12">
+  /* Evita transparencias en el cuerpo del panel del menú */
+  #megaPanel { background: #fff !important; }
+  #megaPanel .mp-content { background: #fff !important; }
+  /* Si existiera algún overlay translúcido dentro del panel, lo neutralizamos */
+  #megaPanel [class*="overlay"],
+  #megaPanel .glass,
+  #megaPanel .backdrop {
+    background: transparent !important;
+  }
+</style>
+
+
+<style id="aj-regv2-open-from-tab-up4mm-2025-09-12">
+  /* Sube el botón "Abrir panel de registros" ~4mm */
+  #regv2-open-from-tab{
+    position: relative !important;
+    top: -4mm !important;
+  }
+</style>
+
 </body>
 <!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
 <style id="aj-replay-glass-css">
@@ -10209,7 +10232,6 @@ function showToast(){
 <!-- AJETREZ: Drop megaPanel an additional 2mm and allow Menu button to be movable -->
 <style id="aj-drop-panel-2mm-more">
   #megaPanel{
-    transform: translateY(calc(var(--square) * 0.5 + 2mm)) scale(0.90) !important;
     transform-origin: top center !important;
   }
   /* Remove any forced centering on the Menu button so it can be shifted horizontally */
@@ -10352,11 +10374,9 @@ function showToast(){
   /* Altura objetivo: 8 × --square */
   :root{ --panel-h: 8; }
   #megaPanel{
-    height: calc(var(--square) * var(--panel-h)) !important;
     /* Alineación vertical coherente con el tablero (ajuste suave) */
     top: calc(var(--square) * -1) !important;
     /* Sin escalado para que el alto visual sea exactamente 8 casilleros */
-    transform: translateY(calc(var(--square) * 0.5)) scale(1) !important;
     transform-origin: top center !important;
   }
 </style>
@@ -10365,7 +10385,6 @@ function showToast(){
 <!-- AJETREZ: Bajar panel de menú 0.5 casillero más -->
 <style id="aj-panel-down-half-square-more">
   #megaPanel{
-    transform: translateY(calc(var(--square) * 1)) scale(1) !important;
     transform-origin: top center !important;
   }
 </style>
