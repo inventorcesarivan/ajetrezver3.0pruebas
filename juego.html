@@ -2168,27 +2168,6 @@ body[data-theme="noche"] .regv2-btn{
   }
 </style>
 
-
-<style id="aj-donatebox-tighten-5pct">
-  /* Achicar un 5% los botones de donación y reducir separaciones (incluye "Colabora") */
-  #donateBox{
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;              /* menor distancia entre todos los elementos */
-  }
-  #donateBox .label{
-    margin: 0 !important;             /* sin márgenes extra */
-  }
-  #donateBox .btn.imgbtn{
-    margin: 0 !important;             /* compactar */
-  }
-  #donateBox .btn.imgbtn img{
-    transform: scale(0.95);           /* -5% tamaño visual */
-    transform-origin: center center;
-    display: block;
-  }
-</style>
-
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -9813,6 +9792,51 @@ function showToast(){
         }
       }
     }catch(e){ /* noop */ }
+  });
+})();
+</script>
+
+
+<script id="aj-restart-shift-compose">
+(function(){
+  if(window.__AJ_RESTART_SHIFT_COMPOSE__) return; window.__AJ_RESTART_SHIFT_COMPOSE__=true;
+  function $(s,r){ return (r||document).querySelector(s); }
+  function px(n){ try{ return (typeof n==='number')? n : parseFloat(n)||0; }catch(_){ return 0; } }
+
+  function shiftRestart(){
+    var el = $('#rightControls #btnRestartBR');
+    if(!el) return;
+    var cs = getComputedStyle(el);
+    var tr = cs.transform;
+    // Detect translateY from the common 'matrix(...)' or 'matrix3d(...)'
+    var ty = 0;
+    try{
+      if(tr && tr !== 'none'){
+        var parts = tr.startsWith('matrix3d') ? tr.slice(9,-1).split(',') : tr.slice(7,-1).split(',');
+        if(parts.length >= 6){
+          // matrix(a,b,c,d, tx, ty)
+          ty = parseFloat(parts[5]) || 0;
+        }else if(parts.length >= 16){
+          // matrix3d(..., tx, ty, tz)
+          ty = parseFloat(parts[13]) || 0;
+        }
+      }
+    }catch(_){ ty = 0; }
+    // Target X shift = 2 * square (fallback 24px)
+    var sq = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--square')) || 24;
+    var tx = 2 * sq;
+    // Compose new transform with both X and existing Y
+    el.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+  }
+
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  ready(function(){
+    shiftRestart();
+    window.addEventListener('resize', shiftRestart);
+    document.addEventListener('fullscreenchange', shiftRestart);
+    // Reapply after we re-order rightControls (if any script does)
+    setTimeout(shiftRestart, 200);
+    setTimeout(shiftRestart, 600);
   });
 })();
 </script>
