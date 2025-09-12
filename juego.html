@@ -1812,6 +1812,31 @@ textarea[placeholder*="UCI"], textarea[placeholder*="uci"]{ height: 160px !impor
 #verDevToast .btn.pp{ border-color:#253b80; }
 </style>
 
+
+<style id="temp-game-outline">
+  /* CONTORNO TEMPORAL DEL ÁREA TOTAL DEL JUEGO */
+  #fsRoot{ position: relative !important; }
+  #fsRoot::after{
+    content:"";
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    border: 3px solid red;
+    pointer-events: none;
+    z-index: 2147483600; /* por encima de todo, sin bloquear clics */
+    border-radius: 10px; /* coincide con esquinas del contenedor si las hubiera */
+  }
+</style>
+
+
+<style id="fit-height-optionA">
+  /* === Option A: el frame abraza el contenido (alto = gris) === */
+  .frame#fsRoot{ padding-top:0 !important; padding-bottom:0 !important; }
+  #fsRoot{ padding-top:0 !important; padding-bottom:0 !important; }
+  #topBar{ margin-top:0 !important; }
+  #bottomBar{ margin-bottom:0 !important; }
+  :root{ --toolbar-gap: 0px !important; }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -3199,7 +3224,7 @@ window.AJ_RULES.legalShift = function(row, target, boardRef, offsRef){
   const selVersion = document.getElementById('selVersion');
   const verActual  = document.getElementById('verActual');
   selVersion.addEventListener('change', ()=>{
-    const map = { '3_0': '3.0 (En desarrollo)' };
+    const map = { '2_5': '2.5 (Estable)', '3_0': '3.0 (En desarrollo)' };
     verActual.textContent = map[selVersion.value] || selVersion.value;
   });
 
@@ -8800,74 +8825,92 @@ catch(_){}
 </script>
 
 
-<div id="verDevToast" style="position:fixed;left:50%;top:22%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:16px 18px;border-radius:14px;z-index:2147483647;box-shadow:0 10px 30px rgba(0,0,0,.28);max-width:min(92vw,780px);font-weight:600;line-height:1.35;display:none;text-align:center">Versión en desarrollo. Muy pronto estará disponible.<br>Por favor apoya el proyecto, para que esta mejora y otras más estén disponibles cuanto antes y que podamos seguir mejorando todos los aspectos del juego. Muchas gracias.<div class="toast-donate" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px"><a class="btn mp" href="https://link.mercadopago.com.ar/ajetrez" target="_blank" rel="noopener">Mercado Pago</a><a class="btn pp" href="https://www.paypal.com/ncp/payment/PTRWET3UWGEY8" target="_blank" rel="noopener">PayPal</a></div></div>
+<div id="verDevToast" style="position:fixed;left:50%;top:22%;transform:translateX(-50%);
+  background:rgba(0,0,0,.85);color:#fff;padding:16px 18px;border-radius:14px;
+  z-index:2147483647;box-shadow:0 10px 30px rgba(0,0,0,.28);max-width:min(92vw,780px);
+  font-weight:600;line-height:1.35;display:none;text-align:center">
+  <button id="verDevToastClose" aria-label="Cerrar" style="position:absolute;top:8px;right:10px;background:transparent;border:none;
+  color:#fff;font-weight:800;font-size:18px;cursor:pointer;line-height:1">✕</button>Versión en desarrollo. Muy pronto estará disponible.<br>Por favor apoya el proyecto, para que podamos seguir mejorando todos los aspectos del juego. Muchas gracias.<div class="toast-donate" style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px">
+    <a class="btn mp" href="https://link.mercadopago.com.ar/ajetrez" target="_blank" rel="noopener">Mercado Pago</a>
+    <a class="btn pp" href="https://www.paypal.com/ncp/payment/PTRWET3UWGEY8" target="_blank" rel="noopener">PayPal</a>
+  </div>
+</div>
 
 
 <script>
-(function(){
-  function showToast(){
-    var el = document.getElementById('verDevToast');
-    if(!el) return;
-    el.style.display = 'block';
+function showToast(){
+  var el = document.getElementById('verDevToast');
+  if(!el) return;
+  clearTimeout(window.__verDevToastTimer);
+  el.style.display = 'block';
+  el.style.opacity = '0';
+  el.style.transition = 'opacity .45s ease, transform .45s ease';
+  el.style.transform = 'translateX(-50%) translateY(10px)';
+  requestAnimationFrame(function(){
+    el.style.opacity = '1';
+    el.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  window.__verDevToastTimer = setTimeout(function(){
     el.style.opacity = '0';
-    el.style.transition = 'opacity .2s ease, transform .2s ease';
-    requestAnimationFrame(function(){
-      el.style.opacity = '1';
-      el.style.transform = 'translateX(-50%) translateY(0)';
-    });
-    setTimeout(function(){ el.style.opacity='0'; setTimeout(function(){ el.style.display='none'; }, 250); }, 8200);
-  }
-  var sel = document.getElementById('selVersion');
-  if(sel){
-    sel.addEventListener('change', function(ev){
-      var v = sel.value;
-      if(v === '3_0_amenaza' || v === '3_0_guerra'){
-        // revert to previous (keep the currently shown version)
-        var prev = sel.getAttribute('data-prev') || '3_0_simple';
-        sel.value = prev;
-        showToast();
-        return;
-      }else{
-        sel.setAttribute('data-prev', v);
-      }
-      // actualizar etiqueta visible, si corresponde
-      try{
-        var verActual = document.getElementById('verActual');
-        if(verActual){
-          var map = {
-            '3_0_simple':'3.0 (modo simple)',
-            '3_0_amenaza':'3.0 (modo amenaza)',
-            '3_0_guerra':'3.0 (modo guerra)'
-          };
-          verActual.textContent = map[v] || v;
-        }
-      }catch(_){}
-    });
-    // inicializar prev según opción inicial
-    sel.setAttribute('data-prev', sel.value || '3_0_simple');
-  }
-})();
+    setTimeout(function(){ el.style.display='none'; }, 450);
+  }, 8200);
+}
 </script>
 
 
 <script>
 (function(){
-  function initVersionIndicator(){
+  function hideToast(){
     try{
-      var sel = document.getElementById('selVersion');
-      var verActual = document.getElementById('verActual');
-      if(!sel || !verActual) return;
-      var textMap = {
-        '3_0_simple':'3.0 (modo simple)',
-        '3_0_amenaza':'3.0 (modo amenaza)',
-        '3_0_guerra':'3.0 (modo guerra)'
-      };
-      verActual.textContent = textMap[sel.value] || '3.0 (modo simple)';
-      sel.setAttribute('data-prev', sel.value || '3_0_simple');
+      var el = document.getElementById('verDevToast');
+      if(!el) return;
+      el.style.opacity = '0';
+      setTimeout(function(){ el.style.display='none'; }, 450);
     }catch(_){}
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initVersionIndicator);
-  else initVersionIndicator();
+  function wireClose(){
+    var btn = document.getElementById('verDevToastClose');
+    if(btn){ btn.addEventListener('click', function(e){ e.preventDefault(); hideToast(); }); }
+    document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ hideToast(); } });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireClose);
+  else wireClose();
+})();
+</script>
+
+
+<script id="wire-selVersion-change">
+(function(){
+  function wire(){
+    var sel = document.getElementById('selVersion');
+    if(!sel) return;
+    if(sel.__wired) return; sel.__wired = true;
+    sel.addEventListener('change', function(){
+      var v = sel.value;
+      if(v === '3_0_amenaza' || v === '3_0_guerra'){
+        // revert and show toast
+        var prev = sel.getAttribute('data-prev') || '3_0_simple';
+        sel.value = prev;
+        if(typeof showToast === 'function') showToast();
+        return;
+      }
+      sel.setAttribute('data-prev', v);
+      // sync #verActual label if present
+      var verActual = document.getElementById('verActual');
+      if(verActual){
+        var map = {
+          '3_0_simple':'3.0 (modo simple)',
+          '3_0_amenaza':'3.0 (modo amenaza)',
+          '3_0_guerra':'3.0 (modo guerra)'
+        };
+        verActual.textContent = map[v] || v;
+      }
+    });
+    // initialize prev
+    sel.setAttribute('data-prev', sel.value || '3_0_simple');
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
 })();
 </script>
 
