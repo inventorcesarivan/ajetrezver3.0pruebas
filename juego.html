@@ -12933,3 +12933,15 @@ function showToast(){
     max-height: calc((100vh - 6mm) * 0.27625) !important;
   }
 </style>
+
+
+<style id="aj-zones-float-css-2025-09-13-width-20-height-plus20">
+  /* Panel de Personalización: hacer más angosto (~20%) y aumentar altura (~20%) */
+  /* Altura previa: (100vh - 6mm) * 0.27625  => nueva = * 1.20 = 0.3315 */
+  #zonesFloat.zf-top{
+    height: calc((100vh - 6mm) * 0.3315) !important;
+    max-height: calc((100vh - 6mm) * 0.3315) !important;
+    transform-origin: top center;
+    transform: scaleX(0.8); /* 20% más angosto */
+  }
+</style>
