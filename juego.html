@@ -10821,3 +10821,179 @@ function showToast(){
     left: calc(var(--square) * 3 + 6mm) !important;
   }
 </style>
+
+
+<!-- AJETREZ: Achicar botón 'Registro de partidas' en 5% (2025-09-13) -->
+<style id="aj-regv2-open-scale-95-2025-09-13">
+  /* Reduce visualmente el botón flotante de Registros sin afectar layout */
+  #regv2-open{
+    transform: scale(0.95);
+    transform-origin: center;
+  }
+</style>
+
+
+<!-- AJETREZ: Centrar horizontalmente el botón de Pausa (#pauseBtn) sobre el tablero (2025-09-13) -->
+<style id="aj-pause-center-css-2025-09-13">
+  /* Neutralizar orden/márgenes previos cuando esté centrado */
+  #pauseBtn.__ajCentered{
+    position: absolute !important;
+    right: auto !important;
+    left: 0 !important; /* será posicionado por JS en px */
+    top: 0 !important;  /* será posicionado por JS en px */
+    transform: none !important;
+    margin: 0 !important;
+    z-index: 2147483000 !important;
+  }
+</style>
+<script id="aj-pause-center-js-2025-09-13">
+(function(){
+  if(window.__AJ_PAUSE_CENTERED__) return; window.__AJ_PAUSE_CENTERED__ = true;
+
+  function $(s, r){ return (r||document).querySelector(s); }
+  function boardRect(){
+    var b = document.getElementById('board');
+    if(!b){ b = document.getElementById('mobile-board-down-1square'); }
+    if(!b){ b = $('#board, [aria-label*="Ajetrez base"]'); }
+    return b ? b.getBoundingClientRect() : null;
+  }
+  function placePause(){
+    var pause = document.getElementById('pauseBtn');
+    var rect = boardRect();
+    if(!pause || !rect) return;
+
+    // Asegurar clase y contenedor: lo dejaremos en body para posicionar con coordenadas de viewport
+    if(!pause.classList.contains('__ajCentered')){
+      pause.classList.add('__ajCentered');
+      document.body.appendChild(pause);
+    }
+
+    // Medidas del botón (forzar display para obtener offsetWidth si está oculto)
+    var prevDisplay = pause.style.display;
+    if(getComputedStyle(pause).display === 'none'){
+      pause.style.display = 'inline-flex';
+    }
+    var bw = pause.offsetWidth || 0;
+    var bh = pause.offsetHeight || 0;
+    pause.style.display = prevDisplay || '';
+
+    // Colocar ~8px por debajo del borde superior del tablero y centrado en X
+    var x = Math.round(rect.left + rect.width/2 - bw/2);
+    var y = Math.round(rect.top + 8);
+
+    pause.style.left = x + 'px';
+    pause.style.top  = y + 'px';
+  }
+
+  // Colocar inicialmente y en cambios de tamaño / fullscreen
+  function init(){
+    placePause();
+    ['resize', 'orientationchange'].forEach(function(evt){
+      window.addEventListener(evt, placePause, {passive:true});
+    });
+    document.addEventListener('fullscreenchange', placePause, {passive:true});
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  }else{
+    init();
+  }
+})();
+</script>
+
+
+<!-- AJETREZ: Forzar posicionamiento del botón Pausa y eliminar anclajes (2025-09-13) -->
+<style id="aj-pause-center-hardening-css-2025-09-13">
+  /* Solo cuando está centrado (clase de control) anulamos anclajes previos */
+  #pauseBtn.__ajCentered{
+    position: fixed !important;   /* fijo al viewport, coordinado con getBoundingClientRect() del tablero */
+    right: auto !important;       /* neutraliza scripts que setean .style.right */
+    left: 0 !important;           /* será ajustado por JS inline con !important */
+    top: 0 !important;            /* será ajustado por JS inline con !important */
+    margin: 0 !important;
+    z-index: 2147483600 !important;
+  }
+  /* Evitar que los wrappers/topbar afecten el layout del botón cuando está centrado */
+  #timeIndicator #pauseBtn.__ajCentered{ order: initial !important; margin-left: 0 !important; }
+</style>
+
+<script id="aj-pause-center-hardening-js-2025-09-13">
+(function(){
+  if(window.__AJ_PAUSE_CENTER_HARDENED__) return; window.__AJ_PAUSE_CENTER_HARDENED__=true;
+
+  function $(s, r){ return (r||document).querySelector(s); }
+  function boardRect(){
+    // Buscar tablero en desktop y móvil
+    var b = document.getElementById('board')
+         || document.getElementById('mobile-board-down-1square')
+         || $('#board, [aria-label*="Ajetrez base"]');
+    return b ? b.getBoundingClientRect() : null;
+  }
+
+  function applyFixed(pause, x, y){
+    // Setear con !important para superar inline styles de otros scripts
+    pause.classList.add('__ajCentered');
+    pause.style.setProperty('position', 'fixed', 'important');
+    pause.style.setProperty('right', 'auto', 'important');
+    pause.style.setProperty('left',  x + 'px', 'important');
+    pause.style.setProperty('top',   y + 'px', 'important');
+    pause.style.setProperty('margin','0', 'important');
+  }
+
+  function placePause(){
+    var pause = document.getElementById('pauseBtn');
+    var rect  = boardRect();
+    if(!pause || !rect) return;
+
+    // Medir botón (si está oculto temporalmente, mostrarlo para medir)
+    var prevDisplay = pause.style.display;
+    var computed = getComputedStyle(pause);
+    if(computed.display === 'none'){ pause.style.display = 'inline-flex'; }
+    var bw = pause.offsetWidth || 64;
+    var bh = pause.offsetHeight || 32;
+    pause.style.display = prevDisplay || '';
+
+    var x = Math.round(rect.left + rect.width/2 - bw/2);
+    var y = Math.round(rect.top + 8); // 8px por debajo del borde superior del tablero
+    applyFixed(pause, x, y);
+  }
+
+  // Neutralizar escrituras a .style.right de otros scripts (layout(), etc.)
+  function neutralizeAnchors(){
+    var pause = document.getElementById('pauseBtn');
+    if(!pause) return;
+    // Si algún script vuelve a escribir 'right', lo eliminamos y recolocamos
+    var mo = new MutationObserver(function(muts){
+      for(var i=0;i<muts.length;i++){
+        if(muts[i].type === 'attributes' && muts[i].attributeName === 'style'){
+          var val = pause.style.right || '';
+          if(val && pause.classList.contains('__ajCentered')){
+            // Borrar el anclaje y volver a colocar
+            pause.style.setProperty('right','auto','important');
+            placePause();
+          }
+        }
+      }
+    });
+    mo.observe(pause, { attributes: true, attributeFilter: ['style'] });
+    // Guardar por si queremos desconectar luego
+    window.__AJ_PAUSE_MO__ = mo;
+  }
+
+  function init(){
+    placePause();
+    neutralizeAnchors();
+    // Recolocar en eventos relevantes
+    ['resize','orientationchange','scroll','fullscreenchange'].forEach(function(evt){
+      window.addEventListener(evt, placePause, {passive:true});
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  }else{
+    init();
+  }
+})();
+</script>
