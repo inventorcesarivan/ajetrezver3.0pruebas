@@ -2181,6 +2181,65 @@ body[data-theme="noche"] .regv2-btn{
   }
 </style>
 
+
+<style id="regv2-open-bottombar-css">
+  /* Estilo del botón 'Registros' cuando está en la barra inferior */
+  #bottomBar #regv2-open{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:#111;
+    color:#fff;
+    border:2px solid #fff;
+    border-radius:14px;
+    padding:6px 16px;
+    font-weight:800;
+    line-height:1.1;
+    margin:0;
+  }
+  /* Asegurar que la barra no recorte el botón */
+  #bottomBar{ overflow: visible; }
+</style>
+
+
+<style id="regv2-offset-3mm">
+  /* Desplazar el panel de Registros 3mm hacia abajo para centrar mejor */
+  #regv2-overlay{
+    display: none; /* no cambia el comportamiento, solo aclara el estado inicial */
+    align-items: flex-start;
+    justify-content: center;
+  }
+  #regv2-panel{
+    margin-top: 3mm;
+    transform-origin: top center;
+  }
+</style>
+
+
+<style id="regv2-overlay-pointer-events-fix">
+  /* Permitir usar botones debajo (ej. Pantalla completa) cuando el panel está abierto */
+  #regv2-overlay{
+    pointer-events: none !important;   /* el overlay no bloquea clics */
+  }
+  #regv2-panel, #regv2-panel *{
+    pointer-events: auto !important;   /* dentro del panel sigue siendo interactivo */
+  }
+</style>
+
+
+<style id="regv2-fs-zindex">
+  /* Asegurar que el overlay flote por encima también en fullscreen */
+  #regv2-overlay{
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147483645 !important;
+  }
+  #regv2-panel{
+    position: relative;
+    z-index: 2147483646 !important;
+  }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
@@ -9877,6 +9936,192 @@ function showToast(){
   }
 </style>
 
+
+<script id="regv2-move-left-of-fs">
+(function(){
+  if(window.__regv2MoveFS__) return; window.__regv2MoveFS__=true;
+
+  function $id(id){ return document.getElementById(id); }
+
+  function tweak(){
+    var bar = $id('bottomBar');
+    var fs  = $id('btnFSBR');
+    var reg = $id('regv2-open');
+    if(!(bar && fs && reg)) return false;
+
+    // Renombrar a "Registros"
+    reg.textContent = "Registros";
+
+    // Asegurar estilo homogéneo y quitar offsets previos
+    try{
+      reg.classList.add('btn','small');
+      reg.style.removeProperty('transform');
+      reg.style.removeProperty('position');
+      reg.style.removeProperty('margin-left');
+      reg.style.removeProperty('left');
+      reg.style.removeProperty('top');
+      reg.style.removeProperty('right');
+      reg.style.removeProperty('bottom');
+      reg.style.removeProperty('display');
+    }catch(_){}
+
+    // Insertar inmediatamente a la izquierda del botón de Pantalla completa
+    if(fs.parentNode){
+      fs.parentNode.insertBefore(reg, fs);
+    }
+
+    return true;
+  }
+
+  function init(){
+    if(tweak()) return;
+    var obs = new MutationObserver(function(){
+      if(tweak()) obs.disconnect();
+    });
+    obs.observe(document.documentElement, {childList:true, subtree:true});
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
+  }
+})();
+</script>
+
+
+<script id="regv2-fs-reparent">
+(function(){
+  if(window.__regv2FSReparent__) return; window.__regv2FSReparent__ = true;
+  function getRoot(){ return document.fullscreenElement || document.getElementById('fsRoot') || document.body; }
+  function placeLast(node, root){
+    try{
+      if(!node || !root) return;
+      if(node.parentElement !== root) root.appendChild(node);
+      else if(node !== root.lastElementChild) root.appendChild(node);
+    }catch(_){}
+  }
+  function reparent(){
+    try{
+      var ov = document.getElementById('regv2-overlay');
+      if(!ov) return;
+      placeLast(ov, getRoot());
+    }catch(_){}
+  }
+  function repos(){
+    try{ if(window.RegV2 && typeof RegV2.reposition === 'function'){ RegV2.reposition(); } }catch(_){}
+  }
+
+  // On fullscreen change, reparent and reposition
+  document.addEventListener('fullscreenchange', function(){ reparent(); repos(); }, {passive:true});
+  // On load, ensure correct parent (even if already in fullscreen)
+  window.addEventListener('load', function(){ reparent(); repos(); }, {once:true});
+
+  // When opening via the "Registros" button, reparent right away
+  var btn = document.getElementById('regv2-open');
+  if(btn){
+    var orig = btn.onclick;
+    btn.onclick = function(ev){
+      try{ if(typeof orig === 'function') orig.call(this, ev); } finally { reparent(); repos(); }
+    };
+  }
+})();
+</script>
+
+
+<!-- AJETREZ PATCH: Centrar panel de Registros con el tablero en FULLSCREEN -->
+<style id="aj-center-reg-fs-css">
+  /* Clase aplicada sólo en modo fullscreen para centrar exactamente sobre el tablero */
+  #regv2-panel.aj-center-on-board,
+  #regPanel.aj-center-on-board,
+  #replayPanel.aj-center-on-board{
+    position: fixed !important;
+    top: var(--aj-reg-center-y, 50%) !important;
+    left: var(--aj-reg-center-x, 50%) !important;
+    transform: translate(-50%, -50%) !important;
+    margin-top: 0 !important; /* anula el offset de 3mm cuando centramos */
+    z-index: 2147483646 !important;
+  }
+</style>
+<script id="aj-center-reg-fs-js">
+(function(){
+  if(window.__AJ_CENTER_REG_FS__) return; window.__AJ_CENTER_REG_FS__ = true;
+
+  function $(s, r){ return (r||document).querySelector(s); }
+  function all(s, r){ return Array.from((r||document).querySelectorAll(s)); }
+
+  function isFullscreen(){
+    return !!document.fullscreenElement;
+  }
+
+  function boardRect(){
+    // Preferimos el wrapper del tablero; si no, el tablero en sí
+    var w = $('#boardWrap') || $('.board-wrap') || $('#board');
+    if(!w) return null;
+    return w.getBoundingClientRect();
+  }
+
+  function applyVars(rect){
+    if(!rect) return;
+    // Centramos en el medio geométrico del tablero
+    var cx = Math.round(rect.left + rect.width / 2);
+    var cy = Math.round(rect.top  + rect.height / 2);
+
+    // Definimos variables CSS a nivel root (son absolutas en viewport)
+    var root = document.documentElement;
+    root.style.setProperty('--aj-reg-center-x', cx + 'px');
+    root.style.setProperty('--aj-reg-center-y', cy + 'px');
+  }
+
+  function centerIfNeeded(){
+    var rect = boardRect();
+    applyVars(rect);
+
+    var panels = [];
+    panels = panels.concat(all('#regv2-panel'));
+    panels = panels.concat(all('#regPanel'));
+    panels = panels.concat(all('#replayPanel'));
+
+    var fs = isFullscreen();
+    panels.forEach(function(p){
+      // Consideramos visible si ocupa espacio
+      var cs = p ? getComputedStyle(p) : null; var visible = !!p && cs && cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0';
+      if(fs && visible){
+        p.classList.add('aj-center-on-board');
+      }else{
+        p.classList.remove('aj-center-on-board');
+      }
+    });
+  }
+
+  // Observar aperturas/cierres del overlay v2
+  var ov = $('#regv2-overlay');
+  if(ov){
+    var mo = new MutationObserver(centerIfNeeded);
+    mo.observe(ov, { attributes:true, attributeFilter:['style','class'] });
+  }
+
+  // Hook liviano a clicks conocidos de apertura
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(!t) return;
+    if(t.id === 'regv2-open' || t.id === 'regv2-open-from-tab'){
+      // esperamos al siguiente frame para que aparezca el panel
+      requestAnimationFrame(centerIfNeeded);
+      setTimeout(centerIfNeeded, 60);
+    }
+  }, true);
+
+  // Recentrar en resize, scroll y cambios de fullscreen
+  window.addEventListener('resize', centerIfNeeded, {passive:true});
+  window.addEventListener('scroll', centerIfNeeded, {passive:true});
+  document.addEventListener('fullscreenchange', centerIfNeeded);
+
+  // Llamado inicial
+  setTimeout(centerIfNeeded, 0);
+  setTimeout(centerIfNeeded, 120);
+})();
+</script>
 </body>
 <!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
 <style id="aj-replay-glass-css">
