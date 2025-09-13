@@ -2211,7 +2211,100 @@ body[data-theme="noche"] .regv2-btn{
 <style id="rulesVersionStyle">
 #rulesContent .rules-version{ display:none; }
 #rulesContent .rules-version[data-version="3_0"]{ display:block; }
-</style></head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
+</style>
+<!-- AJETREZ: Uniformar contornos blancos de botones externos + mover 'Registro de partidas' 2mm (2025-09-13) -->
+<style id="aj-external-btns-border-uniform-2025-09-13">
+  /* Uniforme: contorno blanco de 2px SOLO en botones EXTERNOS del juego */
+  /* Top bar, bottom bar, reloj/pausa, donaciones y menú principal */
+  #topBar .btn,
+  #bottomBar .btn,
+  #timeIndicator .btn,
+  #donateBox .imgbtn,
+  #btnMegaMenu,
+  #modeIndicator,
+  #regv2-replayer {
+    border: 2px solid #fff !important;
+    border-radius: 999px; /* mantiene estilo pill donde corresponda */
+  }
+  /* Botones internos del replayer (si usan .btn) */
+  #regv2-replayer .btn { border: 2px solid #fff !important; }
+</style>
+
+<style id="aj-shift-reg-btn-plus-2mm-2025-09-13">
+  /* Desplaza 2 mm a la DERECHA el botón "Registro de partidas" dentro del reloj */
+  /* Parte de su estado actual (aprox -1 casillero) y compensa +2mm */
+  #timeIndicator #regv2-clock-btn{
+    position: relative !important;
+    left: calc((var(--aj-casillero, 40px) * -1) + 2mm) !important;
+  }
+</style>
+
+<!-- AJETREZ: Resaltar selects de Versión y Reglas dentro del menú (2025-09-13) -->
+<style id="aj-menu-selects-highlight-2025-09-13">
+  /* Estilo visible para los selectores del menú */
+  #selVersion,
+  #selRulesVersion {
+    border: 3px solid #e50914 !important;  /* rojo intenso */
+    border-radius: 10px !important;
+    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.15);
+    background-clip: padding-box;
+  }
+  #selVersion:focus, #selRulesVersion:focus,
+  #selVersion:hover, #selRulesVersion:hover {
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.25);
+    outline: none;
+  }
+  /* Asegura contraste del texto en temas claros/oscuros */
+  #selVersion, #selRulesVersion {
+    color: inherit;
+    background-color: rgba(0,0,0,0.03);
+  }
+</style>
+
+<!-- AJETREZ: 'Reproducir en tablero' rojo con latido (2025-09-13) -->
+<style id="aj-replay-heartbeat-2025-09-13">
+  /* Latido solo cuando el botón está habilitado */
+  #reg-replay-start:not(:disabled) {
+    animation: aj-heartbeat 1.6s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform, box-shadow;
+  }
+  #reg-replay-start:not(:disabled):hover {
+    animation-duration: 1.4s; /* un poco más rápido al hover */
+  }
+  @keyframes aj-heartbeat {
+    0%   { transform: scale(1);   box-shadow: 0 0 0 0 rgba(200,16,46,0.35); }
+    15%  { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(200,16,46,0.18); }
+    30%  { transform: scale(1.0);  box-shadow: 0 0 0 0 rgba(200,16,46,0.10); }
+    45%  { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(200,16,46,0.16); }
+    60%  { transform: scale(1.0);  box-shadow: 0 0 0 0 rgba(200,16,46,0.08); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(200,16,46,0.00); }
+  }
+  /* Respeta accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    #reg-replay-start { animation: none !important; }
+  }
+</style>
+
+<!-- AJETREZ: Control de opacidad/brillo por zona (central vs laterales) 2025-09-13 -->
+<style id="aj-zone-appearance-2025-09-13">
+  :root{
+    --central-opacity: 1;
+    --lateral-opacity: 1;
+    --central-brightness: 1;  /* 1 = 100% */
+    --lateral-brightness: 1;  /* 1 = 100% */
+  }
+  /* Aplica a todas las casillas según su zona */
+  .sq.central{ 
+    opacity: var(--central-opacity) !important;
+    filter: brightness(var(--central-brightness)) !important;
+  }
+  .sq.lateral{ 
+    opacity: var(--lateral-opacity) !important;
+    filter: brightness(var(--lateral-brightness)) !important;
+  }
+</style>
+</head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div aria-label="Reproducir partida" id="rpFab" role="region" style="display:none">
 <button class="btn small" id="rpFabBtn">▶ Reproducir en tablero</button>
@@ -2245,7 +2338,41 @@ body[data-theme="noche"] .regv2-btn{
 </div></div></div><div aria-label="Ajetrez base limpia" id="board"></div><div aria-label="Decidir desplazamiento de fila" class="shift-ctrl" id="shiftCtrl" role="group"><span class="lbl" id="shiftLbl">Fila</span><span id="chooseWrap"><button aria-label="Mantener" id="btnKeep" type="button">Mantener</button><button aria-label="Desplazar sección" id="btnShift" type="button">Desplazar sección</button></span><span id="confirmWrap" style="display:none"><span id="choiceTxt" style="font-size:12px;font-weight:700;margin-right:6px;opacity:.85">Confirmar:</span><button aria-label="Confirmar" class="confirm" id="btnConfirm" type="button">Confirmar</button><button aria-label="Volver a elegir" id="btnBack" type="button">Cambiar elección</button></span></div><div id="overlay"><div id="banner">FIN</div></div><div id="panelBackdrop"></div><div aria-labelledby="mpTitle" aria-modal="true" id="megaPanel" role="dialog"><div class="apply-toast" id="applyToast">✔ Cambios guardados
 </div><div class="mp-header"><div id="mpTitle">Panel de Ajetrez
 </div><div class="right"><span class="hint-sm" id="loggedUser"></span><button class="btn secondary" id="btnLogout" type="button">Cerrar sesión</button><button class="btn" id="btnClosePanel" type="button">Cerrar</button></div></div><div id="loginView"><h2>Iniciar sesión</h2><div class="field"><label for="inpUser">Usuario</label><input id="inpUser" placeholder="Tu nombre de usuario" type="text"/></div><div class="field"><label for="inpPass">Contraseña</label><input id="inpPass" placeholder="••••••••" type="password"/></div><button class="btn" id="btnLogin" type="button">Entrar</button><div class="hint-sm">*Login local (almacenado en este navegador). Próximamente: cuentas online.
-</div></div><div id="tabsView"><div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-registros" id="btnRegistrosTab">Registros</button></div><div class="mp-content"><div class="tab" id="tab-personalizacion" style="display:none"><h3>Personalización del juego</h3><div class="row"><div class="field"><label>Estilo de piezas</label><select id="selSprites"><option value="auto">Auto (usar sprites si están disponibles)</option><option value="sprites">Sprites (imágenes)</option><option value="unicode">Unicode (símbolos)</option></select></div><div class="field"><label>Estilo visual</label><div aria-label="Elegir estilo visual" class="row" id="themePicker" role="group"><button class="btn theme" data-theme="dia" title="Tonos claros, suaves" type="button">Día</button><button class="btn theme" data-theme="noche" title="Tonos oscuros, suaves" type="button">Noche</button><button class="btn theme" data-theme="madera" title="Tonos madera, suaves" type="button">Madera</button><button class="btn theme" data-theme="arena" title="Arena suave" type="button">Arena</button><button class="btn theme" data-theme="pizarra" title="Pizarra / gris" type="button">Pizarra</button><button class="btn theme" data-theme="oliva" title="Verde oliva suave" type="button">Oliva</button></div><span class="hint-sm">Los estilos son suaves para no distraer durante la partida.</span></div></div></div><div class="tab" id="tab-version" style="display:block"><h3>Versión de Ajetrez</h3><p>Versión actual del juego: <strong id="verActual">2.5 (Estable)</strong></p><div class="field"><label>Seleccionar versión</label><select id="selVersion"><option selected="" value="3_0_simple">Versión 3.0 (modo simple)</option><option value="3_0_amenaza">Versión 3.0 (modo amenaza)</option><option value="3_0_guerra">Versión 3.0 (modo guerra)</option></select></div><div class="hint-sm">La selección futura podrá cargar configuraciones específicas por versión.
+</div></div><div id="tabsView"><div class="mp-tabs"><button class="tab-btn active" data-tab="tab-version">Versión de Ajetrez</button><button class="tab-btn" data-tab="tab-modos">Modos de juego</button><button class="tab-btn" data-tab="tab-personalizacion">Personalización</button><button class="tab-btn" data-tab="tab-guia">Guía del juego</button><button class="tab-btn" data-tab="tab-reglas">Reglas del juego</button><button class="tab-btn" data-tab="tab-registros" id="btnRegistrosTab">Registros</button></div><div class="mp-content"><div class="tab" id="tab-personalizacion" style="display:none"><h3>Personalización del juego</h3><div class="row"><div class="field"><label>Estilo de piezas</label><select id="selSprites"><option value="auto">Auto (usar sprites si están disponibles)</option><option value="sprites">Sprites (imágenes)</option><option value="unicode">Unicode (símbolos)</option></select>
+
+<!-- Controles: Apariencia por zonas -->
+<div class="fieldGroup" id="fg-zonas-appearance">
+  <h4>Apariencia de zonas</h4>
+  <div class="row" style="gap: 12px; align-items: center;">
+    <div class="field">
+      <label for="centralOpacity">Opacidad centro</label>
+      <input id="centralOpacity" type="range" min="0.3" max="1.0" step="0.05" value="1">
+      <small>Transparencia del recuadro central (0.3–1.0)</small>
+    </div>
+    <div class="field">
+      <label for="centralBrightness">Brillo centro</label>
+      <input id="centralBrightness" type="range" min="0.6" max="1.6" step="0.05" value="1">
+      <small>Brillo del recuadro central (60%–160%)</small>
+    </div>
+  </div>
+  <div class="row" style="gap: 12px; align-items: center; margin-top: 10px;">
+    <div class="field">
+      <label for="lateralOpacity">Opacidad laterales</label>
+      <input id="lateralOpacity" type="range" min="0.2" max="1.0" step="0.05" value="1">
+      <small>Transparencia de secciones laterales (0.2–1.0)</small>
+    </div>
+    <div class="field">
+      <label for="lateralBrightness">Brillo laterales</label>
+      <input id="lateralBrightness" type="range" min="0.5" max="1.6" step="0.05" value="1">
+      <small>Brillo de secciones laterales (50%–160%)</small>
+    </div>
+  </div>
+  <div class="row" style="gap: 10px; margin-top: 12px;">
+    <button class="btn small" id="btnZonasReset" type="button">Restablecer</button>
+  </div>
+</div>
+
+</div><div class="field"><label>Estilo visual</label><div aria-label="Elegir estilo visual" class="row" id="themePicker" role="group"><button class="btn theme" data-theme="dia" title="Tonos claros, suaves" type="button">Día</button><button class="btn theme" data-theme="noche" title="Tonos oscuros, suaves" type="button">Noche</button><button class="btn theme" data-theme="madera" title="Tonos madera, suaves" type="button">Madera</button><button class="btn theme" data-theme="arena" title="Arena suave" type="button">Arena</button><button class="btn theme" data-theme="pizarra" title="Pizarra / gris" type="button">Pizarra</button><button class="btn theme" data-theme="oliva" title="Verde oliva suave" type="button">Oliva</button></div><span class="hint-sm">Los estilos son suaves para no distraer durante la partida.</span></div></div></div><div class="tab" id="tab-version" style="display:block"><h3>Versión de Ajetrez</h3><p>Versión actual del juego: <strong id="verActual">2.5 (Estable)</strong></p><div class="field"><label>Seleccionar versión</label><select id="selVersion"><option selected="" value="3_0_simple">Versión 3.0 (modo simple)</option><option value="3_0_amenaza">Versión 3.0 (modo amenaza)</option><option value="3_0_guerra">Versión 3.0 (modo guerra)</option></select></div><div class="hint-sm">La selección futura podrá cargar configuraciones específicas por versión.
 </div></div><div class="tab" id="tab-modos" style="display:none"><h3>Modos de juego</h3><div class="row"><button class="btn mode" data-gmode="pvp-local">Player vs player (local)</button><button class="btn mode" data-gmode="bot">Player Vs Bot</button><button class="btn mode" data-gmode="bot-vs-bot">Bot vs Bot (demo)</button><button class="btn mode" data-gmode="online">Modo Online</button></div><div aria-live="polite" id="modeHelp" role="note"><span class="title">¿Cómo funciona este modo?</span><div class="body">Elegí un modo para ver una breve explicación.</div></div><p class="hint-sm">Al elegir un modo, la partida se reinicia automáticamente.</p></div><div class="tab" id="tab-guia" style="display:none"><h3>Guía rápida</h3><ol><li><strong>Objetivo:</strong> dar jaque mate al rey rival.</li><li><strong>Mover piezas:</strong> igual que en ajedrez clásico (incluye enroque y captura al paso).</li><li><strong>Tras capturar:</strong> decidís en la <em>misma fila</em> entre <strong>Mantener</strong> o <strong>Desplazar</strong> la sección completa (offset 0 ↔ 8).</li><li><strong>Restricciones:</strong> no hay desplazamientos si estás en jaque o si el 8×8 quedaría sin piezas de algún bando.</li><li><strong>Zonas:</strong> se juega sólo en el 8×8 central; los laterales funcionan como reserva al desplazar.</li><li><strong>Partida:</strong> pulsá <em>Comenzar</em>, elegí modo; cambiar de modo reinicia la partida.</li><li><strong>Final:</strong> jaque mate o tablas (ahogado, 3 repeticiones, 50 jugadas, material insuficiente, acuerdo).</li></ol></div><div class="tab aj-reglas-ver" id="tab-reglas" style="display:none"><h3>Reglas del juego</h3><div class="field"><label for="selRulesVersion">Ver reglas según versión</label><select id="selRulesVersion"><option selected="selected" value="3_0">3.0 (Modo simple)</option><option value="3_0_amenaza">3.0 (Modo amenaza)</option><option value="3_0_guerra">3.0 (Modo guerra)</option></select><div class="hint-sm">Este selector es independiente del de “Versión de Ajetrez”. Cambiarlo solo afecta el texto mostrado aquí.</div></div><div id="rulesContent" style="margin-top:8px;"><div class="rules-version" data-version="3_0"><h4>Ajetrez Version 3.0 (Modo simple) — Reglas Básicas del juego</h4><div><p>En este modo, sólo el recuadro central del tablero es jugable. Las partes sobrantes (aunque contengan piezas) no participan hasta que sean ingresadas mediante el desplazamiento de secciones.</p><h5>Distribución de las piezas</h5><p>Por color, el tablero contiene:</p><ul><li>2 reyes</li><li>2 reinas</li><li>4 alfiles, 4 caballos, 4 torres</li><li>16 peones</li></ul><p>Las piezas son distribuidas en el recuadro central de la misma manera que en el ajedrez clásico. En los laterales, (si bien ocupan las mismas posiciones entre ellas). Las piezas se colocan desplazadas, 2 secciones hacia abajo en negras y 2 hacia arriba en blancas.</p><ul><li>Ajetrez respeta todas las reglas del clásico ajedrez, por lo tanto, se debe jugar de la misma manera y respetando las reglas generales del ajedrez clásico.</li><li>A su vez, añade nuevas reglas, que dependen del modo de juego que se utilice.</li><li>En este modo de juego (Modo simple). Luego de capturar, se puede elegir entre desplazar o mantener la sección del tablero donde ahora se ubica la pieza que realizó la captura.</li><li>Si decide desplazar. Se desplaza (hacia el lado opuesto al que se encuentra y solo una vez).</li><li>Luego de la elección de mantener, o desplazar la sección, queda cedido el turno al contrincante.</li><li>El desplazamiento de la sección, puede sacar, o introducir piezas del área jugable.</li></ul><h5>Función del desplazamiento de las secciones</h5><ul><li>Escapar de una captura.</li><li>Alterar las posibles estrategias del oponente.</li><li>Sacar piezas rivales del área jugable.</li><li>Ingresar piezas propias al área jugable.</li><li>También ingresar piezas del oponente para luego intentar capturarlas.</li></ul><p>Importante: Si una pieza sale del recuadro central, esto no significa que queda fuera de juego definitivamente; podría reingresar tras nuevos desplazamientos.</p><h5>⚠️ Imposibilidad de desplazamiento de secciones</h5><ul><li>En jaque/mate no hay desplazamientos de las secciones (aun cuando se haya capturado una pieza del oponente que se encuentre en la sección donde está el rey).</li><li>No se pueden desplazar secciones cuando esa acción implica que el recuadro central jugable quede sin piezas disponibles de alguno de los dos participantes.</li></ul></div></div><div class="rules-version" data-version="3_0_amenaza"></div><div class="rules-version" data-version="3_0_guerra"></div></div>
 <script id="rulesVersionHook">
 (function(){
@@ -10096,6 +10223,74 @@ function showToast(){
   // Exponer evento manual por si otra parte del código cambia selVersion programáticamente
   window.addEventListener('aj:version:changed', syncVersionLabel);
   window.ajSyncVersionLabel = syncVersionLabel;
+})();
+</script>
+
+<script id="aj-zone-appearance-js-2025-09-13">
+(function(){
+  const root = document.documentElement;
+  const $ = (id) => document.getElementById(id);
+  const storeKey = "aj.zoneAppearance.v1";
+
+  function apply(vars){
+    if(!vars) return;
+    if(vars.centralOpacity!=null) root.style.setProperty("--central-opacity", String(vars.centralOpacity));
+    if(vars.lateralOpacity!=null) root.style.setProperty("--lateral-opacity", String(vars.lateralOpacity));
+    if(vars.centralBrightness!=null) root.style.setProperty("--central-brightness", String(vars.centralBrightness));
+    if(vars.lateralBrightness!=null) root.style.setProperty("--lateral-brightness", String(vars.lateralBrightness));
+  }
+  function read(){ try{ return JSON.parse(localStorage.getItem(storeKey)||"{}"); }catch(e){ return {}; } }
+  function write(vars){ localStorage.setItem(storeKey, JSON.stringify(vars)); }
+
+  function init(){
+    const els = {
+      centralOpacity: $("centralOpacity"),
+      lateralOpacity: $("lateralOpacity"),
+      centralBrightness: $("centralBrightness"),
+      lateralBrightness: $("lateralBrightness"),
+      reset: $("btnZonasReset"),
+    };
+    if(!els.centralOpacity || !els.lateralOpacity) return;
+
+    // Load saved
+    const saved = read();
+    const defaults = {centralOpacity:1, lateralOpacity:1, centralBrightness:1, lateralBrightness:1};
+    const state = Object.assign({}, defaults, saved);
+    // Reflect UI and apply
+    for(const k of Object.keys(defaults)){
+      if(els[k]) els[k].value = String(state[k]);
+    }
+    apply(state);
+
+    // Handlers
+    for(const k of ["centralOpacity","lateralOpacity","centralBrightness","lateralBrightness"]){
+      const el = els[k];
+      if(!el) continue;
+      const onChange = ()=>{
+        const val = parseFloat(el.value);
+        state[k] = val;
+        apply(state);
+        write(state);
+        const toast = document.getElementById("applyToast");
+        if(toast){ toast.textContent = "✔ Cambios guardados"; toast.classList.add("show"); setTimeout(()=>toast.classList.remove("show"), 800); }
+      };
+      el.addEventListener("input", onChange);
+      el.addEventListener("change", onChange);
+    }
+    els.reset.addEventListener("click", ()=>{
+      for(const k of Object.keys(defaults)){
+        state[k] = defaults[k];
+        if(els[k]) els[k].value = String(defaults[k]);
+      }
+      apply(state);
+      write(state);
+      const toast = document.getElementById("applyToast");
+      if(toast){ toast.textContent = "✔ Restablecido"; toast.classList.add("show"); setTimeout(()=>toast.classList.remove("show"), 800); }
+    });
+  }
+
+  // Defer until DOM ready
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", init); } else { init(); }
 })();
 </script>
 </body>
