@@ -8026,30 +8026,29 @@ div[style="height:var(--toolbar-gap)"]{
 </style>
 <script id="regv2-clock-btn-script">
 (function(){
-  function addBtn(){
+  function moveBtn(){
     var box = document.getElementById('timeIndicator');
-    if(!box) return false;
-    if(document.getElementById('regv2-clock-btn')) return true;
-    var spacer = document.createElement('span');
-    spacer.style.width='8px'; spacer.style.display='inline-block';
-    var btn = document.createElement('button');
-    btn.id='regv2-clock-btn'; btn.className='small'; btn.type='button';
-    btn.innerHTML = '<span class="dot"></span> Registro de partidas';
-    btn.onclick = function(){
-      var ov = document.getElementById('regv2-overlay');
-      if(ov) ov.style.display='flex';
-    };
-    // insert to the right of existing pause/time UI
-    box.appendChild(spacer);
-    box.appendChild(btn);
-    // hide floating button if present
-    var floatBtn = document.getElementById('regv2-open');
-    if(floatBtn) floatBtn.style.display='none';
+    var btn = document.getElementById('regv2-open');
+    if(!box || !btn) return false;
+    try{
+      // Make it look like the clock-side button
+      btn.classList.add('small');
+      // Ensure label with green dot + text
+      btn.innerHTML = '<span class="dot"></span> Registro de partidas';
+      // Neutralize fixed positioning coming from its original styles
+      btn.style.position='';
+      btn.style.top='';
+      btn.style.right='';
+      btn.style.left='';
+      btn.style.bottom='';
+      btn.style.zIndex='';
+    }catch(_){}
+    if(btn.parentElement !== box){ box.appendChild(btn); }
     return true;
   }
-  if(!addBtn()){
+  if(!moveBtn()){
     var obs = new MutationObserver(function(){
-      if(addBtn()) obs.disconnect();
+      if(moveBtn()) obs.disconnect();
     });
     obs.observe(document.documentElement, {childList:true, subtree:true});
   }
@@ -10122,6 +10121,40 @@ function showToast(){
   setTimeout(centerIfNeeded, 120);
 })();
 </script>
+
+<style id="aj-reg-open-as-clock-btn">
+  /* Style the existing #regv2-open when placed inside the clock container */
+  #timeIndicator #regv2-open{
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #111 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+    border-radius: 999px !important;
+    padding: 6px 10px !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    box-shadow: inset 0 0 0 2px #111 !important;
+
+    /* override its original fixed positioning */
+    position: relative !important;
+    top: auto !important; right: auto !important; bottom: auto !important;
+    /* Keep the requested shift to the left relative to the clock */
+    left: calc(-1 * var(--aj-casillero, 40px)) !important;
+
+    /* Order + spacing inside #timeIndicator */
+    order: 2 !important;
+    margin-left: 8px !important;
+
+    z-index: 2147483000 !important;
+  }
+  #timeIndicator #regv2-open.small{ font-size: 12px !important; padding: 5px 9px !important; }
+  #timeIndicator #regv2-open .dot{ width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block; }
+
+  /* If some script sets display:none inline, bring it back */
+  #timeIndicator #regv2-open[style*="display: none"]{ display: inline-flex !important; }
+</style>
 </body>
 <!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
 <style id="aj-replay-glass-css">
