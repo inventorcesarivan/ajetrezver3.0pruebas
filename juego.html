@@ -2240,6 +2240,48 @@ body[data-theme="noche"] .regv2-btn{
   }
 </style>
 
+
+<style id="aj-free-megaMenu-vars">
+  /* Variables para mover el botón libremente (modificables después) */
+  :root{
+    --menu-x: 50%;   /* posición horizontal por defecto (centro) */
+    --menu-y: 0mm;   /* posición vertical por defecto (borde superior del topbar) */
+  }
+</style>
+<style id="aj-free-megaMenu">
+  /* Liberar completamente el botón de Menú para moverlo sin anclajes ni "rebotes" */
+  #btnMegaMenu{
+    position: absolute !important;      /* fuera del flujo del topbar/flex */
+    left: var(--menu-x) !important;
+    top: var(--menu-y) !important;
+    transform: translate(-50%, 0) !important;  /* centrado horizontal por defecto */
+    margin: 0 !important;
+    bottom: auto !important;
+    right: auto !important;
+    inset: auto auto auto auto !important;     /* neutraliza cualquier "inset" previo */
+    z-index: 2147483200 !important;            /* por encima de la barra superior */
+  }
+
+  /* Neutralizar ajustes heredados del topbar que empujaban los botones */
+  #topBar #btnMegaMenu,
+  #topBar .btn#btnMegaMenu{
+    margin: 0 !important;
+    top: var(--menu-y) !important;
+    bottom: auto !important;
+    transform: translate(-50%, 0) !important;
+  }
+</style>
+
+
+<!-- AJETREZ: Menú +0.5 casillero a la derecha (nudge) - 2025-09-13 -->
+<style id="aj-menu-nudge-right-0_5sq-2025-09-13">
+  /* Ajusta la variable --menu-x sumando medio casillero al centro */
+  :root{
+    --menu-x: calc(50% + calc(var(--square, var(--casillero, 64px)) * 0.5));
+    /* --menu-y queda como estaba (0mm por defecto) */
+  }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div id="rpFab" aria-label="Reproducir partida" role="region" style="display:none">
