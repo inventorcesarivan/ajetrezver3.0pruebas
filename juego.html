@@ -2304,6 +2304,653 @@ body[data-theme="noche"] .regv2-btn{
     filter: brightness(var(--lateral-brightness)) !important;
   }
 </style>
+
+<style id="aj-zones-float-css-2025-09-13">
+  /* Panel flotante para brillo/opacidad */
+  #zonesFloat.zf-top{
+    position: fixed; top: 3mm; left: 50%; transform: translateX(-50%);
+    width: min(820px, 96vw); max-height: calc(100vh - 6mm); overflow: auto;
+    background: #fff; z-index: 2147483602; border-radius: 14px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.45); padding: 12px; display: none;
+  }
+  #zonesFloat .zf-header{ display:flex; align-items:center; justify-content:space-between;
+    font-weight: 900; border-bottom: 1px solid #eee; padding: 6px 2px 10px 2px; }
+  #zonesFloat .zf-content{ padding-top: 8px; }
+  #zonesClose{ background:#111; color:#fff; border-radius: 999px; padding:6px 10px; border: 1.5px solid rgba(255,255,255,0.70); }
+  #zonesClose:hover{ background:#222; }
+  /* Tarjeta dentro de Personalización */
+  #zonesOpenCard{ border-radius: 14px; background:#fafafa; box-shadow: 0 6px 18px rgba(0,0,0,.10);
+    padding: 10px; margin: 6px 0 12px 0; }
+  #zonesOpenCard .card-title{ display:flex; align-items:center; justify-content:space-between; font-weight:800; margin-bottom:6px; }
+  #openZonesFloat{ margin-top: 6px; }
+  .zones-illustration{ margin-top:10px; border:1px dashed #ddd; border-radius:12px; padding:8px; background:#fff; }
+  .zones-legend{ display:flex; gap:10px; margin-top:6px; font-size:12px; opacity:.85; flex-wrap:wrap; }
+  .legend-chip{ display:inline-flex; gap:6px; align-items:center; padding:4px 8px; border-radius:999px; background:#f6f6f6; border:1px solid #eee; }
+  .legend-swatch{ width:14px; height:14px; border-radius:3px; outline:1px solid #ccc; }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-override-half">
+  /* Reducir altura total del panel flotante a la mitad del alto de pantalla */
+  #zonesFloat.zf-top{
+    height: calc((100vh - 6mm)/2) !important;
+    max-height: calc((100vh - 6mm)/2) !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-override-layout">
+  /* Botonera del header: Reset a la izquierda de la cruz */
+  #zonesFloat .zf-right{ display:flex; align-items:center; gap:8px; }
+  #zonesReset{ background:transparent; border:1.5px solid #bbb; border-radius:999px; padding:6px 10px; }
+  #zonesReset:hover{ background:#f5f5f5; }
+
+  /* Disposición de controles en 2 columnas (mitad de ancho aprox) */
+  #zonesContent #fg-zonas-appearance{
+    display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; align-items:start;
+  }
+  #zonesContent #fg-zonas-appearance > *{ min-width:0; }
+  #zonesContent #fg-zonas-appearance input[type="range"]{ width:100%; }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-override-quarter-wide">
+  /* Panel: 1/4 del alto de pantalla y un poco más ancho */
+  #zonesFloat.zf-top{
+    height: calc((100vh - 6mm)/4) !important;
+    max-height: calc((100vh - 6mm)/4) !important;
+    width: min(960px, 98vw) !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-override-quarter-wide-plus20">
+  /* ~20% más ancho respecto al tope anterior (960px -> 1152px) y casi todo el viewport */
+  #zonesFloat.zf-top{
+    width: min(1152px, 99vw) !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-center-and-reset-dark">
+  /* Centrar el panel verticalmente */
+  #zonesFloat.zf-top{
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  /* Botón Restablecer con fondo negro */
+  #zonesReset{
+    background: #000 !important;
+    color: #fff !important;
+    border: 1.5px solid #000 !important;
+  }
+  #zonesReset:hover{
+    background: #111 !important;
+    border-color: #111 !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-transparent-bg">
+  /* Fondo del panel totalmente transparente; mantener z-index y layout */
+  #zonesFloat.zf-top{
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-revert-bg-and-shrink15">
+  /* Revertir transparencia y achicar ~15% manteniendo centrado y layout interno */
+  #zonesFloat.zf-top{
+    background: #fff !important;
+    box-shadow: 0 18px 60px rgba(0,0,0,.45) !important;
+    border-radius: 14px !important;
+    /* Tamaño 15% menor */
+    width: min(980px, 90vw) !important; /* 1152px -> ~980px */
+    height: calc(((100vh - 6mm)/4) * 0.85) !important;
+    max-height: calc(((100vh - 6mm)/4) * 0.85) !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-inner-scale-85">
+  /* Reducir 15% ancho de cada campo y tipografía solo dentro del contenido del panel */
+  #zonesContent #fg-zonas-appearance .zf-field{
+    width: 85% !important;
+    justify-self: center !important;
+  }
+  #zonesContent #fg-zonas-appearance input[type="range"]{
+    width: 100% !important; /* 100% de su .zf-field (que ahora es 85% del grid cell) */
+  }
+  #zonesContent{
+    font-size: 0.85em !important; /* texto 15% más chico, no afecta el header */
+  }
+  #zonesContent label, #zonesContent .hint-sm, #zonesContent p, #zonesContent .help, #zonesContent .desc{
+    font-size: 0.95em; /* suavizar para que no quede demasiado pequeño en ayudas */
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-tight-spacings">
+  /* Reducir separación general entre campos */
+  #zonesContent #fg-zonas-appearance{
+    gap: 6px 8px !important;   /* row-gap 6px, col-gap 8px */
+  }
+  /* Campos con padding/márgenes mínimos */
+  #zonesContent #fg-zonas-appearance .zf-field{
+    margin: 0 !important;
+    padding: 2px 0 !important;
+    line-height: 1.15;
+  }
+  /* Quitar exceso de margen en labels, ayudas y rangos */
+  #zonesContent #fg-zonas-appearance label,
+  #zonesContent #fg-zonas-appearance .hint-sm,
+  #zonesContent #fg-zonas-appearance .help,
+  #zonesContent #fg-zonas-appearance p{
+    margin-top: 0 !important;
+    margin-bottom: 2px !important;
+  }
+  #zonesContent #fg-zonas-appearance input[type="range"]{
+    margin: 0 !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-hide-under-text">
+  /* Mantener solo el título de arriba y el control; ocultar textos/indicadores debajo */
+  #zonesContent #fg-zonas-appearance .zf-field input[type="range"] ~ * {
+    display: none !important;
+  }
+  /* Por si hay indicadores con clases específicas en cualquier posición */
+  #zonesContent #fg-zonas-appearance .hint-sm,
+  #zonesContent #fg-zonas-appearance .help,
+  #zonesContent #fg-zonas-appearance .desc,
+  #zonesContent #fg-zonas-appearance small,
+  #zonesContent #fg-zonas-appearance .subtext,
+  #zonesContent #fg-zonas-appearance .indicator,
+  #zonesContent #fg-zonas-appearance .value,
+  #zonesContent #fg-zonas-appearance output,
+  #zonesContent #fg-zonas-appearance .note,
+  #zonesContent #fg-zonas-appearance .muted {
+    display: none !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-width-minus10">
+  /* Ancho total del panel -10% */
+  #zonesFloat.zf-top{
+    width: min(882px, 81vw) !important; /* 980px->882px, 90vw->81vw */
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-fs-support">
+  /* Asegurar visibilidad por encima de todo en fullscreen */
+  :fullscreen #zonesFloat.zf-top{ z-index: 2147483640 !important; }
+  :-webkit-full-screen #zonesFloat.zf-top{ z-index: 2147483640 !important; }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-fs-center-vfix">
+  /* Forzar centrado perfecto en fullscreen (vertical y horizontal) */
+  :fullscreen #zonesFloat.zf-top,
+  :-webkit-full-screen #zonesFloat.zf-top{
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-fs-flex-anchor">
+  /* Wrapper a pantalla completa que centra con flex y no interfiere con clics fuera del panel */
+  :fullscreen #zonesFSAnchor,
+  :-webkit-full-screen #zonesFSAnchor{
+    position: fixed !important;
+    inset: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2147483641 !important;
+    pointer-events: none !important;
+  }
+  :fullscreen #zonesFSAnchor #zonesFloat.zf-top,
+  :-webkit-full-screen #zonesFSAnchor #zonesFloat.zf-top{
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    pointer-events: auto !important; /* solo el panel recibe eventos */
+  }
+</style>
+
+
+<style id="aj-zones-float-css-2025-09-13-fs-top-align">
+  /* En fullscreen: wrapper con flex arriba (no centrado vertical) */
+  :fullscreen #zonesFSAnchor,
+  :-webkit-full-screen #zonesFSAnchor{
+    align-items: flex-start !important;   /* al tope */
+    justify-content: center !important;   /* centrado horizontal */
+    padding-top: 6mm !important;          /* respiro desde arriba */
+  }
+  /* Asegurar que el panel no se re-centre por reglas previas */
+  :fullscreen #zonesFSAnchor #zonesFloat.zf-top,
+  :-webkit-full-screen #zonesFSAnchor #zonesFloat.zf-top{
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+  }
+</style>
+
+
+<style id="aj-piece-style-width-80">
+  /* Regla general para achicar 20% el selector de estilo de piezas */
+  #tab-personalizacion .aj-piece-style-select{ width:80% !important; }
+  /* Por si no podemos añadir la clase, intentos genéricos */
+  #tab-personalizacion select[name*="pieza" i],
+  #tab-personalizacion select[name*="piece" i],
+  #tab-personalizacion select[data-role="piece-style"]{
+    width:80% !important;
+  }
+</style>
+
+
+<style id="aj-topbar-visual-styles-2025-09-13">
+  /* Barra superior con el título y la botonera a la derecha */
+  #tab-personalizacion .aj-topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 12px; margin-bottom: 8px;
+  }
+  #tab-personalizacion .aj-topbar .aj-top-title{
+    display:flex; align-items:baseline; gap: 10px;
+  }
+  #tab-personalizacion .aj-topbar .aj-style-buttons-top{
+    display:flex; flex-wrap:wrap; gap: 8px;
+  }
+  /* En pantallas angostas, que baje a segunda línea */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-topbar{ flex-direction: column; align-items: flex-start; gap: 6px; }
+    #tab-personalizacion .aj-topbar .aj-style-buttons-top{ width: 100%; }
+  }
+  /* Ocultar el pequeño texto descriptivo si se quedó en el bloque original */
+  #tab-personalizacion .aj-visual-desc-hidden{ display:none !important; }
+</style>
+
+
+<style id="aj-piece-below-visual-css-2025-09-13">
+  /* Fila para ubicar el selector de piezas debajo de la botonera de estilos */
+  #tab-personalizacion .aj-piece-row{
+    display:flex; align-items:center; gap:12px; margin: 6px 0 10px 0;
+    flex-wrap: wrap;
+  }
+  #tab-personalizacion .aj-piece-row label{
+    font-weight: 700;
+    min-width: max(120px, 18ch);
+  }
+  #tab-personalizacion .aj-piece-row .aj-piece-style-select{
+    width: 80% !important; /* mantener el -20% que pediste antes */
+    max-width: 640px;
+  }
+  /* Si el espacio es chico, que salte de línea prolijo */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-piece-row{ flex-direction: column; align-items:flex-start; gap:6px; }
+    #tab-personalizacion .aj-piece-row .aj-piece-style-select{ width: 100% !important; max-width: none; }
+  }
+</style>
+
+
+<style id="aj-piece-under-zones-css-2025-09-13">
+  /* Fila debajo de la tarjeta de brillo/opacidad */
+  #tab-personalizacion .aj-piece-row-under-zones{
+    display:flex; align-items:center; gap:12px; margin: 12px 0 8px 0;
+    flex-wrap: wrap;
+  }
+  #tab-personalizacion .aj-piece-row-under-zones label{
+    font-weight: 700;
+    min-width: max(120px, 18ch);
+  }
+  #tab-personalizacion .aj-piece-row-under-zones .aj-piece-style-select{
+    width: 80% !important; /* conservar -20% */
+    max-width: 640px;
+  }
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-piece-row-under-zones{ flex-direction: column; align-items:flex-start; gap:6px; }
+    #tab-personalizacion .aj-piece-row-under-zones .aj-piece-style-select{ width: 100% !important; max-width: none; }
+  }
+</style>
+
+
+<style id="aj-visual-buttons-relocate-2025-09-13">
+  /* Bloque visual bajo el título, con un poco de respiro arriba */
+  #tab-personalizacion .aj-visual-block{
+    margin-top: 10px;
+    margin-bottom: 6px;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-title{
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  /* Contenedor de botones (reutiliza el que ya existe) */
+  #tab-personalizacion .aj-style-buttons-top{
+    display:flex; flex-wrap:wrap; gap: 8px;
+  }
+  /* En móviles, que ocupe todo el ancho */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-style-buttons-top{ width: 100%; }
+  }
+</style>
+
+
+<style id="aj-piece-top-right-css-2025-09-13">
+  /* Topbar robusta (si aún no está) */
+  #tab-personalizacion .aj-topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+  #tab-personalizacion .aj-top-title{ display:flex; align-items:baseline; gap:10px; }
+  /* Contenedor superior derecho para el selector de piezas */
+  #tab-personalizacion .aj-top-right{
+    display:flex; align-items:center; gap:8px;
+    width: clamp(260px, 28vw, 420px);
+  }
+  #tab-personalizacion .aj-top-right label{
+    font-weight: 700; white-space: nowrap;
+  }
+  #tab-personalizacion .aj-top-right .aj-piece-style-select{
+    width: 100% !important; max-width: none !important;
+  }
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-top-right{ width: 100%; }
+  }
+</style>
+
+
+<style id="aj-piece-align-with-visual-row-2025-09-13">
+  /* Fila dentro del bloque de Estilo visual: botones a la izquierda, selector de piezas a la derecha */
+  #tab-personalizacion .aj-visual-block .aj-visual-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-row .aj-style-buttons-top{
+    flex: 1 1 auto;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-row .aj-top-right{
+    flex: 0 0 clamp(260px, 28vw, 420px);
+    display:flex; align-items:center; gap:8px;
+    /* eliminar margen/offset previos */
+    margin: 0 !important;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-title{ margin-bottom: 8px; }
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-visual-block .aj-visual-row{
+      align-items: flex-start;
+    }
+    #tab-personalizacion .aj-visual-block .aj-visual-row .aj-top-right{
+      flex: 1 1 100%;
+    }
+  }
+</style>
+
+
+<style id="aj-topbar-center-title-2025-09-13">
+  /* Convertir topbar en grid para centrar el título sin mover el selector derecho */
+  #tab-personalizacion .aj-topbar{
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  #tab-personalizacion .aj-topbar .aj-top-title{
+    grid-column: 2;
+    justify-self: center;
+    text-align: center;
+  }
+  #tab-personalizacion .aj-topbar .aj-top-right{
+    grid-column: 3;
+    justify-self: end;
+  }
+  /* En móviles: apilar pero mantener el título centrado */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-topbar{
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+      row-gap: 6px;
+    }
+    #tab-personalizacion .aj-topbar .aj-top-title{
+      grid-column: 1;
+      justify-self: center;
+      text-align: center;
+    }
+    #tab-personalizacion .aj-topbar .aj-top-right{
+      grid-column: 1;
+      justify-self: stretch;
+    }
+  }
+</style>
+
+
+<style id="aj-remove-title-and-verticalize-piece-2025-09-13">
+  /* Compactar la parte superior del tab: eliminar espacio del topbar */
+  #tab-personalizacion .aj-topbar{ display:none !important; }
+  /* Reducir margen superior del bloque de Estilo visual para aprovechar el espacio */
+  #tab-personalizacion .aj-visual-block{ margin-top: 4px !important; }
+
+  /* Selector de piezas en columna: label arriba, select abajo */
+  #tab-personalizacion .aj-top-right{
+    display:flex; flex-direction: column; align-items: stretch; gap: 4px;
+  }
+  #tab-personalizacion .aj-top-right label{
+    font-weight: 800; white-space: normal; margin: 0 0 2px 0;
+  }
+  #tab-personalizacion .aj-top-right .aj-piece-style-select{
+    width: 100% !important; max-width: none !important;
+  }
+</style>
+
+
+<style id="aj-visual-header-align-pieces-2025-09-13">
+  /* Header del bloque: título "Estilo visual" a la izquierda y selector de piezas a la derecha */
+  #tab-personalizacion .aj-visual-block{
+    margin-top: 4px !important;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-header{
+    display: grid;
+    grid-template-columns: 1fr clamp(260px, 28vw, 420px);
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 6px;
+    margin-bottom: 6px;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-title{
+    margin: 0 !important;
+  }
+  /* Acomodar el contenedor del selector (mantener label arriba del select) */
+  #tab-personalizacion .aj-visual-block .aj-visual-header .aj-top-right{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-header .aj-top-right label{
+    font-weight: 800;
+    margin: 0 0 2px 0;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-header .aj-top-right .aj-piece-style-select{
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* La fila de botones queda debajo del header, sin cambios */
+  #tab-personalizacion .aj-visual-block .aj-visual-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-row .aj-style-buttons-top{ flex: 1 1 auto; }
+
+  /* Responsive */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-visual-block .aj-visual-header{
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+
+<style id="aj-zonescard-right-below-piece-2025-09-13">
+  /* Colocar la tarjeta de Brillo/Opacidad en la columna derecha del header, debajo del selector */
+  #tab-personalizacion .aj-visual-block .aj-visual-header #zonesOpenCard{
+    grid-column: 2;
+    width: 100%;
+    margin-top: 6px;
+  }
+  /* Ajustes visuales suaves para que respire en la columna derecha */
+  #tab-personalizacion #zonesOpenCard{
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  /* La fila de botones queda debajo del header como antes */
+  #tab-personalizacion .aj-visual-block .aj-visual-row{ margin-top: 8px; }
+
+  /* Responsive: si es angosto, que la tarjeta baje a ocupar todo el ancho */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-visual-block .aj-visual-header{
+      grid-template-columns: 1fr;
+    }
+    #tab-personalizacion .aj-visual-block .aj-visual-header #zonesOpenCard{
+      grid-column: 1;
+    }
+  }
+</style>
+
+
+<style id="aj-visual-fix-zones-title-and-buttons-2025-09-13">
+  /* 1) Ocultar el título dentro de la tarjeta de zonas, conservando el espacio */
+  #tab-personalizacion #zonesOpenCard .card-title{
+    visibility: hidden !important;
+    min-height: 24px; /* espacio similar al título */
+    margin-bottom: 6px;
+  }
+
+  /* 2) Reorganizar header en grilla 2x2: 
+        fila 1: [ Estilo visual | Estilo de piezas ]
+        fila 2: [ Botones visuales | Tarjeta Zonas ] */
+  #tab-personalizacion .aj-visual-block .aj-visual-header{
+    display: grid !important;
+    grid-template-columns: 1fr clamp(260px, 28vw, 420px);
+    grid-auto-rows: auto;
+    align-items: start;
+    column-gap: 12px;
+    row-gap: 8px;
+    margin-bottom: 6px;
+  }
+  #tab-personalizacion .aj-visual-block .aj-visual-title{ grid-column:1; grid-row:1; margin:0 !important; }
+  #tab-personalizacion .aj-visual-block .aj-visual-header .aj-top-right{ grid-column:2; grid-row:1; }
+  #tab-personalizacion .aj-visual-block .aj-style-buttons-top{ grid-column:1; grid-row:2; align-self:start; }
+  #tab-personalizacion .aj-visual-block .aj-visual-header #zonesOpenCard{ grid-column:2; grid-row:2; width:100%; margin-top:0; }
+
+  /* 3) Si quedara la fila antigua debajo, reducir márgenes o esconderla si queda vacía */
+  #tab-personalizacion .aj-visual-block .aj-visual-row{ margin-top: 0 !important; }
+  #tab-personalizacion .aj-visual-block .aj-visual-row:empty{ display:none; }
+
+  /* Responsive: una sola columna en móviles */
+  @media (max-width: 780px){
+    #tab-personalizacion .aj-visual-block .aj-visual-header{
+      grid-template-columns: 1fr;
+    }
+    #tab-personalizacion .aj-visual-block .aj-visual-header .aj-top-right,
+    #tab-personalizacion .aj-visual-block .aj-visual-header #zonesOpenCard,
+    #tab-personalizacion .aj-visual-block .aj-style-buttons-top{
+      grid-column: 1;
+    }
+  }
+</style>
+
+
+<style id="aj-zones-button-red-2025-09-13">
+  /* Botón principal dentro de la tarjeta de brillo y opacidad */
+  #zonesOpenCard #openZonesFloat{
+    background: #d32020 !important;
+    color: #fff !important;
+    border-color: #a51515 !important;
+  }
+  #zonesOpenCard #openZonesFloat:hover{
+    background: #b81c1c !important;
+    border-color: #901313 !important;
+  }
+  #zonesOpenCard #openZonesFloat:active{
+    background: #981616 !important;
+    border-color: #7a1010 !important;
+  }
+  /* Por si en algún tema el texto del botón cambia de color */
+  #zonesOpenCard #openZonesFloat *{ color: inherit !important; }
+</style>
+
+
+<style id="aj-zones-button-black-pulse-2025-09-13">
+  /* Botón en negro con efecto de latido y leve desplazamiento a la derecha */
+  #zonesOpenCard #openZonesFloat{
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+    position: relative;
+    left: 8px;                 /* "un poquito" a la derecha */
+    animation: aj-heartbeat 1.4s ease-in-out infinite;
+    transform-origin: center;
+  }
+  #zonesOpenCard #openZonesFloat:hover{
+    filter: brightness(1.05);
+  }
+  @media (prefers-reduced-motion: reduce){
+    #zonesOpenCard #openZonesFloat{ animation: none; }
+  }
+  @keyframes aj-heartbeat{
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,0,0,.25); }
+    20%  { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(0,0,0,0); }
+    40%  { transform: scale(1.00); box-shadow: 0 0 0 0 rgba(0,0,0,.20); }
+    60%  { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(0,0,0,0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,0,0,.20); }
+  }
+</style>
+
+
+<style id="aj-zones-button-stronger-pulse-legend-center-2025-09-13">
+  /* Heartbeat: más marcado y un poco más rápido */
+  #zonesOpenCard #openZonesFloat{
+    animation: aj-heartbeat-strong 1.1s ease-in-out infinite !important;
+  }
+  @media (prefers-reduced-motion: reduce){
+    #zonesOpenCard #openZonesFloat{ animation: none !important; }
+  }
+  @keyframes aj-heartbeat-strong{
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,0,0,.35); }
+    16%  { transform: scale(1.12); box-shadow: 0 0 0 12px rgba(0,0,0,0); }
+    40%  { transform: scale(1.00); box-shadow: 0 0 0 0 rgba(0,0,0,.30); }
+    60%  { transform: scale(1.12); box-shadow: 0 0 0 12px rgba(0,0,0,0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(0,0,0,.30); }
+  }
+
+  /* Preparar la leyenda para centrado preciso del primer chip */
+  #zonesOpenCard .zones-legend{
+    position: relative;
+    display: block; /* evitamos distribución automática del flex anterior */
+    min-height: 28px; /* altura base para posicionar chips */
+  }
+  #zonesOpenCard .zones-legend .legend-chip{
+    position: absolute; top: 0;
+  }
+  /* Accesibilidad: evitar overlap de clicks sobre el contenedor */
+  #zonesOpenCard .zones-legend{ pointer-events: none; }
+  #zonesOpenCard .zones-legend .legend-chip{ pointer-events: auto; }
+</style>
+
 </head><body><div class="frame" data-fullscreen-root="" id="fsRoot"><div class="shell"><div aria-label="Barra superior" class="bar" id="topBar"><div class="mode-group" id="modeGroup"><button aria-expanded="false" aria-haspopup="true" class="btn" id="btnMode" type="button">Modo de juego</button><span aria-live="polite" class="mode-indicator" id="modeIndicator">Player vs player (local)</span></div><div aria-live="polite" class="bot-hud" id="botHUD" role="status"><div class="bot-hud-inner"><span id="botHUDText"></span></div></div><div aria-label="Elegir modo de juego" class="dropdown" id="modeDropdown" role="menu"><button class="btn dd-item" data-label="Versus Bot" data-mode="bot" style="position:static;" type="button">Player Vs Bot</button><button class="btn dd-item" data-label="Player vs player (local)" data-mode="pvp-local" style="position:static;" type="button">Player vs player (local)</button><button class="btn dd-item" data-label="Bot versus bot (demo)" data-mode="bot-vs-bot" style="position:static;" type="button">Bot versus bot (demo)</button><button class="btn dd-item" data-label="Modo Online" data-mode="online" style="position:static;" type="button">Modo Online</button></div></div><div style="height:var(--toolbar-gap)"></div><div class="board-wrap" id="boardWrap">
 <!-- Floating Replay FAB (centered over board) -->
 <div aria-label="Reproducir partida" id="rpFab" role="region" style="display:none">
@@ -10293,6 +10940,1185 @@ function showToast(){
   if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", init); } else { init(); }
 })();
 </script>
+
+<script id="aj-zones-float-js-2025-09-13">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function closeMenu(){
+    try{
+      var mp = $('#megaPanel'), bp = $('#panelBackdrop');
+      if(mp) mp.style.display = 'none';
+      if(bp) bp.style.display = 'none';
+      var btn = $('#btnMegaMenu'); if(btn) btn.setAttribute('aria-expanded', 'false');
+    }catch(_){}
+  }
+  function reopenMenuOnPersonal(){
+    try{
+      var bp=$('#panelBackdrop'), mp=$('#megaPanel');
+      if(bp) bp.style.display='flex';
+      if(mp) mp.style.display='flex';
+      var tbtn = document.querySelector('.mp-tabs .tab-btn[data-tab="tab-personalizacion"]');
+      if(tbtn) tbtn.click();
+    }catch(_){}
+  }
+
+  function ensureUI(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var group = $('#fg-zonas-appearance', tab);
+    if(!group) return;
+
+    // 1) Crear panel flotante si no existe
+    var zf = $('#zonesFloat');
+    if(!zf){
+      zf = document.createElement('div');
+      zf.id = 'zonesFloat';
+      zf.className = 'zf-top';
+      zf.innerHTML = [
+        '<div class="zf-header">',
+        '  <span>Brillo y opacidad del tablero</span>',
+        '  <div class="zf-right"><button class="btn small" id="zonesClose" type="button">✕</button></div>',
+        '</div>',
+        '<div class="zf-content" id="zonesContent"></div>'
+      ].join('');
+      document.body.appendChild(zf);
+    }
+
+    // 2) Crear tarjeta con botón + ilustración dentro del tab
+    var card = $('#zonesOpenCard', tab);
+    if(!card){
+      card = document.createElement('div');
+      card.id = 'zonesOpenCard';
+      card.innerHTML = [
+        '<div class="card-title"><span>Brillo y opacidad por zonas</span></div>',
+        '<p class="hint-sm">Presioná el botón para abrir los controles y ajustar el <strong>centro</strong> y los <strong>laterales</strong> a gusto.</p>',
+        '<button class="btn small" id="openZonesFloat" type="button">Personalizar brillo y opacidad del tablero</button>',
+        '<div class="zones-illustration"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 960 240\" width=\"100%\" height=\"auto\" aria-hidden=\"true\">\n  <!-- Lateral izquierdo -->\n  <rect x=\"0\" y=\"20\" width=\"240\" height=\"200\" fill=\"#cfd6e2\" opacity=\"0.65\" />\n  <!-- Centro jugable -->\n  <rect x=\"240\" y=\"20\" width=\"480\" height=\"200\" fill=\"#bcc7d8\" opacity=\"0.95\" />\n  <!-- Lateral derecho -->\n  <rect x=\"720\" y=\"20\" width=\"240\" height=\"200\" fill=\"#cfd6e2\" opacity=\"0.65\" />\n  <!-- Líneas del tablero simplificadas -->\n  <g stroke=\"#fff\" stroke-opacity=\"0.8\">\n    <!-- columnas centro (8) -->\n    <line x1=\"240.00\" y1=\"20\" x2=\"240.00\" y2=\"220\" />\n    <line x1=\"300.00\" y1=\"20\" x2=\"300.00\" y2=\"220\" />\n    <line x1=\"360.00\" y1=\"20\" x2=\"360.00\" y2=\"220\" />\n    <line x1=\"420.00\" y1=\"20\" x2=\"420.00\" y2=\"220\" />\n    <line x1=\"480.00\" y1=\"20\" x2=\"480.00\" y2=\"220\" />\n    <line x1=\"540.00\" y1=\"20\" x2=\"540.00\" y2=\"220\" />\n    <line x1=\"600.00\" y1=\"20\" x2=\"600.00\" y2=\"220\" />\n    <line x1=\"660.00\" y1=\"20\" x2=\"660.00\" y2=\"220\" />\n    <line x1=\"720.00\" y1=\"20\" x2=\"720.00\" y2=\"220\" />\n  </g>\n  <g stroke=\"#fff\" stroke-opacity=\"0.8\">\n    <!-- filas (8) -->\n    <line x1=\"240\" y1=\"20.00\" x2=\"720\" y2=\"20.00\" />\n    <line x1=\"240\" y1=\"45.00\" x2=\"720\" y2=\"45.00\" />\n    <line x1=\"240\" y1=\"70.00\" x2=\"720\" y2=\"70.00\" />\n    <line x1=\"240\" y1=\"95.00\" x2=\"720\" y2=\"95.00\" />\n    <line x1=\"240\" y1=\"120.00\" x2=\"720\" y2=\"120.00\" />\n    <line x1=\"240\" y1=\"145.00\" x2=\"720\" y2=\"145.00\" />\n    <line x1=\"240\" y1=\"170.00\" x2=\"720\" y2=\"170.00\" />\n    <line x1=\"240\" y1=\"195.00\" x2=\"720\" y2=\"195.00\" />\n    <line x1=\"240\" y1=\"220.00\" x2=\"720\" y2=\"220.00\" />\n  </g>\n  <!-- Etiquetas -->\n  <text x=\"480\" y=\"18\" fill=\"#333\" font-weight=\"700\" text-anchor=\"middle\" font-size=\"14\">Centro jugable (8×8)</text>\n  <text x=\"120\" y=\"230\" fill=\"#333\" font-size=\"12\" text-anchor=\"middle\">Lateral</text>\n  <text x=\"840\" y=\"230\" fill=\"#333\" font-size=\"12\" text-anchor=\"middle\">Lateral</text>\n</svg></div>',
+        '<div class="zones-legend">',
+        '  <span class="legend-chip"><span class="legend-swatch" style="background:#bcc7d8;"></span> Centro jugable</span>',
+        '  <span class="legend-chip"><span class="legend-swatch" style="background:#cfd6e2;"></span> Laterales</span>',
+        '</div>'
+      ].join('');
+      // Insertar antes del grupo original
+      if(group.parentNode) group.parentNode.insertBefore(card, group);
+    }
+
+    // 3) Mover el grupo de sliders al panel flotante
+    var zc = $('#zonesContent');
+    if(zc && group && group.parentNode !== zc){
+      zc.appendChild(group);
+      group.style.marginTop = '6px';
+    }
+
+    // 4) Wire handlers
+    var openBtn = $('#openZonesFloat', tab);
+    var closeBtn = $('#zonesClose');
+    if(openBtn && !openBtn.__wired){
+      openBtn.__wired = true;
+      openBtn.addEventListener('click', function(){
+        var zf = $('#zonesFloat');
+        if(zf) zf.style.display = 'block';
+        closeMenu(); // cerrar menú para ver el tablero
+      });
+    }
+    if(closeBtn && !closeBtn.__wired){
+      closeBtn.__wired = true;
+      closeBtn.addEventListener('click', function(){
+        var zf = $('#zonesFloat');
+        if(zf) zf.style.display = 'none';
+        reopenMenuOnPersonal(); // reabrir menú en Personalización
+      });
+    }
+  }
+
+  // Ejecutar cuando el DOM esté listo
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ensureUI);
+  }else{
+    ensureUI();
+  }
+})();
+</script>
+
+
+<script id="aj-zones-float-js-2025-09-13-override-layout">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function addResetButton(){
+    var right = $('#zonesFloat .zf-right');
+    if(!right) return;
+    if(!$('#zonesReset')){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'zonesReset';
+      btn.className = 'btn small';
+      btn.textContent = 'Restablecer';
+      // Insertar antes de la cruz
+      var closeBtn = $('#zonesClose', right);
+      if(closeBtn){
+        right.insertBefore(btn, closeBtn);
+      }else{
+        right.appendChild(btn);
+      }
+      btn.addEventListener('click', function(){
+        var group = $('#fg-zonas-appearance');
+        if(!group) return;
+        // Restaurar cada slider a su valor por defecto del HTML
+        $all('input[type="range"]', group).forEach(function(inp){
+          if(typeof inp.defaultValue !== 'undefined'){
+            inp.value = inp.defaultValue;
+          }else if(inp.hasAttribute('value')){
+            inp.value = inp.getAttribute('value');
+          }
+          // Disparar eventos para refrescar vistas
+          inp.dispatchEvent(new Event('input', {bubbles:true}));
+          inp.dispatchEvent(new Event('change', {bubbles:true}));
+        });
+      });
+    }
+  }
+
+  function markFields(){
+    var group = $('#fg-zonas-appearance');
+    if(!group) return;
+    // Etiquetar hijos para estilos (por si el layout requiere targets)
+    Array.from(group.children).forEach(function(ch){
+      if(!ch.classList.contains('zf-field')) ch.classList.add('zf-field');
+    });
+  }
+
+  function init(){
+    addResetButton();
+    markFields();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  }else{
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-zones-float-js-2025-09-13-clean-dup-title">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function removeAppearanceTitle(){
+    var group = $('#fg-zonas-appearance');
+    if(!group) return;
+    // Busca candidatos de títulos dentro del grupo y remueve los que contengan "apariencia" y "zonas"
+    var candidates = $all('h1,h2,h3,h4,h5,h6,label,legend,div,span,p', group);
+    candidates.forEach(function(n){
+      var t = (n.textContent || '').toLowerCase().trim();
+      if(t && t.includes('apariencia') && t.includes('zona')){
+        n.remove();
+      }
+    });
+  }
+
+  function dedupeReset(){
+    var headerRight = $('#zonesFloat .zf-right');
+    if(!headerRight) return;
+    var headerReset = $('#zonesReset', headerRight);
+
+    // 1) Si no existe en header, intenta mover alguno ahí
+    if(!headerReset){
+      // Busca algún botón que diga Restablecer en todo el doc
+      var candidate = $all('button, .btn').find(function(b){
+        var t = (b.textContent || '').trim().toLowerCase();
+        return t.startsWith('restablecer');
+      });
+      if(candidate){
+        candidate.id = 'zonesReset';
+        headerRight.insertBefore(candidate, $('#zonesClose', headerRight) || null);
+        headerReset = candidate;
+      }
+    }
+
+    // 2) Eliminar duplicados fuera del header
+    $all('#zonesReset').forEach(function(node){
+      if(node !== headerReset){
+        node.remove();
+      }
+    });
+    // También cualquier botón con el texto "Restablecer" que no esté en headerRight
+    $all('button, .btn').forEach(function(b){
+      var t = (b.textContent || '').trim().toLowerCase();
+      if(t.startsWith('restablecer') && b.closest('.zf-right') == null){
+        if(b !== headerReset) b.remove();
+      }
+    });
+  }
+
+  function init(){
+    removeAppearanceTitle();
+    dedupeReset();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  }else{
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-zones-float-js-2025-09-13-fs-support">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function movePanelTo(el){
+    var zf = $('#zonesFloat');
+    if(!zf || !el) return;
+    if(zf.parentNode !== el){
+      el.appendChild(zf);
+    }
+  }
+  function movePanelToBody(){
+    var zf = $('#zonesFloat');
+    if(!zf || zf.parentNode === document.body) return;
+    document.body.appendChild(zf);
+  }
+  function onFSChange(){
+    var fs = document.fullscreenElement || document.webkitFullscreenElement || null;
+    if(fs){
+      // Llevar el panel adentro del elemento en fullscreen
+      movePanelTo(fs);
+    }else{
+      // De vuelta al body al salir
+      movePanelToBody();
+    }
+  }
+  document.addEventListener('fullscreenchange', onFSChange);
+  document.addEventListener('webkitfullscreenchange', onFSChange);
+  // Si la página ya está en FS cuando cargamos (raro pero posible)
+  if(document.fullscreenElement || document.webkitFullscreenElement){
+    onFSChange();
+  }
+})();
+</script>
+
+
+<script id="aj-zones-float-js-2025-09-13-fs-flex-anchor">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+
+  function ensureFSAnchor(fsEl){
+    if(!fsEl) return null;
+    var anchor = $('#zonesFSAnchor', fsEl);
+    if(!anchor){
+      anchor = document.createElement('div');
+      anchor.id = 'zonesFSAnchor';
+      fsEl.appendChild(anchor);
+    }
+    return anchor;
+  }
+
+  function movePanelToAnchor(fsEl){
+    var zf = $('#zonesFloat');
+    if(!zf || !fsEl) return;
+    var anchor = ensureFSAnchor(fsEl);
+    if(anchor && zf.parentNode !== anchor){
+      anchor.appendChild(zf);
+    }
+  }
+
+  function resetPanelToBody(){
+    var zf = $('#zonesFloat');
+    if(!zf) return;
+    if(zf.parentNode && zf.parentNode.id === 'zonesFSAnchor'){
+      zf.parentNode.remove(); // quita el wrapper
+    }
+    if(zf.parentNode !== document.body){
+      document.body.appendChild(zf);
+    }
+  }
+
+  function onFSChange(){
+    var fs = document.fullscreenElement || document.webkitFullscreenElement || null;
+    if(fs){
+      movePanelToAnchor(fs);
+    }else{
+      resetPanelToBody();
+    }
+  }
+
+  document.addEventListener('fullscreenchange', onFSChange);
+  document.addEventListener('webkitfullscreenchange', onFSChange);
+
+  // si ya está en FS al cargar
+  if(document.fullscreenElement || document.webkitFullscreenElement){
+    onFSChange();
+  }
+})();
+</script>
+
+
+<script id="aj-piece-style-width-80-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+  function findPieceStyleSelect(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    // 1) Buscamos por label con el texto "Estilo de piezas"
+    var labels = $all('label', tab);
+    for(var i=0;i<labels.length;i++){
+      var t = (labels[i].textContent||'').trim().toLowerCase();
+      if(t.includes('estilo') && t.includes('pieza')){
+        var id = labels[i].getAttribute('for');
+        if(id){
+          var sel = $('#'+CSS.escape(id));
+          if(sel && sel.tagName === 'SELECT') return sel;
+        }
+        // Alternativa: siguiente select hermano
+        var sib = labels[i].nextElementSibling;
+        while(sib && sib !== tab){
+          if(sib.tagName === 'SELECT') return sib;
+          sib = sib.nextElementSibling;
+        }
+      }
+    }
+    // 2) Fallback: primer SELECT del tab que luzca como estilo de piezas
+    var candidates = $all('select', tab);
+    if(candidates.length) return candidates[0];
+    return null;
+  }
+
+  function applyWidth(){
+    var sel = findPieceStyleSelect();
+    if(!sel) return;
+    sel.classList.add('aj-piece-style-select');
+    // Si tiene ancho fijo inline, lo reemplazamos
+    sel.style.maxWidth = 'none';
+    sel.style.width = '80%';
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', applyWidth);
+  } else {
+    applyWidth();
+  }
+})();
+</script>
+
+
+<script id="aj-topbar-visual-styles-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findHeading(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    var hs = $all('h1,h2,h3', tab);
+    for(var i=0;i<hs.length;i++){
+      var t = (hs[i].textContent||'').trim().toLowerCase();
+      if(t.includes('personalización') && t.includes('juego')) return hs[i];
+      if(t.includes('personalizacion') && t.includes('juego')) return hs[i];
+    }
+    return null;
+  }
+
+  function findVisualButtons(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    // Ubicar bloque de "Estilo visual"
+    var candidates = $all('*', tab);
+    var block = null;
+    for(var i=0;i<candidates.length;i++){
+      var n = candidates[i];
+      var txt = (n.textContent||'').toLowerCase();
+      if(txt.includes('estilo visual')){ block = n; break; }
+    }
+    if(!block) return null;
+
+    // Buscar contenedor con botones Día/Noche/etc.
+    var buttons = $all('button', block).filter(function(b){
+      var t = (b.textContent||'').trim().toLowerCase();
+      return ['día','dia','noche','madera','arena','pizarra','oliva'].includes(t);
+    });
+    if(!buttons.length) return null;
+
+    // Elegir un contenedor común para mover (el de mayor profundidad en común)
+    var parent = buttons[0].parentElement;
+    function containsAll(p){
+      return buttons.every(function(b){ return p && p.contains(b); });
+    }
+    while(parent && !containsAll(parent)){ parent = parent.parentElement; }
+    // Ocultar descripciones si existen
+    $all('p, .hint-sm, .desc', block).forEach(function(el){ el.classList.add('aj-visual-desc-hidden'); });
+    return parent || null;
+  }
+
+  function setupTopbar(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var heading = findHeading();
+    var btnWrap = findVisualButtons();
+    if(!heading || !btnWrap) return;
+
+    // Crear topbar si no existe
+    var topbar = $('.aj-topbar', tab);
+    if(!topbar){
+      topbar = document.createElement('div');
+      topbar.className = 'aj-topbar';
+      heading.parentNode.insertBefore(topbar, heading);
+      // meter dentro el título
+      var titleWrap = document.createElement('div');
+      titleWrap.className = 'aj-top-title';
+      heading.parentNode.removeChild(heading);
+      titleWrap.appendChild(heading);
+      topbar.appendChild(titleWrap);
+    }
+    // Crear contenedor para botonera arriba a la derecha
+    var right = $('.aj-style-buttons-top', topbar);
+    if(!right){
+      right = document.createElement('div');
+      right.className = 'aj-style-buttons-top';
+      topbar.appendChild(right);
+    }
+    // Mover la botonera original aquí
+    if(btnWrap && btnWrap.parentNode !== right){
+      right.appendChild(btnWrap);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', setupTopbar);
+  } else {
+    setupTopbar();
+  }
+})();
+</script>
+
+
+<script id="aj-piece-below-visual-js-2025-09-13">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findPieceLabelAndSelect(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    var labels = $all('label', tab);
+    for(var i=0;i<labels.length;i++){
+      var t = (labels[i].textContent||'').trim().toLowerCase();
+      if(t.includes('estilo') && t.includes('pieza')){
+        var sel = null;
+        var id = labels[i].getAttribute('for');
+        if(id){
+          sel = $('#'+CSS.escape(id), tab);
+        }
+        if(!sel){
+          // buscar el primer SELECT cercano
+          var nxt = labels[i].nextElementSibling;
+          while(nxt && nxt !== tab){
+            if(nxt.tagName === 'SELECT'){ sel = nxt; break; }
+            nxt = nxt.nextElementSibling;
+          }
+        }
+        if(sel && sel.tagName === 'SELECT'){
+          return {label: labels[i], select: sel};
+        }
+      }
+    }
+    // fallback: primer select del tab
+    var s = $('select', tab);
+    if(s){
+      // crear un label si no existe
+      var l = document.createElement('label');
+      l.textContent = 'Estilo de piezas';
+      return {label: l, select: s};
+    }
+    return null;
+  }
+
+  function moveBelowVisual(){
+    var tab = $('#tab-personalizacion');
+    var topbar = $('.aj-topbar', tab);
+    var styleButtons = $('.aj-style-buttons-top', topbar || tab);
+    if(!styleButtons) return;
+
+    var found = findPieceLabelAndSelect();
+    if(!found) return;
+
+    // Crear contenedor de fila bajo la botonera
+    var row = $('.aj-piece-row', tab);
+    if(!row){
+      row = document.createElement('div');
+      row.className = 'aj-piece-row';
+      // Insertar justo después del topbar para quedar debajo de la botonera
+      var ref = topbar || styleButtons;
+      ref.parentNode.insertBefore(row, ref.nextSibling);
+    }
+
+    // Mover label y select
+    if(found.label.parentNode !== row){
+      row.appendChild(found.label);
+    }
+    if(found.select.parentNode !== row){
+      row.appendChild(found.select);
+    }
+
+    // Clase para ancho solicitado
+    found.select.classList.add('aj-piece-style-select');
+    // Remover estilos inline que fijen ancho
+    found.select.style.width = '80%';
+    found.select.style.maxWidth = '640px';
+  }
+
+  function init(){
+    moveBelowVisual();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-piece-under-zones-js-2025-09-13">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findPieceLabelAndSelect(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    var labels = $all('label', tab);
+    for(var i=0;i<labels.length;i++){
+      var t = (labels[i].textContent||'').trim().toLowerCase();
+      if(t.includes('estilo') && t.includes('pieza')){
+        var sel = null;
+        var id = labels[i].getAttribute('for');
+        if(id){
+          sel = $('#'+CSS.escape(id), tab);
+        }
+        if(!sel){
+          // buscar el primer SELECT cercano
+          var nxt = labels[i].nextElementSibling;
+          while(nxt && nxt !== tab){
+            if(nxt.tagName === 'SELECT'){ sel = nxt; break; }
+            nxt = nxt.nextElementSibling;
+          }
+        }
+        if(sel && sel.tagName === 'SELECT'){
+          return {label: labels[i], select: sel};
+        }
+      }
+    }
+    // fallback: primer select del tab
+    var s = $('select', tab);
+    if(s){
+      // crear un label si no existe
+      var l = document.createElement('label');
+      l.textContent = 'Estilo de piezas';
+      return {label: l, select: s};
+    }
+    return null;
+  }
+
+  function moveBelowZones(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var zonesCard = $('#zonesOpenCard', tab);
+    if(!zonesCard){
+      // fallback: buscar por texto "Brillo y opacidad por zonas"
+      var blocks = $all('*', tab);
+      for(var i=0;i<blocks.length;i++){
+        var txt = (blocks[i].textContent||'').toLowerCase();
+        if(txt.includes('brillo y opacidad por zonas')){ zonesCard = blocks[i]; break; }
+      }
+    }
+    if(!zonesCard) return;
+
+    var found = findPieceLabelAndSelect();
+    if(!found) return;
+
+    // Crear/ubicar fila justo debajo de la tarjeta de zonas
+    var row = $('.aj-piece-row-under-zones', tab);
+    if(!row){
+      row = document.createElement('div');
+      row.className = 'aj-piece-row-under-zones';
+      // Insertar después de zonesCard
+      if(zonesCard.nextSibling){
+        zonesCard.parentNode.insertBefore(row, zonesCard.nextSibling);
+      }else{
+        zonesCard.parentNode.appendChild(row);
+      }
+    }else{
+      // si existía antes en otra ubicación, moverla debajo de zonesCard
+      if(row.previousElementSibling !== zonesCard){
+        if(zonesCard.nextSibling){
+          zonesCard.parentNode.insertBefore(row, zonesCard.nextSibling);
+        }else{
+          zonesCard.parentNode.appendChild(row);
+        }
+      }
+    }
+
+    // Mover label y select a la fila
+    if(found.label.parentNode !== row){
+      row.appendChild(found.label);
+    }
+    if(found.select.parentNode !== row){
+      row.appendChild(found.select);
+    }
+
+    // Estilos de ancho pedidos
+    found.select.classList.add('aj-piece-style-select');
+    found.select.style.width = '80%';
+    found.select.style.maxWidth = '640px';
+
+    // Si existe una fila vieja (aj-piece-row) vacía, eliminarla
+    var oldRow = $('.aj-piece-row');
+    if(oldRow && oldRow !== row){
+      if(oldRow.children.length === 0 || $all('*', oldRow).length === 0){
+        oldRow.remove();
+      }
+    }
+  }
+
+  function init(){ moveBelowZones(); }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-visual-buttons-relocate-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findExistingLabel(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    // Buscar un nodo que contenga "Estilo visual" (ignorando mayúsculas/acento)
+    var nodes = $all('h1,h2,h3,h4,h5,h6,label,div,span,p', tab);
+    for(var i=0;i<nodes.length;i++){
+      var t = (nodes[i].textContent||'').trim().toLowerCase();
+      if(t === 'estilo visual' || t.startsWith('estilo visual')){
+        return nodes[i];
+      }
+    }
+    return null;
+  }
+
+  function relocate(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var topbar = $('.aj-topbar', tab);
+    var btnWrap = $('.aj-style-buttons-top', tab);
+    if(!btnWrap) return;
+
+    // Crear bloque debajo del título
+    var block = $('.aj-visual-block', tab);
+    if(!block){
+      block = document.createElement('div');
+      block.className = 'aj-visual-block';
+      if(topbar && topbar.parentNode){
+        topbar.parentNode.insertBefore(block, topbar.nextSibling);
+      }else{
+        tab.insertBefore(block, tab.firstChild);
+      }
+    }
+
+    // Título: reutilizar el existente si lo encontramos; sino crear uno
+    var label = findExistingLabel();
+    if(label){
+      // Quitar ocultación si la tenía
+      label.classList.remove('aj-visual-desc-hidden');
+      // Si el label está después del botón o en un sitio distinto, muévelo arriba del bloque
+      if(label.parentNode !== block){
+        block.appendChild(label);
+      }
+      label.classList.add('aj-visual-title');
+    }else{
+      var h = document.createElement('div');
+      h.className = 'aj-visual-title';
+      h.textContent = 'Estilo visual';
+      block.appendChild(h);
+    }
+
+    // Mover la botonera debajo del título
+    if(btnWrap.parentNode !== block){
+      block.appendChild(btnWrap);
+    }
+
+    // Quitar la botonera del topbar para evitar duplicados visuales
+    if(topbar && topbar.contains(btnWrap)){
+      // nada extra: ya fue movida al block
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', relocate);
+  } else {
+    relocate();
+  }
+})();
+</script>
+
+
+<script id="aj-piece-top-right-js-2025-09-13">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function findHeading(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    var hs = $all('h1,h2,h3', tab);
+    for(var i=0;i<hs.length;i++){
+      var t = (hs[i].textContent||'').trim().toLowerCase();
+      if((t.includes('personalización') || t.includes('personalizacion')) && t.includes('juego')) return hs[i];
+    }
+    return null;
+  }
+
+  function ensureTopbar(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    var topbar = $('.aj-topbar', tab);
+    if(!topbar){
+      // crear topbar y mover el título adentro
+      topbar = document.createElement('div');
+      topbar.className = 'aj-topbar';
+      var heading = findHeading();
+      if(heading && heading.parentNode){
+        heading.parentNode.insertBefore(topbar, heading);
+        var titleWrap = document.createElement('div');
+        titleWrap.className = 'aj-top-title';
+        heading.parentNode.removeChild(heading);
+        titleWrap.appendChild(heading);
+        topbar.appendChild(titleWrap);
+      }else{
+        tab.insertBefore(topbar, tab.firstChild);
+      }
+    }
+    // Asegurar contenedor derecho
+    var right = $('.aj-top-right', topbar);
+    if(!right){
+      right = document.createElement('div');
+      right.className = 'aj-top-right';
+      topbar.appendChild(right);
+    }
+    return {topbar: topbar, right: right};
+  }
+
+  function findPieceLabelAndSelect(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return null;
+    var labels = $all('label', tab);
+    for(var i=0;i<labels.length;i++){
+      var t = (labels[i].textContent||'').trim().toLowerCase();
+      if(t.includes('estilo') && t.includes('pieza')){
+        var sel = null;
+        var id = labels[i].getAttribute('for');
+        if(id){ sel = $('#'+CSS.escape(id), tab); }
+        if(!sel){
+          var nxt = labels[i].nextElementSibling;
+          while(nxt && nxt !== tab){
+            if(nxt.tagName === 'SELECT'){ sel = nxt; break; }
+            nxt = nxt.nextElementSibling;
+          }
+        }
+        if(sel && sel.tagName === 'SELECT'){
+          return {label: labels[i], select: sel};
+        }
+      }
+    }
+    // fallback: primer select
+    var s = $('select', tab);
+    if(s){
+      var l = document.createElement('label');
+      l.textContent = 'Estilo de piezas';
+      return {label: l, select: s};
+    }
+    return null;
+  }
+
+  function movePieceSelectorTopRight(){
+    var slots = ensureTopbar();
+    if(!slots) return;
+    var right = slots.right;
+    var found = findPieceLabelAndSelect();
+    if(!found) return;
+
+    // Mover label + select al top-right
+    if(found.label.parentNode !== right){ right.appendChild(found.label); }
+    if(found.select.parentNode !== right){ right.appendChild(found.select); }
+
+    // Ajustar ancho para este layout
+    found.select.classList.add('aj-piece-style-select');
+    found.select.style.width = '100%';
+    found.select.style.maxWidth = 'none';
+
+    // Si existía la fila debajo de zonas, removerla si quedó vacía
+    var oldRow = $('#tab-personalizacion .aj-piece-row-under-zones');
+    if(oldRow){
+      // si no contiene nada más relevante, eliminar
+      if(oldRow.querySelectorAll('select, label').length <= 1){
+        oldRow.remove();
+      }
+    }
+  }
+
+  function init(){ movePieceSelectorTopRight(); }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-piece-align-with-visual-row-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function alignSelectorWithButtons(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var block = $('.aj-visual-block', tab);
+    var btnWrap = $('.aj-style-buttons-top', block || tab);
+    var topRight = $('.aj-top-right', tab);
+    if(!block || !btnWrap || !topRight) return;
+
+    // Crear la fila bajo el título si no existe
+    var row = $('.aj-visual-row', block);
+    if(!row){
+      row = document.createElement('div');
+      row.className = 'aj-visual-row';
+      // insertarla después del título dentro del bloque
+      var title = $('.aj-visual-title', block);
+      if(title && title.nextSibling){
+        block.insertBefore(row, title.nextSibling);
+      }else{
+        block.appendChild(row);
+      }
+    }
+
+    // Mover botones y selector a la misma fila
+    if(btnWrap.parentNode !== row) row.appendChild(btnWrap);
+    if(topRight.parentNode !== row) row.appendChild(topRight);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', alignSelectorWithButtons);
+  } else {
+    alignSelectorWithButtons();
+  }
+})();
+</script>
+
+
+<script id="aj-remove-title-and-verticalize-piece-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function ensurePieceLabelAboveSelect(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    // contenedor donde vive el selector
+    var host = $('.aj-top-right', tab) || $('#tab-personalizacion');
+    if(!host) return;
+
+    // detectar select de piezas
+    var sel = host.querySelector('select.aj-piece-style-select') || host.querySelector('select');
+    if(!sel) return;
+
+    // encontrar/crear label "Estilo de piezas"
+    var label = null;
+    // buscar label asociado por for= o textual
+    var labels = $all('label', tab);
+    for(var i=0;i<labels.length;i++){
+      var t = (labels[i].textContent||'').trim().toLowerCase();
+      if(t.includes('estilo') && t.includes('pieza')){ label = labels[i]; break; }
+    }
+    if(!label){
+      label = document.createElement('label');
+      label.textContent = 'Estilo de piezas';
+    }
+
+    // Si el label no está justo encima del select dentro del host, moverlo allí
+    if(label.parentNode !== host){
+      host.insertBefore(label, host.firstChild);
+    }else{
+      // si está después, reordenar
+      if(label.nextElementSibling !== sel){
+        host.insertBefore(label, host.firstChild);
+      }
+    }
+
+    // Deduplicar otros labels similares fuera del host
+    $all('label', tab).forEach(function(l){
+      if(l !== label){
+        var t = (l.textContent||'').trim().toLowerCase();
+        if(t.includes('estilo') && t.includes('pieza')){
+          // si no contiene directamente un control distinto, remover
+          if(!l.control || l.control === sel){
+            if(l.closest('.aj-top-right') == null){
+              l.remove();
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function moveTopRightIntoVisualRow(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var block = $('.aj-visual-block', tab);
+    var row = $('.aj-visual-row', block || tab);
+    var topRight = $('.aj-top-right', tab);
+    var btnWrap = $('.aj-style-buttons-top', block || tab);
+
+    // si no existe la fila, crearla debajo del título Estilo visual
+    if(block && !row){
+      row = document.createElement('div');
+      row.className = 'aj-visual-row';
+      var title = $('.aj-visual-title', block);
+      if(title && title.nextSibling){
+        block.insertBefore(row, title.nextSibling);
+      }else{
+        block.appendChild(row);
+      }
+    }
+
+    if(row && btnWrap && btnWrap.parentNode !== row) row.appendChild(btnWrap);
+    if(row && topRight && topRight.parentNode !== row) row.appendChild(topRight);
+  }
+
+  function removeTopbarNode(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var topbar = $('.aj-topbar', tab);
+    if(topbar){
+      topbar.remove();
+    }
+  }
+
+  function init(){
+    moveTopRightIntoVisualRow();
+    ensurePieceLabelAboveSelect();
+    removeTopbarNode();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-visual-header-align-pieces-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function ensureHeaderAndAlign(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var block = $('.aj-visual-block', tab);
+    if(!block) return;
+
+    var title = $('.aj-visual-title', block);
+    // Si por alguna razón no hay título, crearlo
+    if(!title){
+      title = document.createElement('div');
+      title.className = 'aj-visual-title';
+      title.textContent = 'Estilo visual';
+      block.insertBefore(title, block.firstChild);
+    }
+
+    var topRight = $('.aj-top-right', tab);
+    // Crear header contenedor si no está
+    var header = $('.aj-visual-header', block);
+    if(!header){
+      header = document.createElement('div');
+      header.className = 'aj-visual-header';
+      // Insertar al principio del bloque, antes de la fila de botones
+      var row = $('.aj-visual-row', block);
+      if(row){
+        block.insertBefore(header, row);
+      }else{
+        block.insertBefore(header, block.firstChild);
+      }
+    }
+
+    // Mover título y selector al header
+    if(title && title.parentNode !== header){ header.appendChild(title); }
+    if(topRight && topRight.parentNode !== header){ header.appendChild(topRight); }
+
+    // Asegurar que en topRight el label quede arriba del select
+    if(topRight){
+      var sel = topRight.querySelector('select.aj-piece-style-select') || topRight.querySelector('select');
+      var labels = $all('label', topRight);
+      var label = labels.find(function(l){ return (l.textContent||'').toLowerCase().includes('pieza'); });
+      if(!label){
+        label = document.createElement('label');
+        label.textContent = 'Estilo de piezas';
+      }
+      if(label.parentNode !== topRight){
+        topRight.insertBefore(label, topRight.firstChild);
+      }else if(label.nextElementSibling !== sel && sel){
+        topRight.insertBefore(label, topRight.firstChild);
+      }
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ensureHeaderAndAlign);
+  } else {
+    ensureHeaderAndAlign();
+  }
+})();
+</script>
+
+
+<script id="aj-zonescard-right-below-piece-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function relocateZonesCard(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var header = $('.aj-visual-header', tab);
+    var topRight = $('.aj-top-right', header || tab);
+    var card = $('#zonesOpenCard', tab);
+    if(header && topRight && card){
+      // Insertar la tarjeta justo después del contenedor del selector (en la misma cabecera)
+      if(card.parentNode !== header){
+        // Si la tarjeta tiene scripts/handlers, se mantienen al mover el nodo
+        // Insertar después de topRight
+        if(topRight.nextSibling){
+          header.insertBefore(card, topRight.nextSibling);
+        }else{
+          header.appendChild(card);
+        }
+      }
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', relocateZonesCard);
+  } else {
+    relocateZonesCard();
+  }
+})();
+</script>
+
+
+<script id="aj-visual-fix-zones-title-and-buttons-2025-09-13-js">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function moveButtonsIntoHeader(){
+    var tab = $('#tab-personalizacion');
+    if(!tab) return;
+    var header = $('.aj-visual-header', tab);
+    var btnWrap = $('.aj-style-buttons-top', tab);
+    if(header && btnWrap && btnWrap.parentNode !== header){
+      header.appendChild(btnWrap); // pasa los botones a la fila del header (izquierda)
+    }
+    // Si existe la fila vieja y queda vacía, ocultar
+    var row = $('.aj-visual-row', tab);
+    if(row && row.children.length === 0){
+      row.style.display = 'none';
+    }
+  }
+
+  function hideZonesCardTitle(){
+    var title = $('#zonesOpenCard .card-title');
+    if(title){
+      title.style.visibility = 'hidden';
+    }
+  }
+
+  function init(){
+    hideZonesCardTitle();
+    moveButtonsIntoHeader();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="aj-legend-center-script-2025-09-13">
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  function centerLegend(){
+    var card = $('#zonesOpenCard');
+    if(!card) return;
+    var legend = $('.zones-legend', card);
+    if(!legend) return;
+    var chips = $all('.legend-chip', legend);
+    if(chips.length < 2) return;
+    var c = chips[0]; // "Centro jugable"
+    var l = chips[1]; // "Laterales"
+
+    // Reset positions to measure natural sizes
+    [c,l].forEach(function(el){ el.style.left = 'auto'; el.style.right='auto'; el.style.transform='none'; });
+
+    // Ensure visibility to get width
+    var cw = c.getBoundingClientRect().width;
+    var lw = l.getBoundingClientRect().width;
+    var gap = 10; // separación visual entre chips
+
+    // Centro exacto para el chip "Centro jugable"
+    c.style.left = '50%';
+    c.style.transform = 'translateX(-50%)';
+
+    // Colocar "Laterales" a la derecha, pegado al primero con un gap
+    l.style.left = 'calc(50% + ' + (cw/2 + gap) + 'px)';
+
+    // Altura del contenedor basada en el chip más alto
+    var ch = Math.max(c.getBoundingClientRect().height, l.getBoundingClientRect().height);
+    legend.style.minHeight = (ch) + 'px';
+  }
+
+  function init(){
+    centerLegend();
+    // Recalcular en resize (cambia el ancho de chips por wrap/zoom)
+    window.addEventListener('resize', centerLegend);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
 </body>
 <!-- AJETREZ: Overlay de reproducción (bloqueo del tablero) v2 -->
 <style id="aj-replay-glass-css">
