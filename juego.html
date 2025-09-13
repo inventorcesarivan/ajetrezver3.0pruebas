@@ -12922,3 +12922,14 @@ function showToast(){
   }
 })();
 </script>
+
+
+<style id="aj-zones-float-css-2025-09-13-height-plus30">
+  /* Aumentar ~30% la altura del panel flotante de brillo/opacidad (solo altura) */
+  /* Basado en la regla previa que usaba: height = ((100vh - 6mm)/4) * 0.85 */
+  /* 0.85 * 1.30 = 0.27625 => ~27.625% del viewport disponible (restando 6mm) */
+  #zonesFloat.zf-top{
+    height: calc((100vh - 6mm) * 0.27625) !important;
+    max-height: calc((100vh - 6mm) * 0.27625) !important;
+  }
+</style>
